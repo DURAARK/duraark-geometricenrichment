@@ -1,0 +1,5 @@
+local
+microservice-e57metadata
+../
+../data
+../src
