@@ -8,7 +8,7 @@
 module.exports = {
 
 	attributes: {
-		originatingFile: {
+		homeDir: {
 			type: 'string',
 			required: true
 		},
@@ -16,10 +16,7 @@ module.exports = {
 		status: {
 			type: 'string',
 			required: false
-		},
-
-		metadata: {
-			required: false
 		}
+
 	}
 };
