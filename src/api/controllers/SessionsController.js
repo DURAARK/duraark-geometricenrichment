@@ -14,8 +14,6 @@ module.exports = {
         var tmp = uuid.v4(),
         homeDir = path.join('/tmp', tmp);
 
-        console.log('bind da');
-
         mkdirp(homeDir, function(err) {
             if (!err) {
                 console.log('Created session at path: ' + homeDir);
@@ -31,7 +29,7 @@ module.exports = {
                     record.save(function(err, saved_record) {
                         console.log('record: ' + JSON.stringify(saved_record, null, 4));
                         res.send(201, {
-                            sessions: [saved_record] // Wrap into 'sessions' key for Ember.js compatibility
+                            session: saved_record // Wrap into 'sessions' key for Ember.js compatibility
                         });
                     });
                 });

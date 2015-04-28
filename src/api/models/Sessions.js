@@ -15,8 +15,27 @@ module.exports = {
 
 		status: {
 			type: 'string',
+			required: true
+		},
+
+		geomodel: {
+			type: 'string',
+			required: false,
+		},
+
+		patches: {
+			type: 'array',
+			required: false
+		},
+
+		panorama_image: {
+			type: 'string',
+			required: false,
+		},
+
+		scanner_info: {
+			type: 'object',
 			required: false
 		}
-
 	}
 };
