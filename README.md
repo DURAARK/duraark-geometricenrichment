@@ -1,3 +1,5 @@
+[![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.io)
+
 # microservice-e57metadata
 
 This microservice provides an API for extracting metadata from e57 (pointcloud) files.

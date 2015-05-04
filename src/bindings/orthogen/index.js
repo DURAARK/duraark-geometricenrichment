@@ -15,6 +15,20 @@ var Orthogen = module.exports = function(session) {
 Orthogen.prototype.createOrthoImages = function() {
     console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(this.session, null, 4));
 
+    var arguments = ['--im', this.session.panoImage,
+        '--ig', this.session.config.poseInformation.proxyGeometry,
+        '--rot', this.session.config.poseInformation.rotationW, this.session.config.poseInformation.rotationX, this.session.config.poseInformation.rotationY, this.session.config.poseInformation.rotationZ,
+        '--trans', this.session.config.poseInformation.translationX, this.session.config.poseInformation.translationY, this.session.config.poseInformation.translationZ,
+        '--res', '1', // default: 1mm/pixel
+        // '--elevation', ...
+        '--scale', 'm', // default: 'm'
+        '--exgeom', '1',
+        '--exsphere', '1',
+        '--exquad', '1'
+    ];
+
+    console.log('arguments: ' + JSON.stringify(arguments, null, 4));
+
     // TODO: change to session directory here?
 
     // orthogen --im=pano.jpg 
@@ -66,6 +80,7 @@ Orthogen.prototype.createOrthoImages = function() {
     //         console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
     //     });
     // });
+
 
     this.session.status = 'finished';
     this.session.resultImages = [ // TODO
