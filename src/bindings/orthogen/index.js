@@ -30,6 +30,8 @@ Orthogen.prototype.createOrthoImages = function() {
     console.log('arguments: ' + JSON.stringify(arguments, null, 4));
 
     // TODO: change to session directory here?
+    var cwd = process.cwd();
+    process.chdir(this.session.homeDir);
 
     // orthogen --im=pano.jpg 
     // --ig=geometry.obj 
@@ -91,6 +93,15 @@ Orthogen.prototype.createOrthoImages = function() {
         path.join(this.session.homeDir, 'image004.jpg'),
         path.join(this.session.homeDir, 'image005.jpg')
     ];
+
+    for (var idx = 0; idx < this.session.resultImages.length; idx++) {
+        var img = this.session.resultImages[idx];
+        fs.openSync(img, 'w');
+    };
+
+    // Switch back to original working directory:
+    // FIXXME: what happens, if there is an error before and this line is not called?
+    process.chdir(cwd);
 
     this.session.save(function(err, record) {
         console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(this.session.resultImages, null, 4));
