@@ -18,7 +18,7 @@ module.exports = {
 			required: true
 		},
 
-		geomodel: {
+		geoModel: {
 			type: 'string',
 			required: false,
 		},
@@ -28,12 +28,12 @@ module.exports = {
 			required: false
 		},
 
-		panorama_image: {
+		panoramaImage: {
 			type: 'string',
 			required: false,
 		},
 
-		scanner_info: {
+		scannerInfo: {
 			type: 'object',
 			required: false
 		}

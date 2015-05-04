@@ -46,4 +46,5 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
+  'get /sessions/:id/geoModel': 'SessionsController.uploadGeoModel'
 };
