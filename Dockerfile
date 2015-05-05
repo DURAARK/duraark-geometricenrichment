@@ -23,10 +23,10 @@ RUN cp /orthogen/build/orthogen /usr/local/bin
 RUN orthogen --help
 
 # Pull in microservice (a SailsJS API) and install it:
-#COPY ./src /microservice
-#WORKDIR /microservice
-#RUN npm install
+COPY ./src /microservice
+WORKDIR /microservice
+RUN npm install
 
-#EXPOSE 5003
+EXPOSE 5010
 
-#CMD ["sails", "lift"]
+CMD ["sails", "lift"]

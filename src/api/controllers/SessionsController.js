@@ -16,22 +16,22 @@ module.exports = {
      *
      * @example POST http://localhost:5010/sessions
      * @input {
-     *   proxyGeometry: '/storage/myBuilding.obj',
-     *   panoImage: '/storage/myBuildingPano.jpg',
-     *   poseInformation: {
-     *       translationX: 3,
-     *       translationY: 5,
-     *       translationZ: 8,
-     *       rotationW: 1,
-     *       rotationX: 2,
-     *       rotationY: 3,
-     *       rotationZ: 4
-     *   },
-     *   clusteringOpts: {
-     *       normalDirection: true,
-     *       distanceClustering: true
-     *   }
-     * }
+     *  "proxyGeometry": "/storage/myBuilding.obj",
+      *  "panoImage": "/storage/myBuildingPano.jpg",
+      *  "poseInformation": {
+      *      "translationX": 3,
+      *      "translationY": 5,
+    *        "translationZ": 8,
+    *        "rotationW": 1,
+    *        "rotationX": 2,
+    *        "rotationY": 3,
+    *        "rotationZ": 4
+    *    },
+    *    "clusteringOpts": {
+    *        "normalDirection": true,
+    *        "distanceClustering": true
+    *    }
+      }
      */
     create: function(req, res, next) {
         var tmp = uuid.v4(),
@@ -46,6 +46,7 @@ module.exports = {
 
                 var sessionInfo = {
                     homeDir: homeDir,
+                    config: config,
                     status: 'created'
                 };
 
@@ -53,13 +54,12 @@ module.exports = {
                     if (err) return next(err);
 
                     session.status = 'pending';
-                    session.config = config;
 
                     session.save(function(err, saved_record) {
                         console.log('session: ' + JSON.stringify(saved_record, null, 4));
 
                         // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
-                        var orthogen = new Orthogen(saved_record);
+                        var orthogen = new Orthogen(session);
                         orthogen.createOrthoImages();
 
                         // FIXXME: delegate to Orthogen executable!

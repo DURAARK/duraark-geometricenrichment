@@ -13,29 +13,34 @@ module.exports = {
 			required: true
 		},
 
-		status: {
-			type: 'string',
-			required: true
-		},
-
-		geoModel: {
-			type: 'string',
-			required: false,
-		},
-
-		patches: {
-			type: 'array',
-			required: false
-		},
-
-		panoramaImage: {
-			type: 'string',
-			required: false,
-		},
-
-		scannerInfo: {
+		config: {
 			type: 'object',
 			required: false
-		}
+		},
+
+		// status: {
+		// 	type: 'string',
+		// 	required: true
+		// },
+		//
+		// geoModel: {
+		// 	type: 'string',
+		// 	required: false,
+		// },
+		//
+		// patches: {
+		// 	type: 'array',
+		// 	required: false
+		// },
+		//
+		// panoramaImage: {
+		// 	type: 'string',
+		// 	required: false,
+		// },
+		//
+		// scannerInfo: {
+		// 	type: 'object',
+		// 	required: false
+		// }
 	}
 };

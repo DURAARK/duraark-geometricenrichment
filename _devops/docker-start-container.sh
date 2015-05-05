@@ -1,9 +1,11 @@
 #!/bin/sh
 
 NAMESPACE="local"
-CONTAINERNAME=$(cat ./service-info.txt)
+CONTAINERNAME="microservice-orthogen"
 IMAGENAME=$NAMESPACE/$CONTAINERNAME
-DEFAULTPORT=1337
+DEFAULTPORT=5010
+
+echo $IMAGENAME
 
 HOSTPORT=$1
 
@@ -18,4 +20,5 @@ echo "Removing "
 docker rm -f $CONTAINERNAME
 
 echo "\nStarted as "
-docker run -d -p $HOSTPORT:1337 --name $CONTAINERNAME --volumes-from microservice-files --link microservice-files:files --link microservice-ifcmetadata:ifcmetadata --link microservice-e57metadata:e57metadata $IMAGENAME
+#docker run -d -p $HOSTPORT:$DEFAULTPORT --name $CONTAINERNAME --volumes-from microservice-files --link microservice-files:files --link microservice-ifcmetadata:ifcmetadata --link microservice-e57metadata:e57metadata $IMAGENAME
+docker run -d -p $HOSTPORT:$DEFAULTPORT --name $CONTAINERNAME $IMAGENAME
