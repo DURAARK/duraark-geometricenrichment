@@ -43,7 +43,9 @@ Orthogen.prototype.createOrthoImages = function() {
     // --exgeom 1
     // --exsphere 1
     // --exquad 1
-    var executable = spawn('orthogen', ['--im', this.session.panoImage,
+
+    var executable = spawn(__dirname + '\\..\\..\\..\\app\\orthogen', [
+        '--im', this.session.panoImage,
         '--ig', this.session.config.proxyGeometry,
         '--rot', this.session.config.poseInformation.rotationW, this.session.config.poseInformation.rotationX, this.session.config.poseInformation.rotationY, this.session.config.poseInformation.rotationZ,
         '--trans', this.session.config.poseInformation.translationX, this.session.config.poseInformation.translationY, this.session.config.poseInformation.translationZ,

@@ -10,33 +10,76 @@ var Orthogen = require('../../bindings/orthogen/index'),
     path = require('path'),
     mkdirp = require('mkdirp');
 
+var savePath = '/tmp'
+
+
 module.exports = {
+    /**
+     * Uploades a new geometry file into the session container
+     *
+     * @example POST http://localhost:5010/uploadGeometry/
+     * Upload must be form-data
+     * session: SessionId
+     * file: <local file>
+     * 
+     * IMPORTANT: session must be before file in order for sails to extract the ID.
+     */
+      uploadGeometry: function (req, res, next) {
+
+        var config = req.body;
+        homeDir = path.join(savePath, config.session);
+
+        console.log('HomeDir: ' + homeDir);
+
+
+        res.setTimeout(0);
+
+        req.file('file').upload({
+          dirname: path.resolve(sails.config.appPath, homeDir)
+        },function (err, uploadedFiles) {
+          if (err) return res.negotiate(err);
+
+          return res.json({
+            files: uploadedFiles,
+            message: 'File uploaded successfully!'            
+          });
+        });
+      },
+
+      uploadPanoramas: function (req, res, next) {
+
+        var config = req.body;
+        homeDir = path.join(savePath, config.session);
+
+        console.log('HomeDir: ' + homeDir);
+
+
+        res.setTimeout(0);
+
+        req.file('file').upload({
+          dirname: path.resolve(sails.config.appPath, homeDir)
+        },function (err, uploadedFiles) {
+          if (err) return res.negotiate(err);
+
+          return res.json({
+            files: uploadedFiles,
+            message: 'File uploaded successfully!'            
+          });
+        });
+      },
+
+
     /**
      * Creates a new session.
      *
-     * @example POST http://localhost:5010/sessions
-     * @input {
-     *  "proxyGeometry": "/storage/myBuilding.obj",
-      *  "panoImage": "/storage/myBuildingPano.jpg",
-      *  "poseInformation": {
-      *      "translationX": 3,
-      *      "translationY": 5,
-    *        "translationZ": 8,
-    *        "rotationW": 1,
-    *        "rotationX": 2,
-    *        "rotationY": 3,
-    *        "rotationZ": 4
-    *    },
-    *    "clusteringOpts": {
-    *        "normalDirection": true,
-    *        "distanceClustering": true
-    *    }
-      }
+     * Returns the SessionUUID which should be used for uploading uploadGeometry and uploadPanoramas
+     * @example POST http://localhost:5010/sessions/createSession
      */
-    create: function(req, res, next) {
+
+    createSession: function(req, res, next) {
         var tmp = uuid.v4(),
-            homeDir = path.join('/tmp', tmp),
-            config = req.body;
+            homeDir = path.join(savePath, tmp),
+            config = req.body; 
 
         console.log('configuration: ' + JSON.stringify(config, null, 4));
 
@@ -58,9 +101,6 @@ module.exports = {
                     session.save(function(err, saved_record) {
                         console.log('session: ' + JSON.stringify(saved_record, null, 4));
 
-                        // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
-                        var orthogen = new Orthogen(session);
-                        orthogen.createOrthoImages();
 
                         // FIXXME: delegate to Orthogen executable!
                         res.send(201, {
@@ -103,6 +143,42 @@ module.exports = {
         //                 });
         //             }
         //         });
+
+    },
+    /**
+     * Starts the Orthogen creation.
+     *
+     * @example POST http://localhost:5010/sessions
+
+         * @input {
+    * "session": "uuid"
+     *  "proxyGeometry": "/storage/myBuilding.obj",
+      *  "panoImage": "/storage/myBuildingPano.jpg",
+      *  "poseInformation": {
+      *      "translationX": 3,
+      *      "translationY": 5,
+    *        "translationZ": 8,
+    *        "rotationW": 1,
+    *        "rotationX": 2,
+    *        "rotationY": 3,
+    *        "rotationZ": 4
+    *    },
+    *    "clusteringOpts": {
+    *        "normalDirection": true,
+    *        "distanceClustering": true
+    *    } 
+      } 
+     */
+
+    start: function(req, res, next) {
+        homeDir = path.join(savePath, tmp),
+        config = req.body;
+
+        console.log('configuration: ' + JSON.stringify(config, null, 4));
+
+        // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
+        var orthogen = new Orthogen(session);
+        orthogen.createOrthoImages();
 
     }
 }
