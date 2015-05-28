@@ -11,6 +11,7 @@
 
 module.exports.http = {
 
+
   /****************************************************************************
   *                                                                           *
   * Express middleware to use for every Sails request. To add custom          *
@@ -21,7 +22,7 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-  // middleware: {
+   //middleware: {
 
   /***************************************************************************
   *                                                                          *
@@ -53,11 +54,16 @@ module.exports.http = {
   * Example custom middleware; logs each request to the console.              *
   *                                                                           *
   ****************************************************************************/
-
     // myRequestLogger: function (req, res, next) {
     //     console.log("Requested :: ", req.method, req.url);
     //     return next();
     // }
+    //tmp/0e275b45-2258-4abd-ba5b-70c8418b3b37/ortho_0.jpg
+
+  customMiddleware: function (app) {
+    var express = require('sails/node_modules/express');
+      app.use('/public', express.static('/tmp'));
+    }
 
 
   /***************************************************************************
@@ -85,3 +91,12 @@ module.exports.http = {
 
   // cache: 31557600000
 };
+/*
+var express = require('sails/node_modules/express');
+module.exports.express = {
+  customMiddleware: function (app) {
+      console.log('foo');
+      app.use('/public', express.static('/tmp'));
+    }
+};
+*/

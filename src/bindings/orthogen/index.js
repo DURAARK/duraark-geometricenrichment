@@ -16,9 +16,9 @@ var Orthogen = module.exports = function(session) {
 Orthogen.prototype.createOrthoImages = function(cb) {
 
 
-    this.session.status = 'working';
+    this.session.status = 'pending';
 
-    //console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(this.session, null, 4));
+    console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(this.session, null, 4));
 
     var arguments = ['--im', this.session.config.panoImage,
         '--ig', this.session.config.proxyGeometry,
@@ -50,7 +50,7 @@ Orthogen.prototype.createOrthoImages = function(cb) {
     // --exsphere 1
     // --exquad 1
 
-    var executable = spawn(__dirname + '\\..\\..\\..\\app\\orthogen', arguments);
+    var executable = spawn(path.join(__dirname, '../../../app/orthogen'), arguments);
 
     executable.stdout.on('data', function(data) {
         console.log(data.toString());
@@ -75,7 +75,18 @@ Orthogen.prototype.createOrthoImages = function(cb) {
 
             console.log('[Orthogen-finished] Read directory and return result ' + JSON.stringify(files));
 
-            this.session.resultImages = files;
+
+            this.session.resultImages = [];
+
+            for (key in files) {
+                var fileResult = {
+                        file : files[key],
+                        //TODO: don't like this style alternatives?
+                        link : sails.getBaseurl() + '/public/' + this.session.sessionId + '/' + files[key]
+                    };
+                    this.session.resultImages.push(fileResult);
+
+            }
             cb();
         }.bind(this));
 

@@ -164,9 +164,10 @@ module.exports = {
     startOrthogen: function(req, res, next) {
         var config = req.body; 
         var homeDir = path.join(savePath, config.session);
-
-
+        var sessionId = config.session;
+       
         var session = {
+            sessionId : sessionId,
             homeDir : homeDir,
             config : {
                 proxyGeometry : path.join(homeDir, config.proxyGeometry),
@@ -176,21 +177,18 @@ module.exports = {
             }
         };
 
-        console.log('configuration: ' + JSON.stringify(session, null, 4));
+        //console.log('configuration: ' + JSON.stringify(session, null, 4));
 
         // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
         var orthogen = new Orthogen(session);
         orthogen.createOrthoImages(function(){
                     res.send(201, {
-                        session: session
+                        session: session,
+                        nextStep: '/sessions/startElecdetect'
                     });
+
                 });
     },
-
-    uploadGeomodel: function(req, res, next){
-        throw('not implemented');
-    },
-
     /**
      * Gets one file in a session which Orthogen created.
      *
@@ -211,10 +209,13 @@ module.exports = {
             if(!err){
                 console.log('[Send File]');
                 res.send(file);
-            };
-            console.log('Error Reading File. Aborting!');
-            console.log('  Error message: ' + err);
-
+            }
+            else
+            {
+                console.log('Error Reading File. Aborting!');
+                console.log('  Error message: ' + err);
+                res.send(500, err);
+            }
         }); 
     }
 }
