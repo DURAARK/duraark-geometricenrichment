@@ -6,6 +6,7 @@
  */
 
 var Orthogen = require('../../bindings/orthogen/index'),
+    Elecdetect = require('../../bindings/elecdetec/index'),
     uuid = require('node-uuid'),
     path = require('path'),
     mkdirp = require('mkdirp');
@@ -111,7 +112,7 @@ module.exports = {
                 Sessions.create(sessionInfo, function(err, session) {
                     if (err) return next(err);
 
-                    //session.status = 'pending';
+                    session.status = 'pending';
                     session.save(function(err, saved_record) {
                         console.log('session: ' + JSON.stringify(saved_record, null, 4));
 
@@ -133,7 +134,7 @@ module.exports = {
     /**
      * Starts the Orthogen creation.
      *
-     * @example POST http://localhost:5010/startOrthogen
+     * @example POST http://localhost:5010/sessions/startOrthogen
 
     {
     "session" : "0a137c92-2679-47e7-931b-9e8f6229517d",
@@ -217,5 +218,43 @@ module.exports = {
                 res.send(500, err);
             }
         }); 
+    },
+
+
+    /**
+     * Starts the Elecdetec creation after the Orthogen images are finished.
+     *
+     * @example POST http://localhost:5010/sessions/startElecdetect
+
+    {
+        "session": "0e275b45-2258-4abd-ba5b-70c8418b3b37", //the sessionId where the orthogen images were created
+        "files": [ //one or multiple which were generated from orthogen.
+            "test1.png", 
+            "test2.png"
+        ]
+    }
+   */
+    startElecdetec: function(req, res, next) {
+        var config = req.body; 
+        var homeDir = path.join(savePath, config.session);
+        var sessionId = config.session;
+       
+        console.log('configuration: ' + JSON.stringify(config, null, 4));
+
+        var session = {
+            sessionId : sessionId,
+            homeDir : homeDir,
+            files : config.files
+        };
+
+        // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
+        var elecdetect = new Elecdetect(session);
+        elecdetect.createElecImages(function(){
+                    res.send(201, {
+                        session: session,
+                        nextStep: 'startWiregen'
+                    });
+
+                });
     }
 }

@@ -22,7 +22,7 @@ Elecdetec.prototype.createElecImages = function(cb) {
     this.session.elecDir = 'elecdetect-test-set';
     this.session.elecResultsDir = 'results';
     this.session.elecdetecPath = path.join(this.session.homeDir, this.session.elecDir);
-    this.session.elecdetecExecutable = path.join(__dirname, '../../../app/ElecDetec/'); //Config.xml, config.ini & elecdetect.exe
+    this.session.elecdetecExecutable = path.join(__dirname, '../../../app/ElecDetec-windows/'); //Config.xml, config.ini & elecdetect.exe
     this.session.elecdetecResults = path.join(this.session.elecdetecPath, this.session.elecResultsDir);
     console.log('[Elecdetect::createElecDetection] configuration: ' + JSON.stringify(this.session, null, 4));
  
