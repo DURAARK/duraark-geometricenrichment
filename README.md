@@ -1,22 +1,22 @@
 [![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.io)
 
-# microservice-e57metadata
+# microservice-rise
 
-This microservice provides an API for extracting metadata from e57 (pointcloud) files.
+This microservice provides an API for detecting in-wall electrical applicances out of point cloud files and panorama images of the scanned rooms.
 
 The easiest way to test the microservice is to install docker (http://docker.io) and pull the latest version via
 
 ```shell
-docker pull duraark/microservice-e57metadata
+docker pull duraark/microservice-rise
 ```
 
 You can start a container afterwards via 
 
 ```shell
-docker run -d -p 1337:1337 -v /my_e57_files:/storage duraark/microservice-e57metadata
+docker run -d -p 5010:1337 -v /my_e57_files:/storage duraark/microservice-rise
 ```
 
-The container exposes port 1337. To bring your e57 files into the container use the "-v" flag and link the desired folder as "/storage".
+The container exposes port 5010. To bring your e57 files into the container use the "-v" flag and link the desired folder as "/storage".
 
 The following API endpoints are available:
 
