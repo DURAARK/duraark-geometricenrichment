@@ -1,6 +1,3 @@
 [submodule "e57extract"]
 	path = e57extract
 	url = https://github.com/DURAARK/e57extract
-[submodule "OrthoGen"]
-	path = OrthoGen
-	url = git@triton.cgv.tugraz.at:u.krispel/OrthoGen.git
