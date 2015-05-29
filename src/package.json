@@ -25,7 +25,8 @@
     "rc": "~0.5.0",
     "sails": "~0.10.2",
     "sails-disk": "~0.10.7",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "lodash": "~3.9.3"
   },
   "scripts": {
     "start": "node app.js",
