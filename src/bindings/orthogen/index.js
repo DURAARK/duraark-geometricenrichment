@@ -50,7 +50,7 @@ Orthogen.prototype.createOrthoImages = function(cb) {
     // --exsphere 1
     // --exquad 1
 
-    var executable = spawn(path.join(__dirname, '../../../app/orthogen/orthogen-windows'), arguments);
+    var executable = spawn(path.join(__dirname, '../../../app/orthogen-windows/orthogen'), arguments);
 
     executable.stdout.on('data', function(data) {
         console.log(data.toString());
