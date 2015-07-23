@@ -1,9 +1,10 @@
 var spawn = require('child_process').spawn,
-    uuid = require('node-uuid'),
-    path = require('path'),
-    fs = require('fs'),
-    mkdirp = require('mkdirp'),
-    _ = require('lodash');
+  uuid = require('node-uuid'),
+  path = require('path'),
+  fs = require('fs'),
+  mkdirp = require('mkdirp'),
+  _ = require('lodash'),
+  Promise = require("bluebird");
 
 
 /**
@@ -11,92 +12,113 @@ var spawn = require('child_process').spawn,
  *
  * @module widget
  */
-var Elecdetec = module.exports = function(session) {
-    this.session = session;
+var Elecdetec = module.exports = function() {};
+
+function copyFile(source, target) {
+  return new Promise(function(resolve, reject) {
+    console.log('[Elecdetect::copyImages]: ' + source + " --> " + target);
+
+    var rd = fs.createReadStream(source);
+    rd.on('error', reject);
+    var wr = fs.createWriteStream(target);
+    wr.on('error', reject);
+    wr.on('finish', resolve);
+    rd.pipe(wr);
+  });
 }
 
-Elecdetec.prototype.createElecImages = function(cb) {
+
+Elecdetec.prototype.createElecImages = function(session) {
+
+  return new Promise(function(resolve, reject) {
+
+    homeDir = session.homeDir;
+    session.status = 'pending';
+    session.elecDir = 'elecdetect-test-set';
+    session.elecResultsDir = 'results';
+    session.elecdetecPath = path.join(homeDir, session.elecDir);
+    session.elecdetecExecutable = path.join(__dirname, '../../../app/ElecDetec-windows/'); //Config.xml, config.ini & elecdetect.exe
+    session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
+    session.resultImages = [];
+    //session.files = session.files;
+    //session.sessionId = session.sessionId;
+    //console.log('[Elecdetect::createElecDetection] create Images: ');
+
+    //console.log(session.ElecdetecInputFiles);
+
+    mkdirp(session.elecdetecPath, function(err) {
+      if (!err) {
+        promises = [];
+
+        _.forEach(session.ElecdetecInputFiles, function(n) {
+          var oldFile = n.file;
+          var newFile = path.join(session.elecdetecPath, path.basename(n.file));
+          promises.push(copyFile(oldFile, newFile));
+        });
+
+        Promise.all(promises).then(function() {
+          var cwd = process.cwd();
+
+          process.chdir(homeDir);
+
+          var arguments = ['-m', 'detect',
+            '-d', session.elecdetecPath,
+            '-c', path.join(session.elecdetecExecutable, 'config.xml'),
+            '-i', path.join(session.elecdetecExecutable, 'config.ini')
+          ];
+
+          var executable = spawn(path.join(session.elecdetecExecutable, 'ElecDetec.exe'), arguments);
+
+          executable.stdout.on('data', function(data) {
+            console.log(data.toString());
+          });
+
+          executable.stderr.on('data', function(data) {
+            console.log('ERROR: ' + data.toString());
+          });
+
+          executable.on('close', function(code) {
+            console.log('[Elecdetec-binding] child process exited with code ' + code);
+
+            //var md = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+            //console.log('myhomeDir: ' + JSON.stringify(session));
+
+            session.status = 'Elecdetec-finished';
+
+            if (code === 0) {
+              var result = fs.readdir(session.elecdetecResults, function(err, files) {
+                if (err) {
+                  throw err;
+                }
+
+                console.log('[Elecdetec-finished] Read directory and return result ' + JSON.stringify(files));
 
 
-    this.session.status = 'pending';
-    this.session.elecDir = 'elecdetect-test-set';
-    this.session.elecResultsDir = 'results';
-    this.session.elecdetecPath = path.join(this.session.homeDir, this.session.elecDir);
-    this.session.elecdetecExecutable = path.join(__dirname, '../../../app/ElecDetec-windows/'); //Config.xml, config.ini & elecdetect.exe
-    this.session.elecdetecResults = path.join(this.session.elecdetecPath, this.session.elecResultsDir);
-    console.log('[Elecdetect::createElecDetection] configuration: ' + JSON.stringify(this.session, null, 4));
- 
 
+                for (var key in files) {
+                  var fileResult = {
+                    file: files[key],
+                    //TODO: don't like this style alternatives?
+                    link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
+                  };
+                  resultImages.push(fileResult);
+                }
+                resolve();
+              });
+            } else {
+              reject();
+            }
+            //this.session.save(function(err, record) {
+            //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
+            //});
+          });
+        });
+      } else {
+        console.log('Error creating test-set directory. Aborting!');
+        console.log('  Error message: ' + err);
+        reject(err);
+      }
+    });
+  });
 
-    mkdirp(this.session.elecdetecPath, function(err) {
-        if (!err) {
-
-            _.forEach(this.session.files, function(n){
-                var oldFile = path.join(this.session.homeDir, n);
-                var newFile = path.join(this.session.elecdetecPath, n);
-                console.log('[Elecdetect::copyImages]: ' + oldFile + " --> " + newFile);
-                fs.createReadStream(oldFile).pipe(fs.createWriteStream(newFile));
-
-            }.bind(this));
-
-            // TODO: change to session directory here?
-            var cwd = process.cwd();
-
-            process.chdir(this.session.homeDir);
-
-            var arguments = ['-m', 'detect',
-                '-d', this.session.elecdetecPath,
-                '-c', path.join(this.session.elecdetecExecutable, 'config.xml'),
-                '-i', path.join(this.session.elecdetecExecutable, 'config.ini')
-            ];
-
-            var executable = spawn(path.join(this.session.elecdetecExecutable, 'ElecDetec.exe'), arguments);
-
-            executable.stdout.on('data', function(data) {
-                console.log(data.toString());
-            });
-
-            executable.stderr.on('data', function(data) {
-                console.log('ERROR: ' + data.toString());
-            });
-
-            executable.on('close', function(code) {
-                console.log('[Elecdetec-binding] child process exited with code ' + code);
-
-                //var md = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-                //console.log('myhomeDir: ' + JSON.stringify(session));
-
-                this.session.status = 'finished';
-
-                var result = fs.readdir(this.session.elecdetecResults, function(err, files) {
-                    if (err) {
-                        throw err;
-                    }
-
-                    console.log('[Elecdetec-finished] Read directory and return result ' + JSON.stringify(files));
-
-
-                    this.session.resultImages = [];
-
-                    for (key in files) {
-                        var fileResult = {
-                                file : files[key],
-                                //TODO: don't like this style alternatives?
-                                link : sails.getBaseurl() + '/public/' + this.session.sessionId + '/' + this.session.elecDir + '/' + this.session.elecResultsDir + '/' + files[key]
-                            };
-                            this.session.resultImages.push(fileResult);
-                    }
-                    cb();
-                }.bind(this));
-
-                //this.session.save(function(err, record) {
-                //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
-                //});
-            }.bind(this));
-        }
-        else {
-            console.log('Error creating test-set directory. Aborting!');
-            console.log('  Error message: ' + err);
-        }
-    }.bind(this));
 };

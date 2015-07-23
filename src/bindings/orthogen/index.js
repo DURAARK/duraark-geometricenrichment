@@ -1,7 +1,7 @@
 var spawn = require('child_process').spawn,
-    uuid = require('node-uuid'),
-    path = require('path'),
-    fs = require('fs');
+  uuid = require('node-uuid'),
+  path = require('path'),
+  fs = require('fs');
 
 
 /**
@@ -9,27 +9,33 @@ var spawn = require('child_process').spawn,
  *
  * @module widget
  */
-var Orthogen = module.exports = function(session) {
-    this.session = session;
-}
+var Orthogen = module.exports = function() {
+  //this.session = session;
+};
 
-Orthogen.prototype.createOrthoImages = function(cb) {
+Orthogen.prototype.createOrthoImages = function(session, objFile) {
+
+  return new Promise(function(resolve, reject) {
 
 
-    this.session.status = 'pending';
+    session.status = 'pending';
 
-    console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(this.session, null, 4));
+    console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(objFile, null, 4));
 
-    var arguments = ['--im', this.session.config.panoImage,
-        '--ig', this.session.config.proxyGeometry,
-        '--rot', this.session.config.poseInformation.rotationW, this.session.config.poseInformation.rotationX, this.session.config.poseInformation.rotationY, this.session.config.poseInformation.rotationZ,
-        '--trans', this.session.config.poseInformation.translationX, this.session.config.poseInformation.translationY, this.session.config.poseInformation.translationZ,
-        '--res', this.session.config.poseInformation.res, // default: 1mm/pixel
-        '--elevation', this.session.config.poseInformation.elevationX, this.session.config.poseInformation.elevationY,
-        '--scale', this.session.config.poseInformation.scale, // default: 'm'
-        '--exgeom', this.session.config.poseInformation.exgeom,
-        '--exsphere', this.session.config.poseInformation.exsphere,
-        '--exquad', this.session.config.poseInformation.exquad
+    var config = session.poseInformation;
+
+
+    var arguments = ['--im', session.panoImage,
+      '--ig', objFile,
+      '--rot', config.poseInformation.rotationW, config.poseInformation.rotationX, config.poseInformation.rotationY, config.poseInformation.rotationZ,
+      '--trans', config.poseInformation.translationX, config.poseInformation.translationY, config.poseInformation.translationZ,
+      '--res', config.poseInformation.res, // default: 1mm/pixel
+      '--elevation', config.poseInformation.elevationX, config.poseInformation.elevationY,
+      '--scale', config.poseInformation.scale, // default: 'm'
+      //'--exgeom', config.poseInformation.exgeom,
+      //'--exsphere', config.poseInformation.exsphere,
+      //'--exquad', config.poseInformation.exquad,
+      '--output', path.basename(objFile,'.obj')
     ];
 
     console.log('arguments: ' + JSON.stringify(arguments, null, 4));
@@ -37,7 +43,7 @@ Orthogen.prototype.createOrthoImages = function(cb) {
     // TODO: change to session directory here?
     var cwd = process.cwd();
 
-    process.chdir(this.session.homeDir);
+    process.chdir(session.homeDir);
 
     // orthogen --im=pano.jpg
     // --ig=geometry.obj
@@ -53,45 +59,56 @@ Orthogen.prototype.createOrthoImages = function(cb) {
     var executable = spawn(path.join(__dirname, '../../../app/orthogen-windows/orthogen'), arguments);
 
     executable.stdout.on('data', function(data) {
-        console.log(data.toString());
+      console.log(data.toString());
     });
 
     executable.stderr.on('data', function(data) {
-        console.log('ERROR: ' + data.toString());
+      console.log('ERROR: ' + data.toString());
     });
 
     executable.on('close', function(code) {
-        console.log('[Orthogen-binding] child process exited with code ' + code);
+      console.log('[Orthogen-binding] child process exited with code ' + code);
 
-        //var md = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-        //console.log('myhomeDir: ' + JSON.stringify(session));
+      //var md = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
+      //console.log('myhomeDir: ' + JSON.stringify(session));
 
-        this.session.status = 'finished';
+      session.status = 'finished-Orthogen';
 
-        var result = fs.readdir(this.session.homeDir, function(err, files) {
-            if (err) {
-                throw err;
-            }
+      if(code === 0)
+      {
+        //in the current development we only get one!!! output... the other code reads the directory and outputs every file.
+        var file = path.join(session.homeDir,path.basename(objFile,'.obj')) + '.jpg';
+        orthoResultImage ={
+          file: file,
+          link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + file
+        };
+        resolve(orthoResultImage);
+      }
+      /*var result = fs.readdir(session.homeDir, function(err, files) {
+        if (err) {
+          throw err;
+        }
 
-            console.log('[Orthogen-finished] Read directory and return result ' + JSON.stringify(files));
+        console.log('[Orthogen-finished] Read directory and return result ' + JSON.stringify(files));
 
 
-            this.session.resultImages = [];
+        session.resultImages = [];
 
-            for (key in files) {
-                var fileResult = {
-                        file : files[key],
-                        //TODO: don't like this style alternatives?
-                        link : sails.getBaseurl() + '/public/' + this.session.sessionId + '/' + files[key]
-                    };
-                    this.session.resultImages.push(fileResult);
+        for (key in files) {
+          var fileResult = {
+            file: files[key],
+            //TODO: don't like this style alternatives?
+            link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
+          };
+          session.resultImages.push(fileResult);
 
-            }
-            cb();
-        }.bind(this));
+        }
+        resolve(session.resultImages);
+      });*/
 
-        //this.session.save(function(err, record) {
-        //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
-        //});
-    }.bind(this));
+      //this.session.save(function(err, record) {
+      //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
+      //});
+    });
+  });
 };
