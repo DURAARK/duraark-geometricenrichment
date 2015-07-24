@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Image file="\tmp\e30bdd8f-8aac-40d3-8e6b-dca352446655\elecdetect-test-set\wall3.jpg">
+    <Object id="0">
+        <label>2</label>
+        <weight>0.72044224</weight>
+        <boundingbox x="472" y="1199" w="128" h="128"/>
+        <centerpoint x="536" y="1263"/>
+    </Object>
+    <Object id="1">
+        <label>2</label>
+        <weight>0.69169497</weight>
+        <boundingbox x="469" y="1030" w="128" h="128"/>
+        <centerpoint x="533" y="1094"/>
+    </Object>
+    <Object id="2">
+        <label>2</label>
+        <weight>0.6820147</weight>
+        <boundingbox x="472" y="1371" w="128" h="128"/>
+        <centerpoint x="536" y="1435"/>
+    </Object>
+    <Object id="3">
+        <label>2</label>
+        <weight>0.66315138</weight>
+        <boundingbox x="482" y="1712" w="128" h="128"/>
+        <centerpoint x="546" y="1776"/>
+    </Object>
+    <Object id="4">
+        <label>2</label>
+        <weight>0.60964561</weight>
+        <boundingbox x="469" y="1115" w="128" h="128"/>
+        <centerpoint x="533" y="1179"/>
+    </Object>
+    <Object id="5">
+        <label>1</label>
+        <weight>0.56852853</weight>
+        <boundingbox x="1521" y="214" w="128" h="128"/>
+        <centerpoint x="1585" y="278"/>
+    </Object>
+    <Object id="6">
+        <label>1</label>
+        <weight>0.54114062</weight>
+        <boundingbox x="7" y="1562" w="128" h="128"/>
+        <centerpoint x="71" y="1626"/>
+    </Object>
+</Image>

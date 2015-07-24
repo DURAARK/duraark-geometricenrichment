@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Image file="\tmp\e30bdd8f-8aac-40d3-8e6b-dca352446655\elecdetect-test-set\wall1.jpg">
+    <Object id="0">
+        <label>2</label>
+        <weight>0.66739154</weight>
+        <boundingbox x="2254" y="1251" w="128" h="128"/>
+        <centerpoint x="2318" y="1315"/>
+    </Object>
+</Image>
