@@ -25,7 +25,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
     var config = session.poseInformation;
 
 
-    var arguments = ['--im', session.panoImage,
+    var args = ['--im', session.panoImage,
       '--ig', objFile,
       '--rot', config.poseInformation.rotationW, config.poseInformation.rotationX, config.poseInformation.rotationY, config.poseInformation.rotationZ,
       '--trans', config.poseInformation.translationX, config.poseInformation.translationY, config.poseInformation.translationZ,
@@ -38,7 +38,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
       '--output', path.basename(objFile,'.obj')
     ];
 
-    console.log('arguments: ' + JSON.stringify(arguments, null, 4));
+    console.log('args: ' + JSON.stringify(args, null, 4));
 
     // TODO: change to session directory here?
     var cwd = process.cwd();
@@ -56,7 +56,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
     // --exsphere 1
     // --exquad 1
 
-    var executable = spawn(path.join(__dirname, '../../../app/orthogen-windows/orthogen'), arguments);
+    var executable = spawn(path.join(__dirname, '../../../app/orthogen-windows/orthogen'), args);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());

@@ -150,9 +150,24 @@ function startElecdetec(session) {
 
     // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
     var elecdetect = new Elecdetect();
-    elecdetect.createElecImages(session).then(function (argument) {
-      resolve(argument);
-    });
+    resolve(elecdetect.createElecImages(session));
+    console.log("[SessionController::finished]");
+  });
+}
+
+function importDetecter(session) {
+  return new Promise(function(resolve, reject) {
+    console.log('[SessionController::starting importDetecter]');
+    console.log('TODO');
+    resolve();
+  });
+}
+
+function startWiregen(session) {
+  return new Promise(function(resolve, reject) {
+    console.log('[SessionController::start Wiregen]');
+    console.log('TODO');
+    resolve();
   });
 }
 
@@ -234,7 +249,10 @@ module.exports = {
       .then(createObjectFiles)
       .then(startOrthogen)
       .then(startElecdetec)
+      .then(importDetecter)
+      .then(startWiregen)
       .then(function(argument) {
+        console.log('returning from everything');
         res.send(200, argument);
       }).catch(function(err) {
         console.log('Error: ' + err);

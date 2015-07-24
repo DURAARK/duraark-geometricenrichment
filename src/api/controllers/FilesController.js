@@ -30,7 +30,7 @@ module.exports = {
                 } else if (fs.lstatSync(absPath).isFile()) {
                     files.push(absPath);
                 }
-            };
+            }
 
             res.send(201, {
                 files: files,
@@ -38,4 +38,4 @@ module.exports = {
             });
         });
     }
-}
+};
