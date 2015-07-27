@@ -231,27 +231,27 @@
     "ElecdetecInputFiles": [
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall4.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall4.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall4.jpg"
         },
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall5.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall5.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall5.jpg"
         },
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall0.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall0.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall0.jpg"
         },
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall3.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall3.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall3.jpg"
         },
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall2.jpg"
         },
         {
             "file": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wall1.jpg"
         }
     ],
     "elecDir": "elecdetect-test-set",
@@ -262,99 +262,99 @@
     "elecDetecResultImages": [
         {
             "file": "wall0-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result-probmap1.jpg"
         },
         {
             "file": "wall0-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result-probmap2.jpg"
         },
         {
             "file": "wall0-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result.jpg"
         },
         {
             "file": "wall0-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall0-result.xml"
         },
         {
             "file": "wall1-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result-probmap1.jpg"
         },
         {
             "file": "wall1-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result-probmap2.jpg"
         },
         {
             "file": "wall1-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result.jpg"
         },
         {
             "file": "wall1-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall1-result.xml"
         },
         {
             "file": "wall2-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result-probmap1.jpg"
         },
         {
             "file": "wall2-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result-probmap2.jpg"
         },
         {
             "file": "wall2-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result.jpg"
         },
         {
             "file": "wall2-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall2-result.xml"
         },
         {
             "file": "wall3-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result-probmap1.jpg"
         },
         {
             "file": "wall3-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result-probmap2.jpg"
         },
         {
             "file": "wall3-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result.jpg"
         },
         {
             "file": "wall3-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall3-result.xml"
         },
         {
             "file": "wall4-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result-probmap1.jpg"
         },
         {
             "file": "wall4-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result-probmap2.jpg"
         },
         {
             "file": "wall4-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result.jpg"
         },
         {
             "file": "wall4-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall4-result.xml"
         },
         {
             "file": "wall5-result-probmap1.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result-probmap1.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result-probmap1.jpg"
         },
         {
             "file": "wall5-result-probmap2.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result-probmap2.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result-probmap2.jpg"
         },
         {
             "file": "wall5-result.jpg",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result.jpg"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result.jpg"
         },
         {
             "file": "wall5-result.xml",
-            "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result.xml"
+            "link": "session/982a3031-7cf9-4f05-a22b-f6476eacc77f/elecdetect-test-set/results/wall5-result.xml"
         }
     ],
     "wiregenInput": [
