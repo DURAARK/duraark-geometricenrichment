@@ -241,12 +241,77 @@ function wireGenResultSvg_hypothesis(session) {
   });
 }
 
+function reOrderResult(session) {
+  return new Promise(function(resolve, reject) {
+    try {
+
+
+      session.resultArray = {};
+      session.resultArray.elecDetecResults = [];
+      session.resultArray.orthogenResults = [];
+      session.resultArray.wireGenResultHypothesis = [];
+      session.resultArray.wireGenResultGrammar = [];
+
+      var baseUrl = sails.getBaseurl() + '/public/' + session.sessionId + '/';
+      var wireGenGramarUrl = baseUrl + 'wiregen/output/svg_grammar/';
+      var wireGenHypothesisUrl = baseUrl + 'wiregen/output/svg_hypothesis/';
+      var elecDetedtUrl = baseUrl + '/elecdetect-test-set/results/';
+
+      var orderedResult = orderSession(session);
+
+      for (var i = 0; i < orderedResult.length; i++) {
+        var picture = orderedResult[i].attributes.id;
+        session.resultArray.wireGenResultGrammar.push(wireGenGramarUrl + picture + '.svg');
+        session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl +  picture + '.svg');
+        session.resultArray.elecDetecResults.push(elecDetedtUrl +  picture + '-result.jpg');
+        session.resultArray.orthogenResults.push(baseUrl + picture + '.jpg');
+      }
+
+      resolve(session);
+    } catch (e) {
+      console.log(e);
+      reject(session);
+    }
+  });
+}
+
+function orderSession(session) {
+  var tempWalls = session.Walls.slice(0);
+  var sorted = [];
+
+
+  while (tempWalls.length > 0) {
+    var first = tempWalls.pop();
+    sorted.push(first);
+    var corner = first.right;
+    while (corner != first.left) {
+      // find wall with left corner
+      var found = false;
+      for (var w in tempWalls) {
+        var wall = tempWalls[w];
+        if (wall.left == corner) {
+          sorted.push(wall);
+          corner = wall.right;
+          tempWalls.splice(w, 1);
+          found = true;
+          break;
+        }
+      }
+      if (found == false) {
+        console.log("loop not closed.");
+        break;
+      }
+    }
+  }
+  return sorted;
+}
+
 module.exports = {
 
   justTest: function(req, res, next) {
     var session = req.body;
 
-    startWiregen(session).then(function(argument) {
+    startWiregen(session).then(reOrderResult).then(function(argument) {
       res.send(argument);
     });
   },
@@ -331,6 +396,7 @@ module.exports = {
       .then(startOrthogen)
       .then(startElecdetec)
       .then(startWiregen)
+      .then(reOrderResult)
       .then(function(argument) {
         console.log('returning from everything');
         res.send(200, argument);

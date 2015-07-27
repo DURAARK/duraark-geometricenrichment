@@ -360,16 +360,6 @@
     "wiregenInput": [
         {
             "attributes": {
-                "left": 2254,
-                "top": 1251,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall1"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
                 "left": 2117,
                 "top": 1217,
                 "width": 128,
@@ -535,6 +525,16 @@
                 "width": 128,
                 "height": 128,
                 "wallid": "wall3"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 2254,
+                "top": 1251,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall1"
             },
             "label": "SWITCH"
         },
@@ -832,16 +832,6 @@
     "Switches": [
         {
             "attributes": {
-                "left": 2254,
-                "top": 1251,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall1"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
                 "left": 2117,
                 "top": 1217,
                 "width": 128,
@@ -1009,6 +999,16 @@
                 "wallid": "wall3"
             },
             "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 2254,
+                "top": 1251,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall1"
+            },
+            "label": "SWITCH"
         }
     ],
     "wiregenPath": "\\tmp\\982a3031-7cf9-4f05-a22b-f6476eacc77f\\wiregen",
@@ -1067,5 +1067,39 @@
             "file": "wall5.svg",
             "link": "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall5.svg"
         }
-    ]
+    ],
+    "resultArray": {
+        "elecDetecResults": [
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall5-result.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall4-result.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall2-result.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall3-result.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall1-result.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f//elecdetect-test-set/results/wall0-result.jpg"
+        ],
+        "orthogenResults": [
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall5.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall4.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall2.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall3.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall1.jpg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wall0.jpg"
+        ],
+        "wireGenResultHypothesis": [
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall5.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall4.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall2.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall3.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall1.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_hypothesis/wall0.svg"
+        ],
+        "wireGenResultGrammar": [
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall5.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall4.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall2.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall3.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall1.svg",
+            "http://localhost:5010/public/982a3031-7cf9-4f05-a22b-f6476eacc77f/wiregen/output/svg_grammar/wall0.svg"
+        ]
+    }
 }
