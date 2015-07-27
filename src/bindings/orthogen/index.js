@@ -80,7 +80,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
         var file = path.join(session.homeDir,path.basename(objFile,'.obj')) + '.jpg';
         orthoResultImage ={
           file: file,
-          link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + path.basename(file)
+          link: 'session/' + session.sessionId + '/' + path.basename(file)
         };
         resolve(orthoResultImage);
       }

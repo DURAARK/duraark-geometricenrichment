@@ -107,9 +107,11 @@ Wiregen.prototype.createWiregenImages = function(session) {
       session.status = 'finished-Wiregen';
 
       if (code === 0) {
-
+        resolve(session);
       }
-      resolve(session);
+      else{
+        reject(session);
+      }
     });
 
   });

@@ -216,7 +216,7 @@ function wireGenResultSvg_grammar(session) {
       for (var key in files) {
         var fileResult = {
           file: files[key],
-          link: sails.getBaseurl() + '/public/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
+          link: 'session/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
         };
         session.wireGenResultGrammar.push(fileResult);
       }
@@ -232,7 +232,7 @@ function wireGenResultSvg_hypothesis(session) {
       for (var key in files) {
         var fileResult = {
           file: files[key],
-          link: sails.getBaseurl() + '/public/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
+          link: 'session/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
         };
         session.wireGenResultHypothesis.push(fileResult);
       }
@@ -252,7 +252,7 @@ function reOrderResult(session) {
       session.resultArray.wireGenResultHypothesis = [];
       session.resultArray.wireGenResultGrammar = [];
 
-      var baseUrl = sails.getBaseurl() + '/public/' + session.sessionId + '/';
+      var baseUrl = 'session/' + session.sessionId + '/';
       var wireGenGramarUrl = baseUrl + 'wiregen/output/svg_grammar/';
       var wireGenHypothesisUrl = baseUrl + 'wiregen/output/svg_hypothesis/';
       var elecDetedtUrl = baseUrl + '/elecdetect-test-set/results/';
