@@ -87,47 +87,36 @@ digraph G {
  V85 [label="V85:wall5"]
  V86 [label="V86:wall5"]
  V87 [label="V87:wall5"]
- V88 [label="V88:wall3"]
- V89 [label="V89:wall3"]
- V90 [label="V90:wall3"]
- V91 [label="V91:wall3"]
- V92 [label="V92:wall3"]
- V93 [label="V93:wall3"]
- V94 [label="V94:wall3"]
- V95 [label="V95:wall3"]
- V96 [label="V96:wall1"]
- V97 [label="V97:wall1"]
+ V88 [label="V88:wall1"]
+ V89 [label="V89:wall1"]
+ V90 [label="V90:wall2"]
+ V91 [label="V91:wall2"]
+ V92 [label="V92:wall2"]
+ V93 [label="V93:wall2"]
+ V94 [label="V94:wall2"]
+ V95 [label="V95:wall2"]
+ V96 [label="V96:wall2"]
+ V97 [label="V97:wall2"]
  V98 [label="V98:wall2"]
  V99 [label="V99:wall2"]
  V100 [label="V100:wall2"]
  V101 [label="V101:wall2"]
  V102 [label="V102:wall2"]
  V103 [label="V103:wall2"]
- V104 [label="V104:wall2"]
- V105 [label="V105:wall2"]
- V106 [label="V106:wall2"]
- V107 [label="V107:wall2"]
- V108 [label="V108:wall2"]
- V109 [label="V109:wall2"]
- V110 [label="V110:wall2"]
- V111 [label="V111:wall2"]
- V112 [label="V112:wall2"]
- V113 [label="V113:wall2"]
+ V104 [label="V104:wall3"]
+ V105 [label="V105:wall3"]
+ V106 [label="V106:wall3"]
+ V107 [label="V107:wall3"]
+ V108 [label="V108:wall3"]
+ V109 [label="V109:wall3"]
+ V110 [label="V110:wall3"]
+ V111 [label="V111:wall3"]
+ V112 [label="V112:wall0"]
+ V113 [label="V113:wall0"]
  V114 [label="V114:wall2"]
  V115 [label="V115:wall2"]
- V116 [label="V116:wall2"]
- V117 [label="V117:wall2"]
- V118 [label="V118:wall2"]
- V119 [label="V119:wall0"]
- V120 [label="V120:wall0"]
- V121 [label="V121:wall0"]
- V122 [label="V122:wall0"]
- V123 [label="V123:wall3"]
- V124 [label="V124:wall3"]
- V125 [label="V125:wall3"]
- V126 [label="V126:wall3"]
- V127 [label="V127:wall2"]
- V128 [label="V128:wall2"]
+ V116 [label="V116:wall3"]
+ V117 [label="V117:wall3"]
  V8 -> V14
  V10 -> V15
  V12 -> V14
@@ -136,9 +125,9 @@ digraph G {
  V9 -> V18
  V14 -> V18
  V11 -> V19
- V15 -> V19
  V16 -> V18
  V17 -> V19
+ V18 -> V19
  V0 -> V26
  V2 -> V27
  V20 -> V28
@@ -149,7 +138,6 @@ digraph G {
  V25 -> V29
  V27 -> V29
  V1 -> V32
- V26 -> V32
  V3 -> V33
  V27 -> V33
  V21 -> V34
@@ -158,6 +146,7 @@ digraph G {
  V29 -> V35
  V32 -> V33
  V30 -> V34
+ V32 -> V34
  V31 -> V35
  V33 -> V35
  V4 -> V42
@@ -168,6 +157,7 @@ digraph G {
  V42 -> V44
  V43 -> V44
  V41 -> V45
+ V43 -> V45
  V5 -> V48
  V42 -> V48
  V37 -> V50
@@ -175,7 +165,6 @@ digraph G {
  V39 -> V51
  V46 -> V48
  V48 -> V50
- V49 -> V50
  V47 -> V51
  V52 -> V58
  V54 -> V59
@@ -186,7 +175,6 @@ digraph G {
  V59 -> V63
  V60 -> V62
  V61 -> V63
- V62 -> V63
  V64 -> V70
  V66 -> V71
  V68 -> V70
@@ -211,56 +199,46 @@ digraph G {
  V84 -> V86
  V85 -> V87
  V86 -> V87
- V58 -> V88
- V88 -> V90
- V89 -> V90
- V89 -> V92
- V59 -> V93
- V93 -> V94
- V90 -> V95
- V91 -> V95
- V32 -> V96
- V34 -> V96
+ V26 -> V88
+ V32 -> V88
+ V88 -> V89
+ V45 -> V90
+ V51 -> V90
+ V90 -> V91
+ V49 -> V92
+ V51 -> V92
+ V92 -> V93
+ V92 -> V95
+ V43 -> V96
  V96 -> V97
- V7 -> V98
- V49 -> V98
  V98 -> V99
- V51 -> V100
- V100 -> V101
- V49 -> V102
- V102 -> V103
- V100 -> V104
- V104 -> V105
- V49 -> V106
- V106 -> V107
- V106 -> V108
- V108 -> V109
- V110 -> V111
- V43 -> V112
- V108 -> V112
+ V49 -> V100
+ V98 -> V100
+ V7 -> V101
+ V49 -> V101
+ V94 -> V102
+ V95 -> V102
+ V97 -> V103
+ V99 -> V103
+ V58 -> V104
+ V104 -> V106
+ V105 -> V106
+ V105 -> V108
+ V62 -> V109
+ V63 -> V109
+ V109 -> V110
+ V106 -> V111
+ V107 -> V111
+ V19 -> V112
+ V15 -> V113
  V112 -> V113
- V45 -> V114
- V51 -> V114
+ V49 -> V114
+ V50 -> V114
  V114 -> V115
- V102 -> V116
- V104 -> V116
- V116 -> V117
- V108 -> V118
- V111 -> V118
- V19 -> V119
- V119 -> V120
- V18 -> V121
- V119 -> V121
- V121 -> V122
- V58 -> V123
- V62 -> V123
- V123 -> V124
- V88 -> V125
- V93 -> V125
- V125 -> V126
- V43 -> V127
- V45 -> V127
- V127 -> V128
+ V58 -> V116
+ V59 -> V116
+ V62 -> V117
+ V104 -> V117
  V12 -> V25
  V16 -> V31
  V24 -> V57

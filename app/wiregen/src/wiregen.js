@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 // WireGen - electrical appliance hypothesis
-// 
+//
 // ulrich.krispel@vc.fraunhofer.at
 //
 var fs = require('fs');
@@ -96,11 +96,12 @@ TerminalSymbols.forEach(function (t) {
 });
 
 // write SVG with terminal symbols (objects + installation zones)
-mkdirSync(program.output + "svg_grammar");
+mkdirSync(path.join(program.output, "svg_grammar"));
 var wallsvg = svgexport.ExportTerminalsToSVG(TerminalSymbols);
 for (var w in wallsvg) {
     var wall = wallsvg[w];
-    fs.writeFileSync(util.format("%s/svg_grammar/%s.svg", program.output, w), wall);
+    console.log(path.join(program.output,'svg_grammar',w + '.svg'));
+    fs.writeFileSync(path.join(program.output,'svg_grammar',w + '.svg'), wall);
 }
 // -------------------------------------------------------------------------------
 // build installation zone graph
@@ -270,7 +271,7 @@ for (var vid in G.N)
                     G.addEdge(VA, VB);
                 }
             }
-        }                
+        }
     } else {
         if (Object.keys(WALLCONN[conn]).length > 2) {
             console.log("not handled connectivity case!");
@@ -333,11 +334,10 @@ fs.writeFileSync(util.format("%s/hypothesis-graph.dot", program.output), WireTre
 
 
 // --------------------------------------------------------------------------------------------------------------------
-mkdirSync(program.output + "svg_hypothesis");
+mkdirSync(path.join(program.output, "svg_hypothesis"));
 for (var wallid in WALLS) {
     fs.writeFileSync(util.format("%s/svg_hypothesis/%s.svg", program.output, wallid), svgexport.ExportGraphToSVG(WireTree, wallid, WALLS[wallid].bb));
 }
 
 //fs.writeFileSync("wire-graph.svg", svgexport.ExportGraphToSVG(WireTree));
 console.log("=== WireGen Finished ===");
-

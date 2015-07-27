@@ -13,6 +13,7 @@ Wiregen.prototype.importDetections = function(session) {
   session.Sockets = [];
   session.Switches = [];
   var promises = [];
+  console.log('[Wiregen::importDetections]');
 
   //console.log("selecimages " + JSON.stringify(session.elecDetecResultImages, null, 4));
   _.forEach(session.elecDetecResultImages, function(n) {
@@ -66,20 +67,6 @@ Wiregen.prototype.importDetections = function(session) {
 
 
 
-  /*
-
-    "Doors": [
-        {
-            "label": "DOOR",
-            "attributes": {
-                "left": 2350.000244140625,
-                "top": 294.64889526367188,
-                "width": 799.99993896484375,
-                "height": 1950,
-                "wallid": "wall1"
-            }
-        },
-  */
   return Promise.all(promises).then(function(argument) {
     return session;
   }).catch(function(err) {
@@ -90,6 +77,40 @@ Wiregen.prototype.importDetections = function(session) {
 
 };
 
-Wiregen.prototype.createWiregenImages = function(session, objFile) {
+Wiregen.prototype.createWiregenImages = function(session) {
+  return new Promise(function(resolve, reject) {
+    console.log('[Wiregen::createWiregenImages]');
+    session.wiregenExecutable = path.join(__dirname, '../../../app/wiregen/src'); //Config.xml, config.ini & elecdetect.exe
+    session.wiregenGrammar = path.join(__dirname, '../../../app/wiregen/src/grammar/grammar-residential.json')
 
+    var cwd = process.cwd();
+
+    process.chdir(session.wiregenExecutable);
+
+    var args = ['-i', session.wireGenFile, '-o', session.wireGenOutput  ,'-g', session.wiregenGrammar];
+
+    console.log('wiregen.bat ' + args);
+    var executable = spawn(path.join(session.wiregenExecutable, 'wiregen.bat'), args);
+
+    executable.stdout.on('data', function(data) {
+      console.log(data.toString());
+    });
+
+    executable.stderr.on('data', function(data) {
+      console.log('ERROR: ' + data.toString());
+    });
+
+    executable.on('close', function(code) {
+      console.log('[Wiregen-binding] child process exited with code ' + code);
+
+
+      session.status = 'finished-Wiregen';
+
+      if (code === 0) {
+
+      }
+      resolve(session);
+    });
+
+  });
 };

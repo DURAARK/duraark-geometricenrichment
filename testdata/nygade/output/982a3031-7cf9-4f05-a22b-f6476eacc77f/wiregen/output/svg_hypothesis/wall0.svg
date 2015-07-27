@@ -1,0 +1,11 @@
+<svg width="233.04506835937502" height="229.46489257812502" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<circle cx="233.04506835937502" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="218.04506835937502" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="217.4" y="148.6" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="218.04506835937502" cy="155" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="217.5" y="142.9" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="218.04506835937502" cy="149.3" r="3" stroke="black" stroke-width="1" fill="black" />
+<line x1="218.04506835937502" y1="199.46489257812502" x2="218.04506835937502" y2="155" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="233.04506835937502" y1="199.46489257812502" x2="218.04506835937502" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="218.04506835937502" y1="155" x2="218.04506835937502" y2="149.3" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>

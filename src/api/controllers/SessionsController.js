@@ -164,45 +164,80 @@ function startWiregen(session) {
     console.log('[SessionController::start Wiregen]');
     //console.log(session);
     var wiregen = new Wiregen();
-    resolve(wiregen.importDetections(session).then(createFlatList));
-
+    resolve(wiregen.importDetections(session)
+      .then(createFlatList)
+      .then(wiregen.createWiregenImages)
+      .then(wireGenResultSvg_grammar)
+      .then(wireGenResultSvg_hypothesis));
   });
 }
 
 function createFlatList(session) {
   return new Promise(function(resolve, reject) {
-      try {
+    try {
 
-        console.log('[SessionController::create Flat List]');
+      console.log('[SessionController::create Flat List]');
 
-        listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
+      listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
 
-        for (var i = 0; i < listImport.length; i++) {
-          var currentList = listImport[i];
-          //console.log(session[currentList]);
-          for (var j = 0; j < session[currentList].length; j++) {
-            var item = session[currentList][j];
-            session.wiregenInput.push(item);
-          }
+      for (var i = 0; i < listImport.length; i++) {
+        var currentList = listImport[i];
+        //console.log(session[currentList]);
+        for (var j = 0; j < session[currentList].length; j++) {
+          var item = session[currentList][j];
+          session.wiregenInput.push(item);
         }
+      }
 
-        session.wiregenPath = path.join(session.homeDir, 'wiregen');
-        session.wireGenFile = 'wiregenInput.json';
-        session.outputPath = path.join(session.wiregenPath, 'output');
-        mkdirp(session.wiregenPath, function(err) {
-            mkdirp(session.outputPath, function(err) {
-              fs.writeFile(path.join(session.wiregenPath, session.wireGenFile), session.wiregenInput, function(err) {
-                if (err) reject(err);
-                resolve(session);
-              });
-            });
+      session.wiregenPath = path.join(session.homeDir, 'wiregen');
+      session.wireGenFile = path.join(session.wiregenPath, 'wiregenInput.json');
+      session.wireGenOutput = path.join(session.wiregenPath, 'output');
+      mkdirp(session.wiregenPath, function(err) {
+        mkdirp(session.wireGenOutput, function(err) {
+          fs.writeFile(session.wireGenFile, JSON.stringify(session.wiregenInput), function(err) {
+            if (err) reject(err);
+            resolve(session);
+          });
         });
+      });
     } catch (e) {
       console.log(e);
-      reject();
+      reject(e);
     }
 
 
+  });
+}
+
+function wireGenResultSvg_grammar(session) {
+  return new Promise(function(resolve, reject) {
+    session.wireGenResultGrammar = [];
+    fs.readdir(path.join(session.wireGenOutput, 'svg_grammar'), function(err, files) {
+      for (var key in files) {
+        var fileResult = {
+          file: files[key],
+          link: sails.getBaseurl() + '/public/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
+        };
+        session.wireGenResultGrammar.push(fileResult);
+      }
+      resolve(session);
+    });
+  });
+}
+
+function wireGenResultSvg_hypothesis(session) {
+  return new Promise(function(resolve, reject) {
+    session.wireGenResultHypothesis = [];
+    fs.readdir(path.join(session.wireGenOutput, 'svg_hypothesis'), function(err, files) {
+      for (var key in files) {
+        var fileResult = {
+          file: files[key],
+          link: sails.getBaseurl() + '/public/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
+        };
+        session.wireGenResultHypothesis.push(fileResult);
+      }
+      resolve(session);
+    });
   });
 }
 
