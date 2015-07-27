@@ -103,9 +103,7 @@ Elecdetec.prototype.createElecImages = function(session) {
                     };
                     session.elecDetecResultImages.push(fileResult);
                   }
-                  console.log('resolving');
                   resolve(session);
-                  console.log('resolved');
                 });
               } else {
                 reject();

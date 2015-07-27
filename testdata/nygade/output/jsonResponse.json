@@ -1,0 +1,595 @@
+{
+    "poseInformation": {
+        "poseInformation": {
+            "translationX": 0,
+            "translationY": 0,
+            "translationZ": 141.6600828,
+            "rotationW": 0.9592315236,
+            "rotationX": -0.00766527459,
+            "rotationY": -0.007286718304,
+            "rotationZ": 0.2824234966,
+            "res": 1,
+            "scale": "m",
+            "elevationX": -1.5707963,
+            "elevationY": 1.5707963,
+            "exgeom": 1,
+            "exsphere": 1,
+            "exquad": 1
+        },
+        "clusteringOpts": {
+            "normalDirection": true,
+            "distanceClustering": true
+        },
+        "objFile": [
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall0.obj",
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall3.obj",
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall2.obj",
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall1.obj",
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall5.obj",
+            "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall4.obj"
+        ]
+    },
+    "Walls": [
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall0",
+                "left": 0,
+                "top": 0,
+                "width": 2330.45068359375,
+                "height": 2294.64892578125,
+                "origin": [
+                    -179.1723175048828,
+                    -2182.7783203125,
+                    142638.65625
+                ],
+                "x": [
+                    0.8267021179199219,
+                    0.5626398324966431,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 0,
+            "right": 5,
+            "crosslink": []
+        },
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall1",
+                "left": 0,
+                "top": 0,
+                "width": 3543.32666015625,
+                "height": 2294.64892578125,
+                "origin": [
+                    -2198.217041015625,
+                    729.0289916992188,
+                    142638.65625
+                ],
+                "x": [
+                    0.5698161721229553,
+                    -0.8217722177505493,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 1,
+            "right": 0,
+            "crosslink": []
+        },
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall2",
+                "left": 0,
+                "top": 0,
+                "width": 3011.731689453125,
+                "height": 2294.64892578125,
+                "origin": [
+                    1854.334716796875,
+                    -204.07559204101562,
+                    142638.65625
+                ],
+                "x": [
+                    -0.5614696741104126,
+                    0.8274973630905151,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 3,
+            "right": 2,
+            "crosslink": []
+        },
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall3",
+                "left": 0,
+                "top": 0,
+                "width": 2829.792236328125,
+                "height": 2294.64892578125,
+                "origin": [
+                    163.33876037597656,
+                    2288.124267578125,
+                    142638.65625
+                ],
+                "x": [
+                    -0.8345332741737366,
+                    -0.5509575605392456,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 2,
+            "right": 1,
+            "crosslink": []
+        },
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall4",
+                "left": 0,
+                "top": 0,
+                "width": 473.86102294921875,
+                "height": 2294.64892578125,
+                "origin": [
+                    1463.546875,
+                    -472.08514404296875,
+                    142638.65625
+                ],
+                "x": [
+                    0.824688732624054,
+                    0.5655868053436279,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 4,
+            "right": 3,
+            "crosslink": []
+        },
+        {
+            "label": "WALL",
+            "attributes": {
+                "id": "wall5",
+                "left": 0,
+                "top": 0,
+                "width": 490.0746154785156,
+                "height": 2294.64892578125,
+                "origin": [
+                    1747.416259765625,
+                    -871.5739135742188,
+                    142638.65625
+                ],
+                "x": [
+                    -0.5792371034622192,
+                    0.8151590824127197,
+                    0
+                ],
+                "y": [
+                    0,
+                    0,
+                    -1
+                ]
+            },
+            "left": 5,
+            "right": 4,
+            "crosslink": []
+        }
+    ],
+    "Doors": [
+        {
+            "label": "DOOR",
+            "attributes": {
+                "left": 2350.000244140625,
+                "top": 294.6488952636719,
+                "width": 799.9999389648438,
+                "height": 1950,
+                "wallid": "wall1"
+            }
+        },
+        {
+            "label": "DOOR",
+            "attributes": {
+                "left": 211.73171997070312,
+                "top": 244.64892578125,
+                "width": 800,
+                "height": 2000,
+                "wallid": "wall2"
+            }
+        }
+    ],
+    "panoImage": "/tmp/panorama.jpg",
+    "homeDir": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a",
+    "sessionId": "f044208f-2293-4b32-959f-03165cb15a3a",
+    "status": "Elecdetec-finished",
+    "createdAt": "2015-07-27T05:33:45.529Z",
+    "updatedAt": "2015-07-27T05:33:45.529Z",
+    "id": 116,
+    "ElecdetecInputFiles": [
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall4.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall4.jpg"
+        },
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall5.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall5.jpg"
+        },
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall0.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall0.jpg"
+        },
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall3.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall3.jpg"
+        },
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall2.jpg"
+        },
+        {
+            "file": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\wall1.jpg"
+        }
+    ],
+    "elecDir": "elecdetect-test-set",
+    "elecResultsDir": "results",
+    "elecdetecPath": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\elecdetect-test-set",
+    "elecdetecExecutable": "e:\\ccaldera\\projects\\Duraark\\duraark-platform-api\\microservice-geometric-enrichment\\app\\ElecDetec-windows\\",
+    "elecdetecResults": "\\tmp\\f044208f-2293-4b32-959f-03165cb15a3a\\elecdetect-test-set\\results",
+    "elecDetecResultImages": [
+        {
+            "file": "wall0-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall0-result-probmap1.jpg"
+        },
+        {
+            "file": "wall0-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall0-result-probmap2.jpg"
+        },
+        {
+            "file": "wall0-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall0-result.jpg"
+        },
+        {
+            "file": "wall0-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall0-result.xml"
+        },
+        {
+            "file": "wall1-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall1-result-probmap1.jpg"
+        },
+        {
+            "file": "wall1-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall1-result-probmap2.jpg"
+        },
+        {
+            "file": "wall1-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall1-result.jpg"
+        },
+        {
+            "file": "wall1-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall1-result.xml"
+        },
+        {
+            "file": "wall2-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall2-result-probmap1.jpg"
+        },
+        {
+            "file": "wall2-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall2-result-probmap2.jpg"
+        },
+        {
+            "file": "wall2-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall2-result.jpg"
+        },
+        {
+            "file": "wall2-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall2-result.xml"
+        },
+        {
+            "file": "wall3-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall3-result-probmap1.jpg"
+        },
+        {
+            "file": "wall3-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall3-result-probmap2.jpg"
+        },
+        {
+            "file": "wall3-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall3-result.jpg"
+        },
+        {
+            "file": "wall3-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall3-result.xml"
+        },
+        {
+            "file": "wall4-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall4-result-probmap1.jpg"
+        },
+        {
+            "file": "wall4-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall4-result-probmap2.jpg"
+        },
+        {
+            "file": "wall4-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall4-result.jpg"
+        },
+        {
+            "file": "wall4-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall4-result.xml"
+        },
+        {
+            "file": "wall5-result-probmap1.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall5-result-probmap1.jpg"
+        },
+        {
+            "file": "wall5-result-probmap2.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall5-result-probmap2.jpg"
+        },
+        {
+            "file": "wall5-result.jpg",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall5-result.jpg"
+        },
+        {
+            "file": "wall5-result.xml",
+            "link": "http://localhost:5010/public/f044208f-2293-4b32-959f-03165cb15a3a/elecdetect-test-set/results/wall5-result.xml"
+        }
+    ],
+    "wiregenInput": [],
+    "Sockets": [
+        {
+            "attributes": {
+                "left": "1486",
+                "top": "2174",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall0"
+            },
+            "label": "Socket"
+        },
+        {
+            "attributes": {
+                "left": "1429",
+                "top": "2175",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall0"
+            },
+            "label": "Socket"
+        },
+        {
+            "attributes": {
+                "left": "214",
+                "top": "1521",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Socket"
+        },
+        {
+            "attributes": {
+                "left": "1562",
+                "top": "7",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Socket"
+        },
+        {
+            "attributes": {
+                "left": "1786",
+                "top": "594",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Socket"
+        }
+    ],
+    "Switches": [
+        {
+            "attributes": {
+                "left": "1251",
+                "top": "2254",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall1"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1199",
+                "top": "472",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1030",
+                "top": "469",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1371",
+                "top": "472",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1712",
+                "top": "482",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1115",
+                "top": "469",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall3"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1217",
+                "top": "2117",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1505",
+                "top": "2116",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1287",
+                "top": "2116",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1436",
+                "top": "2117",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1323",
+                "top": "1093",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1394",
+                "top": "1092",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1681",
+                "top": "1092",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1611",
+                "top": "1091",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1895",
+                "top": "1089",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1961",
+                "top": "1090",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1367",
+                "top": "2119",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        },
+        {
+            "attributes": {
+                "left": "1542",
+                "top": "1093",
+                "width": "128",
+                "height": "128",
+                "wallid": "wall2"
+            },
+            "label": "Switch"
+        }
+    ]
+}

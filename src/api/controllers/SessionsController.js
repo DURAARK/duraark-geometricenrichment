@@ -7,6 +7,7 @@
 
 var Orthogen = require('../../bindings/orthogen/index'),
   Elecdetect = require('../../bindings/elecdetec/index'),
+  Wiregen = require('../../bindings/wiregen/index'),
   uuid = require('node-uuid'),
   fs = require('fs'),
   path = require('path'),
@@ -55,6 +56,7 @@ function createSession(session) {
 function createObjectFiles(session) {
   var promises = [];
   console.log('[SessionController::Creating Object files]');
+
   session.poseInformation.objFile = [];
 
   _.forEach(session.Walls, function(oneWall) {
@@ -63,11 +65,13 @@ function createObjectFiles(session) {
         console.log('[SessionController::Found Wall: ' + oneWall.attributes.id + ']');
 
         var attr = oneWall.attributes;
+        var height = attr.height;
+        var width = attr.width;
 
-        var objFile = 'v ' + attr.origin[0] + ' ' + attr.origin[1] + ' ' + attr.origin[2] + "\n" +
-          'v ' + (attr.origin[0] + attr.y[0]) + ' ' + (attr.origin[1] + attr.y[1]) + ' ' + (attr.origin[2] + attr.y[2]) + "\n" +
-          'v ' + (attr.origin[0] + attr.y[0] + attr.x[0]) + ' ' + (attr.origin[1] + attr.y[1] + attr.x[1]) + ' ' + (attr.origin[2] + attr.y[2] + attr.x[2]) + "\n" +
-          'v ' + (attr.origin[0] + attr.x[0]) + ' ' + (attr.origin[1] + attr.x[1]) + ' ' + (attr.origin[2] + attr.x[2]) + "\n" +
+        var objFile = 'v ' + (attr.origin[0] / 1000) + ' ' + (attr.origin[1] / 1000) + ' ' + (attr.origin[2] / 1000) + "\n" +
+          'v ' + ((attr.origin[0] + attr.y[0] * height) / 1000) + ' ' + ((attr.origin[1] + attr.y[1] * height) / 1000) + ' ' + ((attr.origin[2] + attr.y[2] * height) / 1000) + "\n" +
+          'v ' + ((attr.origin[0] + attr.y[0] * height + attr.x[0] * width) / 1000) + ' ' + ((attr.origin[1] + attr.y[1] * height + attr.x[1] * width) / 1000) + ' ' + ((attr.origin[2] + attr.y[2] * height + attr.x[2] * width) / 1000) + "\n" +
+          'v ' + ((attr.origin[0] + attr.x[0] * width) / 1000) + ' ' + ((attr.origin[1] + attr.x[1] * width) / 1000) + ' ' + ((attr.origin[2] + attr.x[2] * width) / 1000) + "\n" +
           'f 1 2 3 4';
 
         var file = path.join(session.homeDir, oneWall.attributes.id + '.obj');
@@ -155,23 +159,53 @@ function startElecdetec(session) {
   });
 }
 
-function importDetecter(session) {
-  return new Promise(function(resolve, reject) {
-    console.log('[SessionController::starting importDetecter]');
-    console.log('TODO');
-    resolve();
-  });
-}
-
 function startWiregen(session) {
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::start Wiregen]');
-    console.log('TODO');
-    resolve();
+    //console.log(session);
+    var wiregen = new Wiregen();
+    resolve(wiregen.importDetections(session).then(createFlatList));
+
+  });
+}
+
+function createFlatList(session) {
+  return new Promise(function(resolve, reject) {
+    try {
+
+      console.log('[SessionController::create Flat List]');
+
+      listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
+
+      for (var i = 0; i < listImport.length; i++) {
+        var currentList = listImport[i];
+        //console.log(session[currentList]);
+        for (var j = 0; j < session[currentList].length; j++) {
+          var item = session[currentList][j];
+          session.wiregenInput.push(item);
+        }
+      }
+
+      resolve(session);
+
+    } catch (e) {
+        console.log(e);
+      reject();
+    }
+
+
   });
 }
 
 module.exports = {
+
+  justTest: function(req, res, next) {
+    var session = req.body;
+
+    startWiregen(session).then(function(argument) {
+      res.send(argument);
+    });
+  },
   /**
    * Uploades a new geometry file into the session container
    *
@@ -242,6 +276,9 @@ module.exports = {
 
 
   rise: function(req, res, next) {
+
+    req.connection.setTimeout(0);
+
     var session = req.body;
     session.panoImage = hardCodedPanoImage;
 
@@ -249,7 +286,6 @@ module.exports = {
       .then(createObjectFiles)
       .then(startOrthogen)
       .then(startElecdetec)
-      .then(importDetecter)
       .then(startWiregen)
       .then(function(argument) {
         console.log('returning from everything');
