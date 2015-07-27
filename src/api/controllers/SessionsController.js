@@ -171,25 +171,34 @@ function startWiregen(session) {
 
 function createFlatList(session) {
   return new Promise(function(resolve, reject) {
-    try {
+      try {
 
-      console.log('[SessionController::create Flat List]');
+        console.log('[SessionController::create Flat List]');
 
-      listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
+        listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
 
-      for (var i = 0; i < listImport.length; i++) {
-        var currentList = listImport[i];
-        //console.log(session[currentList]);
-        for (var j = 0; j < session[currentList].length; j++) {
-          var item = session[currentList][j];
-          session.wiregenInput.push(item);
+        for (var i = 0; i < listImport.length; i++) {
+          var currentList = listImport[i];
+          //console.log(session[currentList]);
+          for (var j = 0; j < session[currentList].length; j++) {
+            var item = session[currentList][j];
+            session.wiregenInput.push(item);
+          }
         }
-      }
 
-      resolve(session);
-
+        session.wiregenPath = path.join(session.homeDir, 'wiregen');
+        session.wireGenFile = 'wiregenInput.json';
+        session.outputPath = path.join(session.wiregenPath, 'output');
+        mkdirp(session.wiregenPath, function(err) {
+            mkdirp(session.outputPath, function(err) {
+              fs.writeFile(path.join(session.wiregenPath, session.wireGenFile), session.wiregenInput, function(err) {
+                if (err) reject(err);
+                resolve(session);
+              });
+            });
+        });
     } catch (e) {
-        console.log(e);
+      console.log(e);
       reject();
     }
 
