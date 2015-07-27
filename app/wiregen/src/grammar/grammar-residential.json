@@ -1,0 +1,33 @@
+{
+  "WALL" : [
+    { "label" : "vzone", "attributes" : { "pos": "att.left+150", "wallid":  "att.id" } },
+    { "label" : "vzone", "attributes" : { "pos": "att.left+att.width-150", "wallid":  "att.id" } },
+    { "label" : "hzone", "attributes" : { "pos": "att.top+300", "wallid":  "att.id" } },
+    { "label" : "hzone", "attributes" : { "pos": "att.top+att.height-300", "wallid":  "att.id" } },
+    { "label" : "wall",  "attributes" : { "zone_width" : "200" } }
+  ],
+
+  "DOOR" : [
+    { "label" : "vzone", "attributes" : { "pos": "att.left-150" } },
+    { "label" : "vzone", "attributes" : { "pos": "att.left+att.width+150" } },
+    { "label" : "door" }
+  ],
+
+  "WINDOW" : [
+    { "label" : "vzone", "attributes" : { "pos":"att.left-150" } },
+    { "label" : "vzone", "attributes" : { "pos":"att.left+att.width+150" } },
+    { "label" : "window" }
+  ],
+
+  "SOCKET" : [
+    { "label" : "socket" , "attributes" : { "endpoint":"true" } }
+  ],
+
+  "SWITCH" : [
+    { "label" : "switch" , "attributes" : { "endpoint":"true" }}
+  ],
+
+  "ROOT" : [
+    { "label" : "root" , "attributes" : { "root":"true" }}
+  ]
+}

@@ -1,0 +1,9 @@
+<svg width="47.386102294921876" height="229.46489257812502" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<circle cx="0" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="47.386102294921876" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="15" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="32.386102294921876" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<line x1="0" y1="199.46489257812502" x2="15" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="15" y1="199.46489257812502" x2="32.386102294921876" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="47.386102294921876" y1="199.46489257812502" x2="32.386102294921876" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>

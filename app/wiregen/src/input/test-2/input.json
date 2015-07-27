@@ -1,0 +1,165 @@
+
+[
+  {
+    "label": "WALL",
+    "attributes": {
+      "id" : "WALL-A",
+      "left" : 0,
+      "top" : 0,
+      "width" : 4000,
+      "height" : 2400,
+      "origin" : [ 0, 3000, 2400 ],
+      "x" : [ 1, 0, 0],
+      "y" : [ 0, 0, -1]
+    },
+    "left": 1,
+    "right": 2,
+    "crosslink": [ ]
+  },
+  {
+    "label": "WALL",
+    "attributes": {
+      "id" : "WALL-B",
+      "left" : 0,
+      "top" : 0,
+      "width" : 3000,
+      "height" : 2400,
+      "origin" : [ 4000, 3000, 2400 ],
+      "x" : [ 0, -1, 0],
+      "y" : [ 0, 0, -1]
+    },
+    "left": 2,
+    "right": 3,
+    "crosslink": [ ]
+  },
+  {
+    "label": "DOOR",
+    "attributes": {
+      "left" : 500,
+      "top" : 415,
+      "width" : 735,
+      "height" : 1985,
+      "wallid" : "WALL-A"
+    }
+  },
+  {
+    "label": "SWITCH",
+    "attributes": {
+      "left" : 1335,
+      "top" : 1350,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-A"
+    }
+  },
+  {
+    "label": "SWITCH",
+    "attributes": {
+      "left" : 1335,
+      "top" : 1200,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-A"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2000,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-A"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2150,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-A"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2300,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-A"
+    }
+  },
+    {
+        "label": "ROOT",
+        "attributes": {
+            "left": 150,
+            "top": 300,
+            "width": 0,
+            "height": 0,
+            "wallid": "WALL-A"
+        }
+    },
+      {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 300,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-B"
+    }
+  },
+      {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 450,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-B"
+    }
+  },
+      {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2350,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-B"
+    }
+  },
+      {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2500,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "WALL-B"
+    }
+  },
+  {
+    "label": "WINDOW",
+    "attributes": {
+      "left" : 700,
+      "top" : 415,
+      "width" : 735,
+      "height" : 800,
+      "wallid" : "WALL-B"
+    }
+  }
+
+]

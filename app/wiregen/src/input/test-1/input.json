@@ -1,0 +1,91 @@
+
+[
+  {
+    "label": "WALL",
+    "attributes": {
+      "id" : "wall01_1_01",
+      "left" : 0,
+      "top" : 0,
+      "width" : 3000,
+      "height" : 2400,
+      "origin" : [ 0, 0, 2400 ],
+      "x" : [ 1, 0, 0],
+      "y" : [ 0, 0, -1]
+    }
+  },
+  {
+    "label": "DOOR",
+    "attributes": {
+      "left" : 500,
+      "top" : 415,
+      "width" : 735,
+      "height" : 1985,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "SWITCH",
+    "attributes": {
+      "left" : 1335,
+      "top" : 1350,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "SWITCH",
+    "attributes": {
+      "left" : 1335,
+      "top" : 1200,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2000,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2150,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "SOCKET",
+    "attributes": {
+      "left" : 2300,
+      "top" : 2036,
+      "width" : 128,
+      "height" : 128,
+      "weight:" : 0.8,
+      "wallid" : "wall01_1_01"
+    }
+  },
+  {
+    "label": "ROOT",
+    "attributes": {
+      "left" : 150,
+      "top" : 300,
+      "width" : 0,
+      "height" : 0,
+      "wallid" : "wall01_1_01"
+    }
+  }
+]

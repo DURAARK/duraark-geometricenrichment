@@ -1,0 +1,20 @@
+{
+  "name": "wiregen",
+  "version": "1.0.0",
+  "description": "DURAARK wiregen",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ulrich Krispel",
+  "license": "ISC",
+  "preferGlobal": true,
+  "bin": {
+    "wiregen": "wiregen.js"
+  },
+  "dependencies": {
+    "commander": "^2.8.1",
+    "priorityqueuejs": "^1.0.0",
+    "xml2js" : "^0.4.9"
+  }
+}

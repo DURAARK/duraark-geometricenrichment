@@ -1,0 +1,17 @@
+<svg width="233.04506835937502" height="230.3" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<circle cx="233.04506835937502" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="218.04506835937502" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="148.6" y="217.4" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="155" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="148.6" y="217.4" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="155" cy="223.8" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="142.9" y="217.5" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="149.3" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="142.9" y="217.5" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
+<circle cx="149.3" cy="223.9" r="3" stroke="black" stroke-width="1" fill="black" />
+<line x1="155" y1="199.46489257812502" x2="155" y2="223.8" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="218.04506835937502" y1="199.46489257812502" x2="155" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="233.04506835937502" y1="199.46489257812502" x2="218.04506835937502" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="149.3" y1="199.46489257812502" x2="149.3" y2="223.9" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="155" y1="199.46489257812502" x2="149.3" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>

@@ -1,0 +1,11 @@
+<svg width="354.332666015625" height="238.20000000000002" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<circle cx="0" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="15" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="125.10000000000001" y="225.4" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,0,200)" />
+<circle cx="131.5" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<rect x="125.10000000000001" y="225.4" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,0,200)" />
+<circle cx="131.5" cy="231.8" r="3" stroke="black" stroke-width="1" fill="black" />
+<line x1="131.5" y1="199.46489257812502" x2="131.5" y2="231.8" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="15" y1="199.46489257812502" x2="131.5" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="0" y1="199.46489257812502" x2="15" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>

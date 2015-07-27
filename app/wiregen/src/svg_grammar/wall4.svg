@@ -1,0 +1,7 @@
+<svg width="47.386102294921876" height="229.46489257812502" version="1.1" xmlns="http://www.w3.org/2000/svg">
+<rect width="47.386102294921876" height="229.46489257812502" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />
+<line x1="15" y1="0" x2="15" y2="229.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="32.386102294921876" y1="0" x2="32.386102294921876" y2="229.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="0" y1="30" x2="47.386102294921876" y2="30" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="0" y1="199.46489257812502" x2="47.386102294921876" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+</svg>
