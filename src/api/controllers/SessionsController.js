@@ -94,26 +94,6 @@ function createObjectFiles(session) {
 }
 
 function startOrthogen(session) {
-
-  //console.log('[StarOrthogen::] Start config ' + JSON.stringify(session, null, 4));
-  /*var config = session;
-  var homeDir = path.join(savePath, config.session);
-  var sessionId = config.session;*/
-
-  /*  var session = {
-      sessionId: sessionId,
-      homeDir: homeDir,
-      config: {
-        proxyGeometry: path.join(homeDir, config.proxyGeometry),
-        panoImage: path.join(homeDir, config.panoImage),
-        poseInformation: config.poseInformation,
-        clusteringOpts: config.clusteringOpts
-      }
-    };*/
-
-  //console.log('configuration: ' + JSON.stringify(session, null, 4));
-
-  // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
   var promises = [];
   session.ElecdetecInputFiles = [];
   console.log('[SessionController::starting Orthogens]');
@@ -297,7 +277,7 @@ function orderSession(session) {
           break;
         }
       }
-      if (found == false) {
+      if (found === false) {
         console.log("loop not closed.");
         break;
       }
@@ -308,13 +288,6 @@ function orderSession(session) {
 
 module.exports = {
 
-  justTest: function(req, res, next) {
-    var session = req.body;
-
-    startWiregen(session).then(reOrderResult).then(function(argument) {
-      res.send(argument);
-    });
-  },
   /**
    * Uploades a new geometry file into the session container
    *
@@ -407,125 +380,65 @@ module.exports = {
   },
 
 
-  /**
-   * Creates a new session.
-   *
-   * Returns the SessionUUID which should be used for uploading uploadGeometry and uploadPanoramas
-   * @example POST http://localhost:5010/sessions/createSession
-   */
-
-
   createSession: function(req, res, next) {
-    createSession(req, res, next).then(function(argument) {
+
+    var session = req.body;
+
+    createSession(session).then(function(argument) {
       res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
     });
 
   },
+  createObjectFiles: function (req, res, next) {
+    var session = req.body;
 
-  /**
-     * Starts the Orthogen creation.
-     *
-     * @example POST http://localhost:5010/sessions/startOrthogen
-
-    {
-    "session" : "0a137c92-2679-47e7-931b-9e8f6229517d",
-       "proxyGeometry": "237996dd-ef7b-43be-9c89-cb86a55c2495.obj",
-        "panoImage": "9f647cb6-22fd-4aa3-b42b-8b349fbb5fa3.jpg",
-        "poseInformation": {
-            "translationX": 0,
-            "translationY": 0,
-            "translationZ": 0,
-            "rotationW": 0.0266818,
-            "rotationX": 0.00336098,
-            "rotationY": 0.00221603,
-            "rotationZ": 0.999636,
-            "res": 1,
-            "scale": "mm",
-            "elevationX": -1.5707963,
-            "elevationY": 1.5707963,
-            "exgeom": 1,
-            "exsphere": 1,
-            "exquad": 1
-        },
-        "clusteringOpts": {
-            "normalDirection": true,
-            "distanceClustering": true
-        }
-      }
-   */
-  startOrthogen: function(req, res, next) {
-    console.log(req.body);
-    var argument = req.body;
-    startOrthogen(req, res, next).then(function(argument) {
-      res.send(201, {
-        session: argument,
-        nextStep: '/sessions/startElecdetect'
-      });
+    createObjectFiles(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
     });
   },
-  /**
-   * Gets one file in a session which Orthogen created.
-   *
-   * @example GET http://localhost:5010/sessions/getOrthogenImage?session=a00ba655-8628-43bd-8505-94b1692aef89&file=ortho_5.jpg
-   */
+  startOrthogen : function (req, res, next) {
+    var session = req.body;
+    session.panoImage = hardCodedPanoImage;
 
-  getOrthogenImage: function(req, res, next) {
-
-    console.log('[Retrieved Query]: ' + JSON.stringify(req.query));
-
-    var config = req.query;
-    var homeDir = path.join(savePath, config.session);
-    var filePath = path.join(homeDir, config.file);
-
-    var fs = require('fs');
-
-    fs.readFile(filePath, function(err, file) {
-      if (!err) {
-        console.log('[Send File]');
-        res.send(file);
-      } else {
-        console.log('Error Reading File. Aborting!');
-        console.log('  Error message: ' + err);
-        res.send(500, err);
-      }
+    startOrthogen(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
     });
   },
+  startElecdetec : function (req, res, next) {
+    var session = req.body;
+    req.connection.setTimeout(0);
 
+    startElecdetec(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
+    });
+  },
+  startWiregen: function (req, res, next) {
+    startWiregen(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
+    });
 
-  /**
-     * Starts the Elecdetec creation after the Orthogen images are finished.
-     *
-     * @example POST http://localhost:5010/sessions/startElecdetect
-
-    {
-        "session": "0e275b45-2258-4abd-ba5b-70c8418b3b37", //the sessionId where the orthogen images were created
-        "files": [ //one or multiple which were generated from orthogen.
-            "test1.png",
-            "test2.png"
-        ]
-    }
-   */
-  startElecdetec: function(req, res, next) {
-    var config = req.body;
-    var homeDir = path.join(savePath, config.session);
-    var sessionId = config.session;
-
-    console.log('configuration: ' + JSON.stringify(config, null, 4));
-
-    var session = {
-      sessionId: sessionId,
-      homeDir: homeDir,
-      files: config.files
-    };
-
-    // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
-    var elecdetect = new Elecdetect(session);
-    elecdetect.createElecImages(function() {
-      res.send(201, {
-        session: session,
-        nextStep: 'startWiregen'
-      });
-
+  },
+  reOrderResult: function (req, res, next) {
+    reOrderResult(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
     });
   }
 };
