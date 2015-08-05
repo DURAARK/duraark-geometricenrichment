@@ -99,7 +99,7 @@ Elecdetec.prototype.createElecImages = function(session) {
                     var fileResult = {
                       file: files[key],
                       //TODO: don't like this style alternatives?
-                      link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
+                      link: 'session/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
                     };
                     session.elecDetecResultImages.push(fileResult);
                   }

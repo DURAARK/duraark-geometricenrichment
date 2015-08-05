@@ -62,7 +62,7 @@ module.exports.http = {
 
   customMiddleware: function (app) {
     var express = require('sails/node_modules/express');
-      app.use('/public', express.static('/tmp'));
+      app.use('/session', express.static('/tmp'));
     }
 
 
