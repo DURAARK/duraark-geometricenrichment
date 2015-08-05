@@ -383,7 +383,6 @@ module.exports = {
     });
   },
 
-
   rise: function(req, res, next) {
 
     req.connection.setTimeout(0);
