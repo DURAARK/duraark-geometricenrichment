@@ -62,7 +62,6 @@
     "name": "duraark-geometricenrichment",
     "version": "0.7.0",
     "title": "DURAARK GeometricEnrichment Service",
-    "url": "http://data.duraark.eu/services/api/geometricenrichment",
-    "sampleUrl": "http://data.duraark.eu/services/api/geometricenrichment"
+    "url": "http://data.duraark.eu/services/api/geometricenrichment"
   }
 }
