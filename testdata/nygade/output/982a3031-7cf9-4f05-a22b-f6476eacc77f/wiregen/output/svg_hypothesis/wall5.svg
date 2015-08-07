@@ -1,9 +1,10 @@
 <svg width="49.00746154785156" height="229.46489257812502" version="1.1" xmlns="http://www.w3.org/2000/svg">
-<circle cx="0" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
-<circle cx="49.00746154785156" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
-<circle cx="15" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
-<circle cx="34.00746154785156" cy="199.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
-<line x1="0" y1="199.46489257812502" x2="15" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
-<line x1="15" y1="199.46489257812502" x2="34.00746154785156" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
-<line x1="49.00746154785156" y1="199.46489257812502" x2="34.00746154785156" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<rect width="49.00746154785156" height="229.46489257812502" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />
+<circle cx="0" cy="214.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="49.00746154785156" cy="214.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="15" cy="214.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<circle cx="34.00746154785156" cy="214.46489257812502" r="3" stroke="black" stroke-width="1" fill="black" />
+<line x1="0" y1="214.46489257812502" x2="15" y2="214.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="15" y1="214.46489257812502" x2="34.00746154785156" y2="214.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="49.00746154785156" y1="214.46489257812502" x2="34.00746154785156" y2="214.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
 </svg>

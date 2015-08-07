@@ -4,6 +4,6 @@
 <rect x="217.5" y="142.9" width="12.8" height="12.8" style="fill:none;stroke-width:3;stroke:rgb(0,200,0)" />
 <line x1="15" y1="0" x2="15" y2="229.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
 <line x1="218.04506835937502" y1="0" x2="218.04506835937502" y2="229.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
-<line x1="0" y1="30" x2="233.04506835937502" y2="30" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
-<line x1="0" y1="199.46489257812502" x2="233.04506835937502" y2="199.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="0" y1="15" x2="233.04506835937502" y2="15" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
+<line x1="0" y1="214.46489257812502" x2="233.04506835937502" y2="214.46489257812502" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />
 </svg>
