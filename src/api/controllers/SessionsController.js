@@ -452,6 +452,8 @@ module.exports = {
     });
   },
   startWiregen: function(req, res, next) {
+    var session = req.body;
+
     startWiregen(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
