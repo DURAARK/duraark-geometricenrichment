@@ -242,8 +242,8 @@ function reOrderResult(session) {
       for (var i = 0; i < orderedResult.length; i++) {
         var picture = orderedResult[i].attributes.id;
         session.resultArray.wireGenResultGrammar.push(wireGenGramarUrl + picture + '.svg');
-        session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl +  picture + '.svg');
-        session.resultArray.elecDetecResults.push(elecDetedtUrl +  picture + '-result.jpg');
+        session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl + picture + '.svg');
+        session.resultArray.elecDetecResults.push(elecDetedtUrl + picture + '-result.jpg');
         session.resultArray.orthogenResults.push(baseUrl + picture + '.jpg');
       }
 
@@ -287,16 +287,18 @@ function orderSession(session) {
 }
 
 module.exports = {
-
   /**
-   * Uploades a new geometry file into the session container
+   * @api {post} /uploadFile Upload geometry file
+   * @apiVersion 0.7.0
+   * @apiName PostUploadFile
+   * @apiGroup RISE
+   * @apiPermission none
    *
-   * @example POST http://localhost:5010/uploadFile/
-   * Upload must be form-data
-   * session: SessionId
-   * file: <local file>
+   * @apiDescription Upload a new geometry file for RISE.
    *
-   * IMPORTANT: session must be before file in order for sails to extract the ID.
+   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   * @apiParam {Number} ID of the internal Session the file should be added to.
+   *
    */
   uploadFile: function(req, res, next) {
 
@@ -324,18 +326,19 @@ module.exports = {
   },
 
   /**
-   * Uploades a new geometry file into the session container
+   * @api {post} /uploadPanoramas Upload panorama file
+   * @apiVersion 0.7.0
+   * @apiName PostUploadPanorama
+   * @apiGroup RISE
+   * @apiPermission none
    *
-   * @example POST http://localhost:5010/uploadGeometry/
-   * Upload must be form-data
-   * session: SessionId
-   * file: <local file>
+   * @apiDescription Upload a new panorama file for RISE.
    *
-   * IMPORTANT: session must be before file in order for sails to extract the ID.
+   * @apiParam (File) {File} file Upload of file via form data.
+   * @apiParam {Number} ID of the internal Session the file should be added to.
+   *
    */
-
   uploadPanoramas: function(req, res, next) {
-
     var config = req.body;
     var homeDir = path.join(savePath, config.session);
 
@@ -356,7 +359,31 @@ module.exports = {
     });
   },
 
+  /**
+   * @api {post} /ifcreconstruction Extract BIM model
+   * @apiVersion 0.7.0
+   * @apiName PostIFCReconstruction
+   * @apiGroup IFCReconstruction
+   * @apiPermission none
+   *
+   * @apiDescription Extracts BIM model as IFC file from given E57 point cloud file.
+   *
+   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   *
+   */
 
+  /**
+   * @api {post} /rise Extract electrical appliances
+   * @apiVersion 0.7.0
+   * @apiName PostRise
+   * @apiGroup RISE
+   * @apiPermission none
+   *
+   * @apiDescription Extract BIM model as IFC file with in-wall electrical appliances from given E57 point cloud file.
+   *
+   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   *
+   */
   rise: function(req, res, next) {
 
     req.connection.setTimeout(0);
@@ -392,7 +419,7 @@ module.exports = {
     });
 
   },
-  createObjectFiles: function (req, res, next) {
+  createObjectFiles: function(req, res, next) {
     var session = req.body;
 
     createObjectFiles(session).then(function(argument) {
@@ -402,7 +429,7 @@ module.exports = {
       res.send(500, err);
     });
   },
-  startOrthogen : function (req, res, next) {
+  startOrthogen: function(req, res, next) {
     var session = req.body;
     session.panoImage = hardCodedPanoImage;
 
@@ -413,7 +440,7 @@ module.exports = {
       res.send(500, err);
     });
   },
-  startElecdetec : function (req, res, next) {
+  startElecdetec: function(req, res, next) {
     var session = req.body;
     req.connection.setTimeout(0);
 
@@ -424,7 +451,7 @@ module.exports = {
       res.send(500, err);
     });
   },
-  startWiregen: function (req, res, next) {
+  startWiregen: function(req, res, next) {
     startWiregen(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
@@ -433,7 +460,7 @@ module.exports = {
     });
 
   },
-  reOrderResult: function (req, res, next) {
+  reOrderResult: function(req, res, next) {
     reOrderResult(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
