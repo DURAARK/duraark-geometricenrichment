@@ -1,58 +1,128 @@
 [
         {
             "attributes": {
-                "left": 1199,
-                "top": 472,
+                "left": 2117,
+                "top": 1217,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall3"
+                "wallid": "wall2"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1030,
-                "top": 469,
+                "left": 2116,
+                "top": 1505,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall3"
+                "wallid": "wall2"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1371,
-                "top": 472,
+                "left": 2116,
+                "top": 1287,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall3"
+                "wallid": "wall2"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1712,
-                "top": 482,
+                "left": 2117,
+                "top": 1436,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall3"
+                "wallid": "wall2"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1115,
-                "top": 469,
+                "left": 1093,
+                "top": 1323,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall3"
+                "wallid": "wall2"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1251,
-                "top": 2254,
+                "left": 1092,
+                "top": 1394,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 1092,
+                "top": 1681,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 1091,
+                "top": 1611,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 1089,
+                "top": 1895,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 1090,
+                "top": 1961,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 2119,
+                "top": 1367,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 1093,
+                "top": 1542,
+                "width": 128,
+                "height": 128,
+                "wallid": "wall2"
+            },
+            "label": "SWITCH"
+        },
+        {
+            "attributes": {
+                "left": 2254,
+                "top": 1251,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall1"
@@ -61,128 +131,68 @@
         },
         {
             "attributes": {
-                "left": 1217,
-                "top": 2117,
+                "left": 472,
+                "top": 1199,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall2"
+                "wallid": "wall3"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1505,
-                "top": 2116,
+                "left": 469,
+                "top": 1030,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall2"
+                "wallid": "wall3"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1287,
-                "top": 2116,
+                "left": 472,
+                "top": 1371,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall2"
+                "wallid": "wall3"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1436,
-                "top": 2117,
+                "left": 482,
+                "top": 1712,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall2"
+                "wallid": "wall3"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1323,
-                "top": 1093,
+                "left": 469,
+                "top": 1115,
                 "width": 128,
                 "height": 128,
-                "wallid": "wall2"
+                "wallid": "wall3"
             },
             "label": "SWITCH"
         },
         {
             "attributes": {
-                "left": 1394,
-                "top": 1092,
+                "left": 594,
+                "top": 1786,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall2"
             },
-            "label": "SWITCH"
+            "label": "SOCKET"
         },
         {
             "attributes": {
-                "left": 1681,
-                "top": 1092,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1611,
-                "top": 1091,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1895,
-                "top": 1089,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1961,
-                "top": 1090,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1367,
-                "top": 2119,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1542,
-                "top": 1093,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
-            },
-            "label": "SWITCH"
-        },
-        {
-            "attributes": {
-                "left": 1486,
-                "top": 2174,
+                "left": 2174,
+                "top": 1486,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall0"
@@ -191,8 +201,8 @@
         },
         {
             "attributes": {
-                "left": 1429,
-                "top": 2175,
+                "left": 2175,
+                "top": 1429,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall0"
@@ -201,8 +211,8 @@
         },
         {
             "attributes": {
-                "left": 214,
-                "top": 1521,
+                "left": 1521,
+                "top": 214,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall3"
@@ -211,21 +221,11 @@
         },
         {
             "attributes": {
-                "left": 1562,
-                "top": 7,
+                "left": 7,
+                "top": 1562,
                 "width": 128,
                 "height": 128,
                 "wallid": "wall3"
-            },
-            "label": "SOCKET"
-        },
-        {
-            "attributes": {
-                "left": 1786,
-                "top": 594,
-                "width": 128,
-                "height": 128,
-                "wallid": "wall2"
             },
             "label": "SOCKET"
         },
@@ -417,4 +417,4 @@
             "right": 4,
             "crosslink": []
         }
-]
+    ]

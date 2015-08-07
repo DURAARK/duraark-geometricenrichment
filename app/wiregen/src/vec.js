@@ -41,6 +41,11 @@ AABB.prototype.insert = function(x,y)
     if (y < this.bbmin.y) this.bbmin.y = y;
     if (y > this.bbmax.y) this.bbmax.y = y;
 };
+AABB.prototype.isInside = function (v) {
+    return (v.x >= this.bbmin.x && v.x <= this.bbmax.x 
+         && v.y >= this.bbmin.y && v.y <= this.bbmax.y);
+};
+
 AABB.prototype.width  = function() { return this.bbmax.x - this.bbmin.x; };
 AABB.prototype.height = function() { return this.bbmax.y - this.bbmin.y; };
 

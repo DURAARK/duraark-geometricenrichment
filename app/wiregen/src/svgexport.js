@@ -99,6 +99,7 @@ function ExportGraphToSVG(G, wallid, bb)
         }
     }
     var result = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', bb.width()*s, bb.height()*s);
+    result += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', bb.width() * s, bb.height() * s);
     // draw vertices
     for (var n in G.N) {
         var v = G.N[n];
