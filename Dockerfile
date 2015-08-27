@@ -20,7 +20,7 @@ RUN cp /orthogen/build/orthogen /usr/local/bin && orthogen --help
 # Pull in microservice (a SailsJS API) and install it:
 COPY ./ /microservice
 WORKDIR /microservice/src
-RUN npm install
+RUN npm install sails nodemon -g && npm install
 
 RUN curl -sSL https://get.docker.com/ubuntu/ | sh
 ADD ./scripts/wrapdocker /usr/local/bin/wrapdocker
