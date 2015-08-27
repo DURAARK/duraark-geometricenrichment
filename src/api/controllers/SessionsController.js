@@ -360,19 +360,6 @@ module.exports = {
   },
 
   /**
-   * @api {post} /ifcreconstruction Extract BIM model
-   * @apiVersion 0.7.0
-   * @apiName PostIFCReconstruction
-   * @apiGroup IFCReconstruction
-   * @apiPermission none
-   *
-   * @apiDescription Extracts BIM model as IFC file from given E57 point cloud file.
-   *
-   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
-   *
-   */
-
-  /**
    * @api {post} /rise Extract electrical appliances
    * @apiVersion 0.7.0
    * @apiName PostRise

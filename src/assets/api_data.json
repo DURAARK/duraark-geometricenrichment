@@ -1,17 +1,17 @@
 [
   {
     "type": "post",
-    "url": "/ifcreconstruction",
+    "url": "/pc2bim/",
     "title": "Extract BIM model",
-    "version": "0.7.0",
-    "name": "PostIFCReconstruction",
-    "group": "IFCReconstruction",
+    "version": "0.8.0",
+    "name": "PostPc2bim",
+    "group": "PC2BIM",
     "permission": [
       {
         "name": "none"
       }
     ],
-    "description": "<p>Extracts BIM model as IFC file from given E57 point cloud file.</p> ",
+    "description": "<p>Schedule the extraction of a BIM model as IFC file from a given E57 point cloud file.</p> ",
     "parameter": {
       "fields": {
         "File": [
@@ -25,8 +25,42 @@
         ]
       }
     },
-    "filename": "api/controllers/SessionsController.js",
-    "groupTitle": "IFCReconstruction"
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\n   \"input\": \"/duraark-storage/files/Nygade_Scan1001.e57\",\n   \"output\": \"/duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc\",\n   \"error\": null\n }",
+          "type": "json"
+        }
+      ],
+      "fields": {
+        "Response": [
+          {
+            "group": "Response",
+            "type": "<p>String</p> ",
+            "optional": false,
+            "field": "input",
+            "description": "<p>Location of the input file.</p> "
+          },
+          {
+            "group": "Response",
+            "type": "<p>String</p> ",
+            "optional": false,
+            "field": "output",
+            "description": "<p>Location of the reconstructed output file.</p> "
+          },
+          {
+            "group": "Response",
+            "type": "<p>String</p> ",
+            "optional": false,
+            "field": "error",
+            "description": "<p>'null' if extraction was successfull, otherwise contains error message.</p> "
+          }
+        ]
+      }
+    },
+    "filename": "api/controllers/Pc2bimController.js",
+    "groupTitle": "PC2BIM"
   },
   {
     "type": "post",
