@@ -4,8 +4,7 @@ var spawn = require('child_process').spawn,
   path = require('path'),
   fs = require('fs'),
   Promise = require('bluebird'),
-  sys = require('sys'),
-  Docker = require('dockerode');
+  sys = require('sys');
 
 var PC2BIM = module.exports = function() {
   //this.session = session;
