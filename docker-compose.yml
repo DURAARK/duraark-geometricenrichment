@@ -1,0 +1,11 @@
+duraark-geometricenrichment:
+  image: duraark/duraark-geometricenrichment:0.7.0
+  ports:
+    - "5014:5014"
+  privileged: true
+#  If you are also using the 'duraark-sessions' service use 'volumes_from'
+#  instead of 'volumes' to link to the file storage.
+#  volumes-from:
+#    - duraark-sessions
+  volumes:
+    - /tmp/duraark:/duraark-storage

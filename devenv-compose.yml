@@ -1,0 +1,10 @@
+duraark-geometricenrichment:
+  # image: duraark/duraark-geometricenrichment:0.7.0
+  build: .
+  command: nodemon --watch /microservice/src/api -w /microservice/src/config app.js
+  ports:
+    - "5014:5014"
+  privileged: true
+  volumes:
+    - .:/microservice
+    - /duraark-storage:/duraark-storage
