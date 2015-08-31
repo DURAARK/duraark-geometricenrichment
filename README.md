@@ -1,4 +1,4 @@
-# duraark-metadata
+# duraark-geometricenrichment
 
 [![Circle CI](https://circleci.com/gh/DURAARK/duraark-geometricenrichment.svg?style=svg)](https://circleci.com/gh/DURAARK/duraark-geometricenrichment)
 
