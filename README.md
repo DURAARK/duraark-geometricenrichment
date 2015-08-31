@@ -1,47 +1,90 @@
-[![ZenHub](https://raw.githubusercontent.com/ZenHubIO/support/master/zenhub-badge.png)](https://zenhub.io)
+# duraark-metadata
 
-# microservice-rise
+[![Circle CI](https://circleci.com/gh/DURAARK/duraark-geometricenrichment.svg?style=svg)](https://circleci.com/gh/DURAARK/duraark-geometricenrichment)
 
-This microservice provides an API for detecting in-wall electrical applicances out of point cloud files and panorama images of the scanned rooms.
+## Overview
 
-The easiest way to test the microservice is to install docker (http://docker.io) and pull the latest version via
+This library is part of the [DURAARK](http://github.com/duraark/duraark-system) system and contains the metadata extraction components.
 
-```shell
-docker pull duraark/microservice-rise
+Information on the provided functionalities can be found in the reports
+
+* [D4.2 Documenting the Changing State of Built Architecture Software prototype v2](http://duraark.eu/wp-content/uploads/2014/02/DURAARK_D4.2-1.pdf)
+* [D5.4 Shape grammars for almost invisible structures Software prototype v2](http://duraark.eu/wp-content/uploads/2015/08/DURAARK_D5.5.4.pdf) 
+* [D2.5 Software prototype v2, Section 4.4](http://duraark.eu/wp-content/uploads/2015/08/DURAARK_D2_5_final.pdf) (overview)
+
+### Dependencies
+
+The service depends on the following DURAARK components:
+
+* pc2bim (provided by University of Bonn)
+* [elecdetect](https://github.com/DURAARK/elecdetect)
+* [orthogen](https://github.com/DURAARK/orthogen)
+* [wiregen](https://github.com/DURAARK/wiregen)
+
+### Used By
+
+This service is used by the
+
+* [DURAARK System](https://github.com/duraark/duraark-system)
+
+## Installation
+
+The following instructions will deploy the SailsJS-based service which exports a REST API.
+
+### Prerequisites
+
+The deployment is tested on Ubuntu 14.04 LTS. Other Linux distribution should work too, but are not tested. [Docker](https://docs.docker.com/userguide/) and [Docker Compose](https://docs.docker.com/compose/) are used for installation and have to be installed on the system you want to deploy the DURAARK system on. The following instructions assume that Docker and Docker Compose are installed on working on the system. See the above links on how to install them for various platforms. [Git](https://git-scm.com/downloads) has to be installed, too.
+
+It is also possible to install DURAARK on Windows and Mac users via the [Docker Toolbox](https://docs.docker.com/installation/windows/). Installing Docker Compose on windows is possible, but seems to be a bit of a hurdle. See this [Stackoverflow answer](http://stackoverflow.com/questions/29289785/how-to-install-docker-compose-on-windows) for details.
+
+Our recommended stack is to install DURAARK on a Docker-compatible Linux system or to use [VirtualBox](https://www.virtualbox.org/) to install a Linux virtual machine on your Windows host.
+
+### Installation Steps
+
+On the host you want to deploy the service execute the following steps (assuming that Docker and Docker Compose are installed and working):
+
+```js
+> git clone https://github.com/DURAARK/duraark-geometricenrichment.git
+> cd duraark-geometricenrichment
+> docker-compose up -d
 ```
 
-You can start a container afterwards via
+This will deploy the system in the current stable version (v0.7.0) which exposes its API at **http://HOST_IP:5014/** (http://localhost:5012/ if you did the setup on your local host).
 
-```shell
-docker run -d -p 5010:1337 -v /my_e57_files:/storage duraark/microservice-rise
+The files you want to use have to be put into the folder **/tmp/duraark/files**. You may want to also install the [duraark-sessions](https://github.com/DURAARK/duraark-sessions), which acts as the data volume container for files in the [DURAARK System](https://github.com/DURAARK/duraark-system).
+
+## Development Environment
+
+To setup the environment follow these steps:
+
+```js
+> git clone https://github.com/DURAARK/duraark-geometricenrichment.git
+> cd duraark-geometricenrichment
+> npm install
+> docker-compose -f devenv-compose.yml build
+> docker-compose -f devenv-compose.yml up -d
 ```
 
-The container exposes port 5010. To bring your e57 files into the container use the "-v" flag and link the desired folder as "/storage".
+This will build the dockerized development environment. After building the docker container is started and you can access the service at **http://localhost:5014**. Changing the source code will live reload the container.
 
-The following API endpoints are available:
+The files you want to use have to be put into the folder **/tmp/duraark/files**. You may want to also install the [duraark-sessions](https://github.com/DURAARK/duraark-sessions), which acts as the data volume container for files in the [DURAARK System](https://github.com/DURAARK/duraark-system).
 
-* Sessions -> For creating sessions and start the algorithmic.
-* Files -> For managing files on the storage
+### Testing
 
-### Sessions
+Run **npm test** in the **src** folder.
 
-The session controller has the function "rise", which is the geometric enrichment part of Duraark.
+## Platform Support
 
-Currently Rise requires the Wall.json, a panorama picture hardcoded somewhere in the storage and the pose information.
-At a later stage the panorama picture and the pose information will be extracted from the given files.
+This library is running on [NodeJS](https://nodejs.org/) and provides a Dockerfile for deployments on [Docker](https://www.docker.com/)-enabled hosts.
 
-One example JSON request for rise is in the folder testdata.
+## Public API
 
-After this post is done rise does the following requests in this specific order:
-* createSession(session) --> Creates a new session for this request and generates folders.
-*  .then(createObjectFiles) --> Extracts object files from the pose information.
-*  .then(startOrthogen) --> Start the Orthogen toolkit which extracts orthogonal pictures from the panorama image.
-*  .then(startElecdetec) --> Starts the Elecdeted toolkit which is an electrical switches/socket detection.
-*  .then(startWiregen) --> Starts the Wiregen toolkit which connects the electrical switches and sockets in the room
-*  .then(reOrderResult) --> reorders the pictures in the output to form a "beautiful" room.
+We are hosting a public API endpoint at
 
-Each of these requests can also be requested separately and they require the response of the previous step.
+* http://data.duraark.eu/services/api/geometricenrichment/
 
-Eg.: It is possible to request "startOrthogen" in the session controller. and the post data requires the response of createObjectFiles.
+which also provides API documentation for the current stable version.
 
-Enjoy!
+## Demo
+
+A public demo of the [DURAARK System](http://github.com/duraark/duraark-system) which incorporates this service is available [here](http://workbench.duraark.eu).
