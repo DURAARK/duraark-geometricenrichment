@@ -49,7 +49,7 @@ On the host you want to deploy the service execute the following steps (assuming
 > docker-compose up -d
 ```
 
-This will deploy the system in the current stable version (v0.7.0) which exposes its API at **http://HOST_IP:5014/** (http://localhost:5012/ if you did the setup on your local host).
+This will deploy the system in the current stable version (v0.7.0) which exposes its API at **http://HOST_IP:5014/** (http://localhost:5014/ if you did the setup on your local host).
 
 The files you want to use have to be put into the folder **/tmp/duraark/files**. You may want to also install the [duraark-sessions](https://github.com/DURAARK/duraark-sessions), which acts as the data volume container for files in the [DURAARK System](https://github.com/DURAARK/duraark-system).
 
