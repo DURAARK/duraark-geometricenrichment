@@ -46,8 +46,8 @@ module.exports = {
     res.setTimeout(0);
 
     startExtraction(filename).then(function(res) {
-      console.log('juhuu: ' + JSON.stringify(res, null, 4));
-      res.send(argument).status(200);
+      // console.log('juhuu: ' + JSON.stringify(res, null, 4));
+      res.send(res).status(200);
     }).catch(function(err) {
       console.log('[Pc2bimController] Error:\n' + err);
 

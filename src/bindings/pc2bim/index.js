@@ -17,11 +17,12 @@ PC2BIM.prototype.extract = function(filename) {
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
     //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED_DOCKER.ifc
-    var outputfile = filename.slice(0, -4) + '_RECONSTRUCTED.ifc';
+    var outputfile = filename.slice(0, -4) + '_RECONSTRUCTED.ifc',
+      errorText = '';
 
     console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim --input ' + filename + ' --output ' + outputfile);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', '/duraark-storage:/duraark-storage', 'ubo/pc2bim', 'pc2bim', '--input', filename, '--output', outputfile]);
+    var executable = spawn('docker', ['run', '--rm', '-v', '/duraark-storage:/duraark-storage', 'ubo/pc2bim77', 'pc2bim', '--input', filename, '--output', outputfile]);
     // var executable = spawn('docker', 'run', '--rm', 'hello-world');
     // var executable = spawn('docker');
 
@@ -31,44 +32,27 @@ PC2BIM.prototype.extract = function(filename) {
 
     executable.stderr.on('data', function(data) {
       console.log('ERROR: ' + data.toString());
+      errorText += data.toString();
     });
 
     executable.on('close', function(code) {
-      console.log('[PC2BIM-binding] child process exited with code ' + code);
+      // console.log('[PC2BIM-binding] child process exited with code ' + code);
 
       if (code === 0) {
+        console.log('[PC2BIM-binding] successfully finished');
         resolve({
           input: filename,
           output: outputfile,
           error: null
         });
       } else {
+        console.log('[PC2BIM-binding] finished with error code: ' + code);
         reject({
           input: filename,
           output: null,
-          error: 'extraction closed with error code: ' + code
+          error: errorText
         });
       }
     });
-
-    // function puts(error, stdout, stderr) {
-    //   console.log('ss');
-    //   sys.puts(stdout)
-    // }
-    // exec('docker run hello-world', puts);
-
-    // docker.createContainer({
-    //   Image: 'hello-world',
-    //   // Cmd: ['/bin/bash'],
-    //   name: 'ubuntu-test'
-    // }, function(err, container) {
-    //   container.start(function(err, data) {
-    //     if (err) reject(err);
-    //     resolve(data);
-    //     console.log('err: ' + err);
-    //     console.log('data: ' + data);
-    //   });
-    // });
-
   });
 };
