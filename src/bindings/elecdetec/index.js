@@ -49,9 +49,12 @@ Elecdetec.prototype.createElecImages = function(session) {
       if (!err) {
         promises = [];
 
-        _.forEach(session.ElecdetecInputFiles, function(n) {
-          var oldFile = n.file;
+
+
+        _.forEach(session.resultImages, function(n) {
+          var oldFile = path.join(session.orthoresult, n.file);
           var newFile = path.join(session.elecdetecPath, path.basename(n.file));
+          console.log(n.file + ': ' + oldFile + '-->' + newFile)
           promises.push(copyFile(oldFile, newFile));
         });
 

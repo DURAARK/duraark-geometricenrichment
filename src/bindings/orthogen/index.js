@@ -13,29 +13,34 @@ var Orthogen = module.exports = function() {
   //this.session = session;
 };
 
-Orthogen.prototype.createOrthoImages = function(session, objFile) {
+Orthogen.prototype.createOrthoImages = function(session) {
 
   return new Promise(function(resolve, reject) {
 
-
     session.status = 'pending';
 
-    console.log('[Orthogen::createOrthoImages] configuration: ' + JSON.stringify(objFile, null, 4));
+    console.log('[Orthogen::createOrthoImages] configuration: ' + session.basename);
 
-    var config = session.poseInformation;
+    //var config = session.poseInformation;
+    // var args = ['--im', session.panoImage,
+    //   '--ig', objFile,
+    //   '--rot', config.poseInformation.rotationW, config.poseInformation.rotationX, config.poseInformation.rotationY, config.poseInformation.rotationZ,
+    //   '--trans', config.poseInformation.translationX, config.poseInformation.translationY, config.poseInformation.translationZ,
+    //   '--res', config.poseInformation.res, // default: 1mm/pixel
+    //   '--elevation', config.poseInformation.elevationX, config.poseInformation.elevationY,
+    //   '--scale', config.poseInformation.scale, // default: 'm'
+    //   //'--exgeom', config.poseInformation.exgeom,
+    //   //'--exsphere', config.poseInformation.exsphere,
+    //   //'--exquad', config.poseInformation.exquad,
+    //   '--output', path.basename(objFile,'.obj')
 
-
-    var args = ['--im', session.panoImage,
-      '--ig', objFile,
-      '--rot', config.poseInformation.rotationW, config.poseInformation.rotationX, config.poseInformation.rotationY, config.poseInformation.rotationZ,
-      '--trans', config.poseInformation.translationX, config.poseInformation.translationY, config.poseInformation.translationZ,
-      '--res', config.poseInformation.res, // default: 1mm/pixel
-      '--elevation', config.poseInformation.elevationX, config.poseInformation.elevationY,
-      '--scale', config.poseInformation.scale, // default: 'm'
-      //'--exgeom', config.poseInformation.exgeom,
-      //'--exsphere', config.poseInformation.exsphere,
-      //'--exquad', config.poseInformation.exquad,
-      '--output', path.basename(objFile,'.obj')
+    var args = [
+      '--e57metadata', session.e57file,
+      '--walljson', session.wallfile,
+      '--panopath', session.panopath,
+      '--align', '../../../app/orthogen-windows/panoalign',
+      '--output', session.basename,
+      '--exgeom', '1'
     ];
 
     console.log('args: ' + JSON.stringify(args, null, 4));
@@ -43,7 +48,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
     // TODO: change to session directory here?
     var cwd = process.cwd();
 
-    process.chdir(session.homeDir);
+    process.chdir(session.orthoresult);
 
     // orthogen --im=pano.jpg
     // --ig=geometry.obj
@@ -73,7 +78,7 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
       //console.log('myhomeDir: ' + JSON.stringify(session));
 
       session.status = 'finished-Orthogen';
-
+      /*
       if(code === 0)
       {
         //in the current development we only get one!!! output... the other code reads the directory and outputs every file.
@@ -84,7 +89,8 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
         };
         resolve(orthoResultImage);
       }
-      /*var result = fs.readdir(session.homeDir, function(err, files) {
+      */
+      var result = fs.readdir(session.orthoresult, function(err, files) {
         if (err) {
           throw err;
         }
@@ -95,16 +101,17 @@ Orthogen.prototype.createOrthoImages = function(session, objFile) {
         session.resultImages = [];
 
         for (key in files) {
-          var fileResult = {
-            file: files[key],
-            //TODO: don't like this style alternatives?
-            link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
-          };
-          session.resultImages.push(fileResult);
-
+          if (files[key].substr(-4)==".jpg") {
+            var fileResult = {
+              file: files[key],
+              //TODO: don't like this style alternatives?
+              link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
+            };
+            session.resultImages.push(fileResult);
+          }
         }
-        resolve(session.resultImages);
-      });*/
+        resolve(session);
+      });
 
       //this.session.save(function(err, record) {
       //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));

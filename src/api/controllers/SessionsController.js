@@ -18,7 +18,7 @@ var savePath = '/tmp';
 
 function createSession(session) {
   return new Promise(function(resolve, reject) {
-    var tmp = uuid.v4(),
+    var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47',  //uuid.v4(),
       homeDir = path.join(savePath, tmp),
       config = session;
 
@@ -51,6 +51,26 @@ function createSession(session) {
     });
   });
 
+}
+
+function initializeSession(session) {
+  return new Promise(function(resolve, reject) {
+    //todo upload stuff
+    session.basename = "Byg72";
+    session.e57file  = path.join(session.homeDir,session.basename + "_e57metadata.json");
+    session.wallfile = path.join(session.homeDir,session.basename + "_wall.json");
+    session.panopath = path.join(session.homeDir, "pano");
+    session.orthoresult = path.join(session.homeDir, "orthoresult");
+    mkdirp(session.orthoresult, function(err) {
+      if (!err) {
+        resolve(session);
+      } else {
+        console.log('Error creating session directory. Aborting!');
+        console.log('  Error message: ' + err);
+        reject(err);
+      }
+    });
+  });
 }
 
 function createObjectFiles(session) {
@@ -94,7 +114,22 @@ function createObjectFiles(session) {
 }
 
 function startOrthogen(session) {
-  var promises = [];
+ 
+  return new Promise(function(resolve, reject) {
+    var orthogen = new Orthogen();
+    orthogen.createOrthoImages(session).then(function(orthogen_result){
+
+      for (key in orthogen_result.resultImages) {
+        orthogen_result.ElecdetecInputFiles.push(
+          path.join(orthogen_result.orthoresult, orthogen_result.resultImages[key].file)
+        );
+      }
+
+     resolve(orthogen_result); 
+    });
+  });
+
+ /* var promises = [];
   session.ElecdetecInputFiles = [];
   console.log('[SessionController::starting Orthogens]');
 
@@ -119,7 +154,7 @@ function startOrthogen(session) {
   }).catch(function(err) {
     console.log('Error: ' + err);
     throw new Error(err);
-  });
+  });*/
 
 }
 
@@ -379,7 +414,7 @@ module.exports = {
     session.panoImage = hardCodedPanoImage;
 
     createSession(session)
-      .then(createObjectFiles)
+      .then(initializeSession)
       .then(startOrthogen)
       .then(startElecdetec)
       .then(startWiregen)
@@ -406,6 +441,21 @@ module.exports = {
     });
 
   },
+
+  initializeSession: function(req, res, next) {
+
+    var session = req.body;
+
+    initializeSession(session).then(function(argument) {
+      res.send(200, argument);
+    }).catch(function(err) {
+      console.log('Error: ' + err);
+      res.send(500, err);
+    });
+
+  },
+
+
   createObjectFiles: function(req, res, next) {
     var session = req.body;
 
