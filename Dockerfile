@@ -28,7 +28,7 @@ RUN chmod +x /usr/local/bin/wrapdocker
 ADD ./scripts/startAPI.sh /microservice/scripts/startAPI.sh
 RUN chmod +x /microservice/scripts/startAPI.sh
 
-EXPOSE 5015
+EXPOSE 5014
 
 VOLUME /var/lib/docker
 
