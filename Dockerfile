@@ -10,12 +10,12 @@ RUN add-apt-repository ppa:chris-lea/node.js -y && apt-get update -y && apt-get 
 COPY ./orthogen /orthogen
 
 # Compile orthogen binary:
-RUN mkdir -p /orthogen/build && cd /orthogen/build
-WORKDIR /orthogen/build
-RUN cmake -DEIGEN3_INCLUDE_DIR=/usr/include/eigen3 ../ && make -j2
+##RUN mkdir -p /orthogen/build && cd /orthogen/build
+##WORKDIR /orthogen/build
+##RUN cmake -DEIGEN3_INCLUDE_DIR=/usr/include/eigen3 ../ && make -j2
 
 # Perform system-wide installation as 'orthogen':
-RUN cp /orthogen/build/orthogen /usr/local/bin && orthogen --help
+##RUN cp /orthogen/build/orthogen /usr/local/bin && orthogen --help
 
 # Pull in microservice (a SailsJS API) and install it:
 COPY ./ /microservice
