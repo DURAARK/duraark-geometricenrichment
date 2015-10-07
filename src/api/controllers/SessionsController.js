@@ -73,6 +73,7 @@ function initializeSession(session) {
   });
 }
 
+/*
 function createObjectFiles(session) {
   var promises = [];
   console.log('[SessionController::Creating Object files]');
@@ -112,18 +113,13 @@ function createObjectFiles(session) {
     throw new Error(err);
   });
 }
+*/
 
 function startOrthogen(session) {
  
   return new Promise(function(resolve, reject) {
     var orthogen = new Orthogen();
     orthogen.createOrthoImages(session).then(function(orthogen_result){
-
-      for (key in orthogen_result.resultImages) {
-        orthogen_result.ElecdetecInputFiles.push(
-          path.join(orthogen_result.orthoresult, orthogen_result.resultImages[key].file)
-        );
-      }
 
      resolve(orthogen_result); 
     });

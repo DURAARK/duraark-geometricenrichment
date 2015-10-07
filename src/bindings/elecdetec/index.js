@@ -5,7 +5,7 @@ var spawn = require('child_process').spawn,
   mkdirp = require('mkdirp'),
   _ = require('lodash'),
   Promise = require("bluebird");
-
+  imgsize = require('image-size');
 
 /**
  * Provides NodeJS-Javascript bindings for the 'orthogen' executable.
@@ -49,13 +49,15 @@ Elecdetec.prototype.createElecImages = function(session) {
       if (!err) {
         promises = [];
 
-
-
         _.forEach(session.resultImages, function(n) {
           var oldFile = path.join(session.orthoresult, n.file);
           var newFile = path.join(session.elecdetecPath, path.basename(n.file));
           console.log(n.file + ': ' + oldFile + '-->' + newFile)
-          promises.push(copyFile(oldFile, newFile));
+          var dimensions = imgsize(oldFile);
+          console.log("IMAGE SIZE: ", dimensions.width, dimensions.height);
+          if ((dimensions.width > 128) && (dimensions.height > 128)) {
+             promises.push(copyFile(oldFile, newFile));
+          }
         });
 
         Promise.all(promises).then(function() {
