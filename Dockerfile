@@ -22,7 +22,7 @@ COPY ./ /microservice
 WORKDIR /microservice/src
 RUN npm install sails nodemon -g && npm install
 
-#RUN curl -sSL https://get.docker.com/ubuntu/ | sh
+RUN curl -sSL https://get.docker.com/ubuntu/ | sh
 #ADD ./scripts/wrapdocker /usr/local/bin/wrapdocker
 #RUN chmod +x /usr/local/bin/wrapdocker
 ADD ./scripts/startAPI.sh /microservice/scripts/startAPI.sh
@@ -30,7 +30,7 @@ RUN chmod +x /microservice/scripts/startAPI.sh
 
 EXPOSE 5014
 
-VOLUME /var/lib/docker
+#VOLUME /var/lib/docker
 VOLUME /var/run/docker.sock
 VOLUME /duraark-storage
 
