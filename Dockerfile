@@ -30,8 +30,6 @@ RUN chmod +x /microservice/scripts/startAPI.sh
 
 EXPOSE 5014
 
-#VOLUME /var/lib/docker
-VOLUME /var/run/docker.sock
 VOLUME /duraark-storage
 
 CMD ["/microservice/scripts/startAPI.sh"]
