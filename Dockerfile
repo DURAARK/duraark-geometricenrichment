@@ -7,7 +7,7 @@ RUN DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -qqy git software-properties-common build-essential cmake vim libboost-program-options1.55-dev libeigen3-dev apt-transport-https ca-certificates curl iptables && apt-get install --fix-missing
 RUN add-apt-repository ppa:chris-lea/node.js -y && apt-get update -y && apt-get -y install nodejs -y && npm install -g grunt-cli sails nodemon
 # Copy sources and dependencies for the 'orthogen' binary:
-COPY ./orthogen /orthogen
+##COPY ./orthogen /orthogen
 
 # Compile orthogen binary:
 ##RUN mkdir -p /orthogen/build && cd /orthogen/build
