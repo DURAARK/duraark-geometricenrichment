@@ -35,13 +35,15 @@ Wiregen.prototype.importDetections = function(session) {
 
               var attr = object.boundingbox[0].$;
 
+              var wallid = path.basename(result.Image.$.file, '.jpg').substring(session.basename.length+1);
+
               var item = {
                 "attributes": {
                   "left": Number(attr.x),
                   "top": Number(attr.y),
                   "width": Number(attr.w),
                   "height": Number(attr.h),
-                  "wallid": path.basename(result.Image.$.file, '.jpg')
+                  "wallid": wallid
                 }
               };
               //console.log('new item' + object.label);
@@ -68,6 +70,8 @@ Wiregen.prototype.importDetections = function(session) {
 
 
   return Promise.all(promises).then(function(argument) {
+    console.log(session.Sockets.length + " sockets");
+    console.log(session.Switches.length + " switches");
     return session;
   }).catch(function(err) {
     console.log('Error: ' + err);

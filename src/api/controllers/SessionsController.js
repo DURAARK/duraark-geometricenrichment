@@ -176,27 +176,39 @@ function startWiregen(session) {
     //console.log(session);
     var wiregen = new Wiregen();
     resolve(wiregen.importDetections(session)
-      .then(createFlatList)
+      .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
       .then(wireGenResultSvg_grammar)
       .then(wireGenResultSvg_hypothesis));
   });
 }
 
-function createFlatList(session) {
+function createInputSymbolList(session) {
   return new Promise(function(resolve, reject) {
     try {
 
       console.log('[SessionController::create Flat List]');
 
-      listImport = ['Switches', 'Sockets', 'Doors', 'Walls'];
+      console.log('reading from ' + session.wallfile);
+      walljson =  JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      session.Walls = walljson.Walls;
+      session.Windows = walljson.Windows;
+      session.Doors = walljson.Doors;
+
+      listImport = ['Switches', 'Sockets', 'Doors', 'Windows', 'Walls'];
+      //console.log(session);
+
+      //console.log(walljson);
 
       for (var i = 0; i < listImport.length; i++) {
-        var currentList = listImport[i];
-        //console.log(session[currentList]);
-        for (var j = 0; j < session[currentList].length; j++) {
-          var item = session[currentList][j];
-          session.wiregenInput.push(item);
+        if (session[listImport[i]]) {
+          console.log(listImport[i] + " : " + session[listImport[i]]);
+          var currentList = session[listImport[i]];
+          for (var j = 0; j < currentList.length; j++) {
+            var item = currentList[j];
+            session.wiregenInput.push(item);
+          }
+          console.log("imported " + currentList.length + listImport[i] + ".");
         }
       }
 
@@ -213,6 +225,7 @@ function createFlatList(session) {
       });
     } catch (e) {
       console.log(e);
+      console.log(e.stack);
       reject(e);
     }
 
@@ -486,7 +499,7 @@ module.exports = {
   },
   startWiregen: function(req, res, next) {
     var session = req.body;
-
+    //console.log(session);
     startWiregen(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {

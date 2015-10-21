@@ -15,6 +15,7 @@
   "dependencies": {
     "commander": "^2.8.1",
     "priorityqueuejs": "^1.0.0",
-    "xml2js" : "^0.4.9"
+    "xml2js" : "^0.4.9",
+    "d3" : "^3.5.6"
   }
 }

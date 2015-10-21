@@ -83,17 +83,60 @@ Symbols.forEach(function (s) {
 
 // -------------------------------------------------------------------------------
 // evaluate the grammar
-while(Symbols.length > 0)
+var steps = 0;
+while(grammar.evaluateGrammarStep(Symbols, TerminalSymbols, Grammar))
 {
-    Symbols = grammar.evaluateGrammarStep(Symbols, TerminalSymbols, Grammar);
+    steps = steps + 1;
 }
 
+console.log("evaluation took " + steps + " steps.");
+
+// collect walls
+var numSockets = 0;
+var numSwitches = 0;
+var numWalls = 0;
 TerminalSymbols.forEach(function (t) {
     if (t.label == "wall") {
         t.bb = new vec.AABB();
         WALLS[t.attributes.id] = t;
+        numWalls = numWalls + 1;
     }
+    if (t.label == "socket") numSockets = numSockets + 1;
+    if (t.label == "switch") numSwitches = numSwitches + 1;
+    if (t.label == "vgroup") console.log("vgroup height:" + t.attributes.height);
 });
+console.log("found " + numWalls + " walls, " + numSwitches + " switches and " + numSockets + " sockets.");
+
+// get wall arrangements
+var WALLORDER = [];
+{
+    // build left index
+    var LEFT = {}
+    for (var w in WALLS) { LEFT[WALLS[w].attributes.connleft] = WALLS[w]; }
+    
+    while (Object.keys(LEFT).length > 0) {
+        var current = LEFT[Object.keys(LEFT)[0]];
+        var corder = [];
+        do {
+            corder.push(current.attributes.id);               // add to ordered list
+            delete LEFT[current.attributes.connleft];         // remove entry
+            current = LEFT[current.attributes.connright];     // move to next
+        } while (current);
+        WALLORDER.push(corder);
+    }
+}
+console.log("WALL ORDER:");
+console.log(WALLORDER);
+
+var SVG_HTML = "<html><body>\n";
+WALLORDER.forEach(function (cycle) {
+    cycle.forEach(function (id) {
+        SVG_HTML += '<img src="' + id + '.svg">\n';
+    });
+    SVG_HTML += '<br>\n\n'
+});
+SVG_HTML += "</body></html>\n";
+
 
 // write SVG with terminal symbols (objects + installation zones)
 mkdirSync(program.output);
@@ -103,24 +146,29 @@ for (var w in wallsvg) {
     var wall = wallsvg[w];
     fs.writeFileSync(util.format("%s/svg_grammar/%s.svg", program.output, w), wall);
 }
+fs.writeFileSync(util.format("%s/svg_grammar/index.html", program.output), SVG_HTML);
 // -------------------------------------------------------------------------------
 // build installation zone graph
 
 var G = new graph.Graph();
 
-// get bounding box
+// calculate wall bounding boxes
 TerminalSymbols.forEach(function (symbol)
 {
     var att = symbol.attributes;
-    if (att.hasOwnProperty("id")) {
+    if (att["id"]) {
         var bb = WALLS[att["id"]].bb;
         bb.insert(att.left, att.top);
         bb.insert(att.left + att.width, att.top + att.height);
     }
-    if (att.hasOwnProperty("wallid")) {
-        var bb = WALLS[att["wallid"]].bb;
-        bb.insert(att.left, att.top);
-        bb.insert(att.left + att.width, att.top + att.height);
+    if (att["wallid"]) {
+        if (WALLS[att["wallid"]]) {
+            var bb = WALLS[att["wallid"]].bb;
+            bb.insert(att.left, att.top);
+            bb.insert(att.left + att.width, att.top + att.height);
+        } else {
+            console.log("terminal " + symbol.label + " wall id " + att.wallid + " not found!");
+        }
     }
 });
 
@@ -172,22 +220,23 @@ for (ts in TerminalSymbols) {
 var ROOT = null;
 // insert detections: insert as node if "near" to zone, connect to nearest zone otherwise
 for (var ts in TerminalSymbols) {
-    var t = TerminalSymbols[ts];
+    var term = TerminalSymbols[ts];
 
-    if (t.label == 'switch' || t.label == 'socket' || t.label == 'root') {
+    if (term.label == 'switch' || term.label == 'socket' || term.label == 'root') {
         var validEndPoint = true;
         // ignore if inside an opening
-        var a = t.attributes;
+        var a = term.attributes;
+        var posx = a.left + a.width / 2;
+        var posy = a.top + a.height / 2;
         for (var tso in TerminalSymbols) {
             var to = TerminalSymbols[tso];
             if (to.label == 'door' || to.label == 'window') {
                 if (to.attributes.wallid == a.wallid) {
                     var att = to.attributes;
                     var l = att.left, t = att.top, r = att.left + att.width, b = att.top + att.height;
-                    if ((att.left >= l && att.left <= r && att.top >= t && att.top <= b)) {
+                    if ((posx >= l && posx <= r && posy >= t && posy <= b)) {
                         validEndPoint = false;
-                    } else {
-                        console.log("endpoint inside opening.");
+                        console.log("endpoint " + term.label + " inside opening.");
                     }
                 }
             }
@@ -195,7 +244,7 @@ for (var ts in TerminalSymbols) {
         
         if (validEndPoint) {
             var p = new vec.Vec2(a.left + a.width / 2, a.top + a.height / 2, a.wallid);
-            p.terminal = t;
+            p.terminal = term;
             // get line with minimal normal projection distance
             var mindist = Number.MAX_VALUE;
             var minedge = null;
@@ -223,13 +272,13 @@ for (var ts in TerminalSymbols) {
                 if (p.sub(q).length() > wall.attributes.zone_width / 2) {
                     // add an additional edge, TODO:check for occluders
                     G.addEdge(p, q);
-                    endpoint = { pos: p, terminal: t };
+                    endpoint = { pos: p, terminal: term };
                 } else {
                     // inside installation zone
-                    endpoint = { pos: q, terminal: t };
+                    endpoint = { pos: q, terminal: term };
                 }
                 EndPoints.push(endpoint);
-                if (t.label == 'root') {
+                if (term.label == 'root') {
                     ROOT = endpoint;
                 }
             }
@@ -237,14 +286,21 @@ for (var ts in TerminalSymbols) {
     }
 }
 
-if (ROOT == null) {
+if (!ROOT) {
     console.log("WARNING: no root found, using an endpoint.");
     if (EndPoints.length > 0) {
         ROOT = EndPoints[0];
     } else {
         console.log("ERROR: no endpoints.");
+        return;
     }
 }
+// Display endpoint statistics
+var epstat = { 'socket': 0, 'switch': 0 };
+for (var e in EndPoints) {
+    epstat[EndPoints[e].terminal.label] = epstat[EndPoints[e].terminal.label] + 1;
+}
+console.log(epstat);
 
 // Connect wall segments
 var WALLCONN = {};
@@ -314,7 +370,7 @@ function findWireTree(G, root, EndPoints)
     var v = G.isGraphVertex(root.pos);
     T.N[v._id]=v;
     wgutil.removeArrObj(EP, root);
-    var i =0;
+    var i = 0;
     // - find shortest path from current endpoint to tree, for all endpoints
     while(EP.length > 0) {
         var best = { path:{cost: Number.MAX_VALUE }, ep: null };
@@ -323,27 +379,33 @@ function findWireTree(G, root, EndPoints)
             var ep = EP[epid];
             //console.log("Processing EndPoint: %d,%d", ep.pos.x, ep.pos.y);
             var path = graph2d.getShortestPath(G, T, ep.pos);   // { edge: [], cost: <val> }
-            if (path.path.length > 0 && path.cost < best.path.cost) {
-                //console.log(util.format("found new best path, cost: %d, old best %d, length", path.cost, best.path.cost, path.path.length));
-                best.path = path;
-                best.ep   = ep;
-            }
+            if (path) {
+                if (path.path.length > 0 && path.cost < best.path.cost) {
+                    //console.log(util.format("found new best path, cost: %d, old best %d, length", path.cost, best.path.cost, path.path.length));
+                    best.path = path;
+                    best.ep = ep;
+                }
+            } 
         }
-        // add path to tree, remove endpoint
-        if (best.path.path.length > 0) {
-            T.addPathFromGraph(G, best.path.path);
-            wgutil.removeArrObj(EP, best.ep);
-            //fs.writeFileSync(util.format("wire-graph-%d.svg", ++i), svgexport.ExportGraphToSVG(T));
-            if (i > EndPoints.length) {
-                return T;
+        if (best.path.path) {
+            // add path to tree, remove endpoint
+            if (best.path.path.length > 0) {
+                T.addPathFromGraph(G, best.path.path);
+                wgutil.removeArrObj(EP, best.ep);
+                //fs.writeFileSync(util.format("wire-graph-%d.svg", ++i), svgexport.ExportGraphToSVG(T));
+                if (i > EndPoints.length) {
+                    return T;
+                }
             }
+        } else {
+            console.log("[Error] no best path found, isolated endpoint.");
         }
     }
     return T;
 }
 
 var WireTree = findWireTree(G, ROOT, EndPoints);
-//console.log(WireTree);
+
 
 fs.writeFileSync(util.format("%s/iz-graph.json",program.output), JSON.stringify(G));
 fs.writeFileSync(util.format("%s/iz-graph.dot", program.output), G.exportToGraphViz());
@@ -357,6 +419,7 @@ mkdirSync(program.output + "/svg_hypothesis");
 for (var wallid in WALLS) {
     fs.writeFileSync(util.format("%s/svg_hypothesis/%s.svg", program.output, wallid), svgexport.ExportGraphToSVG(WireTree, wallid, WALLS[wallid].bb));
 }
+fs.writeFileSync(util.format("%s/svg_hypothesis/index.html", program.output), SVG_HTML);
 
 //fs.writeFileSync("wire-graph.svg", svgexport.ExportGraphToSVG(WireTree));
 console.log("=== WireGen Finished ===");

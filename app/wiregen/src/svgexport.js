@@ -70,12 +70,16 @@ function ExportTerminalsToSVG(symbols)
                 case "switch":
                     result[att.wallid] += util.format('<rect x="%d" y="%d" width="%d" height="%d" style="fill:none;stroke-width:3;stroke:rgb(0,0,200)" />\n', att.left*s, att.top*s, att.width*s, att.height*s);
                     break;
+                case "vgroup":
+                    result[att.wallid] += util.format('<rect x="%d" y="%d" width="%d" height="%d" style="fill:none;stroke-width:3;stroke:rgb(200,200,0)" />\n', att.left * s, att.top * s, att.width * s, att.height * s);
+                    break;
             }
         }
     });
-
+    
     WALLS.forEach(function (symbol) {
         var att = symbol.attributes;
+        result[att.id] += '<text x="10" y="10" fill="black">' + att.id + '</text>'
         result[att.id] += '</svg>\n'; 
     });
 

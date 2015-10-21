@@ -40,12 +40,23 @@ AABB.prototype.insert = function(x,y)
     if (x > this.bbmax.x) this.bbmax.x = x;
     if (y < this.bbmin.y) this.bbmin.y = y;
     if (y > this.bbmax.y) this.bbmax.y = y;
+    return this;
 };
+AABB.prototype.insertBB = function (bb) {
+    this.insert(bb.bbmin.x, bb.bbmin.y);
+    this.insert(bb.bbmax.x, bb.bbmax.y);
+    return this;
+};
+
 AABB.prototype.isInside = function (v) {
     return (v.x >= this.bbmin.x && v.x <= this.bbmax.x 
          && v.y >= this.bbmin.y && v.y <= this.bbmax.y);
 };
 
+AABB.prototype.left   = function() { return this.bbmin.x; }
+AABB.prototype.top    = function() { return this.bbmin.y; }
+AABB.prototype.right  = function() { return this.bbmax.x; }
+AABB.prototype.bottom = function() { return this.bbmax.y; }
 AABB.prototype.width  = function() { return this.bbmax.x - this.bbmin.x; };
 AABB.prototype.height = function() { return this.bbmax.y - this.bbmin.y; };
 

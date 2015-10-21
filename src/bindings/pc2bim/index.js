@@ -22,7 +22,7 @@ PC2BIM.prototype.extract = function(filename) {
 
     console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim --input ' + filename + ' --output ' + outputfile);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', '/duraark-storage:/duraark-storage', 'ubo/pc2bim77', 'pc2bim', '--input', filename, '--output', outputfile]);
+    var executable = spawn('docker', ['run', '--rm', '-v', '/duraark-storage:/duraark-storage', 'ubo/pc2bim', 'pc2bim', '--input', filename, '--output', outputfile]);
     // var executable = spawn('docker', 'run', '--rm', 'hello-world');
     // var executable = spawn('docker');
 

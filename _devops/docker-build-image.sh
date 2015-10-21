@@ -9,4 +9,4 @@ DOCKERFILE=$(sed '3q;d' $SERVICEFILE)
 echo "Building docker image '$IMAGENAME' from Dockerfile located at '$DOCKERFILE':"
 echo "docker build -t $IMAGENAME $DOCKERFILE"
 
-docker build -t duraark-geometricenrichment-v0.7.0 $DOCKERFILE
+docker build -t local/duraark-geometricenrichment $DOCKERFILE
