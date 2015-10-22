@@ -8,7 +8,8 @@
 module.exports = {
 
   attributes: {
-
+    inputFile: 'string',
+    outputFile: 'string',
+    status: 'string'
   }
 };
-
