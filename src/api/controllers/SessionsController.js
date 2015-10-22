@@ -18,7 +18,7 @@ var savePath = '/tmp';
 
 function createSession(session) {
   return new Promise(function(resolve, reject) {
-    var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47',  //uuid.v4(),
+    var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(),
       homeDir = path.join(savePath, tmp),
       config = session;
 
@@ -57,8 +57,8 @@ function initializeSession(session) {
   return new Promise(function(resolve, reject) {
     //todo upload stuff
     session.basename = "Byg72";
-    session.e57file  = path.join(session.homeDir,session.basename + "_e57metadata.json");
-    session.wallfile = path.join(session.homeDir,session.basename + "_wall.json");
+    session.e57file = path.join(session.homeDir, session.basename + "_e57metadata.json");
+    session.wallfile = path.join(session.homeDir, session.basename + "_wall.json");
     session.panopath = path.join(session.homeDir, "pano");
     session.orthoresult = path.join(session.homeDir, "orthoresult");
     mkdirp(session.orthoresult, function(err) {
@@ -116,41 +116,41 @@ function createObjectFiles(session) {
 */
 
 function startOrthogen(session) {
- 
+
   return new Promise(function(resolve, reject) {
     var orthogen = new Orthogen();
-    orthogen.createOrthoImages(session).then(function(orthogen_result){
+    orthogen.createOrthoImages(session).then(function(orthogen_result) {
 
-     resolve(orthogen_result); 
+      resolve(orthogen_result);
     });
   });
 
- /* var promises = [];
-  session.ElecdetecInputFiles = [];
-  console.log('[SessionController::starting Orthogens]');
+  /* var promises = [];
+   session.ElecdetecInputFiles = [];
+   console.log('[SessionController::starting Orthogens]');
 
-  _.forEach(session.poseInformation.objFile, function(oneObj) {
-    var promise = new Promise(function(resolve, reject) {
+   _.forEach(session.poseInformation.objFile, function(oneObj) {
+     var promise = new Promise(function(resolve, reject) {
 
-      var orthogen = new Orthogen();
-      orthogen.createOrthoImages(session, oneObj)
-        .then(function(newFile) {
-          resolve(session.ElecdetecInputFiles.push(newFile));
-        });
+       var orthogen = new Orthogen();
+       orthogen.createOrthoImages(session, oneObj)
+         .then(function(newFile) {
+           resolve(session.ElecdetecInputFiles.push(newFile));
+         });
 
 
-    });
+     });
 
-    promises.push(promise);
-  });
+     promises.push(promise);
+   });
 
-  return Promise.all(promises).then(function(argument) {
-    //console.log(session.ElecdetecInputFiles);
-    return session;
-  }).catch(function(err) {
-    console.log('Error: ' + err);
-    throw new Error(err);
-  });*/
+   return Promise.all(promises).then(function(argument) {
+     //console.log(session.ElecdetecInputFiles);
+     return session;
+   }).catch(function(err) {
+     console.log('Error: ' + err);
+     throw new Error(err);
+   });*/
 
 }
 
@@ -190,7 +190,7 @@ function createInputSymbolList(session) {
       console.log('[SessionController::create Flat List]');
 
       console.log('reading from ' + session.wallfile);
-      walljson =  JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
       session.Walls = walljson.Walls;
       session.Windows = walljson.Windows;
       session.Doors = walljson.Doors;
@@ -515,5 +515,19 @@ module.exports = {
       console.log('Error: ' + err);
       res.send(500, err);
     });
+  },
+
+  roomInfo: function(req, res, next) {
+    // var sessionId = req.param('sessionId'),
+    // roomId = req.param('roomId');
+
+    var sessionId = 3,
+      roomId = 'room11';
+
+    Sessions.findOne(sessionId).then(function(session) {
+      console.log('session: ' + JSON.stringify(session, null, 4));
+
+      // TODO: find svgs for room
+    })
   }
 };
