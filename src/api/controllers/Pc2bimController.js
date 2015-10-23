@@ -4,6 +4,8 @@
 
 var PC2BIM = require('../../bindings/pc2bim');
 
+var _SIMULATE_SUCCESS = false;
+
 function pc2bimRun(filename, duraarkStoragePath) {
   var pc2bim = new PC2BIM(duraarkStoragePath);
   return pc2bim.extract(filename);
@@ -97,12 +99,13 @@ module.exports = {
           downloadUrl: null
         }).then(function(runState) {
 
-          // // Simluate success:
-          // runState.status = "finished";
-          // var url = runState.inputFile.replace('.e57', '.ifc');
-          // url = url.replace('/duraark-storage', '');
-          // runState.downloadUrl = url;
-          // return res.send(runState);
+          if (_SIMULATE_SUCCESS) {
+            runState.status = "finished";
+            var url = runState.inputFile.replace('.e57', '.ifc');
+            url = url.replace('/duraark-storage', '');
+            runState.downloadUrl = url;
+            return res.send(runState);
+          }
 
           startExtraction({
             runState: runState,
@@ -114,12 +117,13 @@ module.exports = {
         });
       } else {
 
-        // // Simluate success:
-        // runState.status = "finished";
-        // var url = runState.inputFile.replace('.e57', '.ifc');
-        // url = url.replace('/duraark-storage', '');
-        // runState.downloadUrl = url;
-        // return res.send(runState);
+        if (_SIMULATE_SUCCESS) {
+          runState.status = "finished";
+          var url = runState.inputFile.replace('.e57', '.ifc');
+          url = url.replace('/duraark-storage', '');
+          runState.downloadUrl = url;
+          return res.send(runState);
+        }
 
         if (runState.status === "finished") {
           console.log('Returning cached result: ' + JSON.stringify(runState, null, 4));
