@@ -3,4 +3,4 @@
 	url = https://github.com/DURAARK/e57extract
 [submodule "orthogen"]
 	path = orthogen
-	url = git@github.com:DURAARK/orthogen.git
+	url = https://github.com/DURAARK/orthogen.git
