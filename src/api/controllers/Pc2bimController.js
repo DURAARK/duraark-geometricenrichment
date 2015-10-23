@@ -11,7 +11,6 @@ function pc2bimRun(filename, duraarkStoragePath) {
 
 function startExtraction(config) {
   var runState = config.runState,
-    res = config.res,
     inputFile = config.inputFile;
 
   pc2bimRun(config.inputFile, config.duraarkStoragePath).then(function(result) {
@@ -20,7 +19,7 @@ function startExtraction(config) {
     runState.outputFile = result.outputFile;
     runState.status = "finished";
     runState.save().then(function(pc2bimRecord) {
-      res.send(pc2bimRecord).status(200);
+      console.log('[Pc2bimController] Successfully reconstructed BIM model for: ' + pc2bimRecord.inputFile);
     });
   }).catch(function(err) {
     console.log('[Pc2bimController] Error:\n' + err);
@@ -31,13 +30,9 @@ function startExtraction(config) {
     runState.status = "error";
     runState.errorText = err;
 
-    runState.save().then(function() {
-      res.send({
-        inputFile: inputFile,
-        outputFile: null,
-        status: "error",
-        errorText: err
-      }).status(200); // NOTE: we send 200 here, as an extraction error is a valid result.
+    runState.save().then(function(pc2bimRecord) {
+        console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
+        console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
     });
   });
 }
@@ -77,6 +72,8 @@ module.exports = {
       duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage';
 
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
+    // console.log('inputFile: ' + inputFile);
+    // console.log('restart: ' + restart);
 
     console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
 
@@ -89,7 +86,11 @@ module.exports = {
         }
       }
     }).then(function(runState) {
-      // console.log('runState: ' + JSON.stringify(runState, null, 4));
+      console.log('runState: ' + JSON.stringify(runState, null, 4));
+
+      // Simluate success:
+      // runState.status = "finished";
+      // return res.send(runState);
 
       if (!runState) {
         Pc2bim.create({
@@ -100,9 +101,10 @@ module.exports = {
           startExtraction({
             runState: runState,
             inputFile: inputFile,
-            duraarkStoragePath: duraarkStoragePath,
-            res: res
+            duraarkStoragePath: duraarkStoragePath
           });
+
+          return res.send(runState).status(200);
         });
       } else {
         if (runState.status === "finished") {
