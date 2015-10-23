@@ -10,6 +10,7 @@ module.exports = {
   attributes: {
     inputFile: 'string',
     outputFile: 'string',
-    status: 'string'
+    status: 'string',
+    errorText: 'string'
   }
 };

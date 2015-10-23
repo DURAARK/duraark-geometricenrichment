@@ -73,9 +73,19 @@ module.exports = {
           }).catch(function(err) {
             console.log('[Pc2bimController] Error:\n' + err);
 
+            if (err === "") {
+              err = "'pc2bim' could not start. Are you sure that your CPU is from Intel? AMD is not supported at the moment."
+            }
             pc2bim.status = "error";
+            pc2bim.errorText = err;
+            
             pc2bim.save().then(function() {
-              res.send(err).status(500);
+              res.send({
+                inputFile: inputFile,
+                outputFile: null,
+                status: "error",
+                errorText: err
+              }).status(200); // NOTE: we send 200 here, as an extraction error is a valid result.
             });
           });
 
