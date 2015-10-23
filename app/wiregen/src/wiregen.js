@@ -82,13 +82,13 @@ Symbols.forEach(function (s) {
 
 
 // -------------------------------------------------------------------------------
+console.log("evaluating grammar...");
 // evaluate the grammar
 var steps = 0;
 while(grammar.evaluateGrammarStep(Symbols, TerminalSymbols, Grammar))
 {
     steps = steps + 1;
 }
-
 console.log("evaluation took " + steps + " steps.");
 
 // collect walls
@@ -103,7 +103,7 @@ TerminalSymbols.forEach(function (t) {
     }
     if (t.label == "socket") numSockets = numSockets + 1;
     if (t.label == "switch") numSwitches = numSwitches + 1;
-    if (t.label == "vgroup") console.log("vgroup height:" + t.attributes.height);
+    //if (t.label == "vgroup") console.log("vgroup height:" + t.attributes.height);
 });
 console.log("found " + numWalls + " walls, " + numSwitches + " switches and " + numSockets + " sockets.");
 
@@ -125,8 +125,8 @@ var WALLORDER = [];
         WALLORDER.push(corder);
     }
 }
-console.log("WALL ORDER:");
-console.log(WALLORDER);
+//console.log("WALL ORDER:");
+//console.log(WALLORDER);
 
 var SVG_HTML = "<html><body>\n";
 WALLORDER.forEach(function (cycle) {
@@ -199,6 +199,7 @@ TerminalSymbols.forEach(function (t)
 });
 
 // remove segments that overlap with openings
+var removededges = 0;
 for (ts in TerminalSymbols) {
     t = TerminalSymbols[ts];
     if (t.label=='door' || t.label=='window')
@@ -208,14 +209,15 @@ for (ts in TerminalSymbols) {
         {
             if (t.attributes.wallid == G.N[G.E[e].v0].wallid) {
                 if (graph2d.edgeAABBIntersection(G, G.E[e], t.attributes)) {
-                    console.log("removing edge " + e);
+                    //console.log("removing edge " + e);
                     G.removeEdge(e);
+                    removededges++;
                 }
             }
         }
     }
 }
-
+console.log("removed " + removededges + " edges that overlapped with openings.");
 
 var ROOT = null;
 // insert detections: insert as node if "near" to zone, connect to nearest zone otherwise
@@ -236,7 +238,7 @@ for (var ts in TerminalSymbols) {
                     var l = att.left, t = att.top, r = att.left + att.width, b = att.top + att.height;
                     if ((posx >= l && posx <= r && posy >= t && posy <= b)) {
                         validEndPoint = false;
-                        console.log("endpoint " + term.label + " inside opening.");
+                        //console.log("endpoint " + term.label + " inside opening.");
                     }
                 }
             }
@@ -300,8 +302,9 @@ var epstat = { 'socket': 0, 'switch': 0 };
 for (var e in EndPoints) {
     epstat[EndPoints[e].terminal.label] = epstat[EndPoints[e].terminal.label] + 1;
 }
-console.log(epstat);
+console.log("Endpoints:" + epstat);
 
+console.log("Connecting walls...");
 // Connect wall segments
 var WALLCONN = {};
 
@@ -314,6 +317,29 @@ function insertWallConnection(connid, v)
         WALLCONN[connid][v.wallid] = {};
     }
     WALLCONN[connid][v.wallid][v._id] = v;
+}
+
+function clusterVerticesByY(vertices)
+{
+    var clusters = [];
+    // poor mans clustering, if necessary integrate a better method like 1D meanshift
+    for (var i=0; i < vertices.length; ++i) {
+        var v = vertices[i];
+        var notfound = true;
+        for (var c = 0; c < clusters.length && notfound; ++c) {
+            var cluster = clusters[c];
+            for (var j = 0; j < cluster.length && notfound; ++j) {
+                if (Math.abs(v.y - cluster[j].y) < 3) {
+                    cluster.push(v);
+                    notfound = false;
+                }
+            }
+        }
+        if (notfound) {
+            clusters.push([v]);
+        }
+    }
+    return clusters;
 }
 
 for (var vid in G.N)
@@ -331,7 +357,27 @@ for (var vid in G.N)
 
 }
 //console.log(WALLCONN);
- for (var conn in WALLCONN) {
+for (var conn in WALLCONN) {
+    var connvertices = [];
+    //       cluster all vertices by y coordinate
+    for (var wconn in WALLCONN[conn]) {
+        for (var v in WALLCONN[conn][wconn]) {
+            connvertices.push(WALLCONN[conn][wconn][v]);
+        }
+    }
+    var clusters = clusterVerticesByY(connvertices);
+
+    for (var c = 0; c < clusters.length; ++c) {
+        var cluster = clusters[c];
+        //  create isolated connection vertex, wallid NaN always creates a new vertex
+        var cv = G.checkVertex(new vec.Vec2(0, cluster[0].y, NaN));
+        //  connect cluster edges
+        for (var i = 0; i < cluster.length; ++i) {
+            G.addEdge(cv, cluster[i]);
+        }
+    }
+
+    /*
     if (Object.keys(WALLCONN[conn]).length == 2) {
         var K = Object.keys(WALLCONN[conn]);
         var A = WALLCONN[conn][K[0]];
@@ -341,8 +387,8 @@ for (var vid in G.N)
             var VA = A[va];
             for (var vb in B) {
                 var VB = B[vb];
-                if (Math.abs(VA.y - VB.y) < 2) {
-                    console.log(util.format("connecting %s<->%s at %s-%s", Object.keys(WALLCONN[conn])[0], Object.keys(WALLCONN[conn])[1]),va,vb);
+                if (Math.abs(VA.y - VB.y) < 3) {
+                    console.log(util.format("connecting %s<->%s at %s-%s", Object.keys(WALLCONN[conn])[0], Object.keys(WALLCONN[conn])[1]), va, vb);
                     G.addEdge(VA, VB);
                 }
             }
@@ -352,6 +398,7 @@ for (var vid in G.N)
             console.log("not handled connectivity case!");
         }
     }
+    */
 }
 
 //// debug
@@ -398,14 +445,23 @@ function findWireTree(G, root, EndPoints)
                 }
             }
         } else {
-            console.log("[Error] no best path found, isolated endpoint.");
+            // tree is isolated (no endpoints connect to this tree)
+            // -> insert new endpoint into tree (may become new tree)
+            if (!G.forestRoots) G.forestRoots = [];
+            var ep = EP[0];
+            var v = G.isGraphVertex(ep.pos);
+            T.N[v._id] = v;
+            G.forestRoots.push(v);
+            wgutil.removeArrObj(EP, ep);
         }
     }
     return T;
 }
 
+console.log("Extracting wire hypothesis...");
 var WireTree = findWireTree(G, ROOT, EndPoints);
 
+console.log("writing output...");
 
 fs.writeFileSync(util.format("%s/iz-graph.json",program.output), JSON.stringify(G));
 fs.writeFileSync(util.format("%s/iz-graph.dot", program.output), G.exportToGraphViz());

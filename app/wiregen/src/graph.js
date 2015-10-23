@@ -115,9 +115,6 @@ Graph.prototype.getAdjacency = function(v)
 
 Graph.prototype.addEdge = function(v0, v1)
 {
-    if (!v0.wallid || !v1.wallid) {
-        console.log("[ERROR] cannot add edge between walls.");
-    }
     if (!('root' in this)) this['root'] = v0;
     v0 = this.checkVertex(v0);
     v1 = this.checkVertex(v1);

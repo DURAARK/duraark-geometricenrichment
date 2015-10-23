@@ -78,18 +78,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
       //console.log('myhomeDir: ' + JSON.stringify(session));
 
       session.status = 'finished-Orthogen';
-      /*
-      if(code === 0)
-      {
-        //in the current development we only get one!!! output... the other code reads the directory and outputs every file.
-        var file = path.join(session.homeDir,path.basename(objFile,'.obj')) + '.jpg';
-        orthoResultImage ={
-          file: file,
-          link: 'session/' + session.sessionId + '/' + path.basename(file)
-        };
-        resolve(orthoResultImage);
-      }
-      */
+
       var result = fs.readdir(session.orthoresult, function(err, files) {
         if (err) {
           throw err;

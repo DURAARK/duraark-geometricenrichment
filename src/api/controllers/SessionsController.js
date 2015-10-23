@@ -18,7 +18,8 @@ var savePath = '/tmp';
 
 function createSession(session) {
   return new Promise(function(resolve, reject) {
-    var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(),
+    //var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(), // Bygade72
+    var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
       homeDir = path.join(savePath, tmp),
       config = session;
 
@@ -56,7 +57,7 @@ function createSession(session) {
 function initializeSession(session) {
   return new Promise(function(resolve, reject) {
     //todo upload stuff
-    session.basename = "Byg72";
+    session.basename = "CITY_Byg72_2nd_Scan";
     session.e57file = path.join(session.homeDir, session.basename + "_e57metadata.json");
     session.wallfile = path.join(session.homeDir, session.basename + "_wall.json");
     session.panopath = path.join(session.homeDir, "pano");
