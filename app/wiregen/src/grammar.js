@@ -89,7 +89,8 @@ function performRuleProductions(match)
         
         prod.push(N);
     }
-    console.log(dbgout);
+    
+    //console.log(dbgout);
     return prod;
 }
 
