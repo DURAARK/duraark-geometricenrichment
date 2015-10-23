@@ -18,7 +18,7 @@ PC2BIM.prototype.extract = function(filename) {
 
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
-    //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED_DOCKER.ifc
+    //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc
     var outputfile = filename.slice(0, -4) + '_RECONSTRUCTED.ifc',
       errorText = '';
 
@@ -47,11 +47,7 @@ PC2BIM.prototype.extract = function(filename) {
         });
       } else {
         console.log('[PC2BIM-binding] finished with error code: ' + code);
-        reject({
-          inputFile: filename,
-          outputFile: null,
-          error: errorText
-        });
+        reject(errorText);
       }
     });
   });

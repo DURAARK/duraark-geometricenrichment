@@ -4,9 +4,37 @@
 
 var PC2BIM = require('../../bindings/pc2bim');
 
-function startExtraction(filename, duraarkStoragePath) {
+function pc2bimRun(filename, duraarkStoragePath) {
   var pc2bim = new PC2BIM(duraarkStoragePath);
   return pc2bim.extract(filename);
+}
+
+function startExtraction(config) {
+  var runState = config.runState,
+    inputFile = config.inputFile;
+
+  pc2bimRun(config.inputFile, config.duraarkStoragePath).then(function(result) {
+    console.log('Extraction finished: ' + JSON.stringify(result, null, 4));
+
+    runState.outputFile = result.outputFile;
+    runState.status = "finished";
+    runState.save().then(function(pc2bimRecord) {
+      console.log('[Pc2bimController] Successfully reconstructed BIM model for: ' + pc2bimRecord.inputFile);
+    });
+  }).catch(function(err) {
+    console.log('[Pc2bimController] Error:\n' + err);
+
+    if (err === "") {
+      err = "'pc2bim' could not start. Are you sure that your CPU is from Intel? AMD is not supported at the moment."
+    }
+    runState.status = "error";
+    runState.errorText = err;
+
+    runState.save().then(function(pc2bimRecord) {
+        console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
+        console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
+    });
+  });
 }
 
 /**
@@ -40,9 +68,12 @@ module.exports = {
    */
   create: function(req, res, next) {
     var inputFile = req.param('inputFile'),
+      restart = req.param('restart'),
       duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage';
 
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
+    // console.log('inputFile: ' + inputFile);
+    // console.log('restart: ' + restart);
 
     console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
 
@@ -54,46 +85,50 @@ module.exports = {
           "equals": inputFile
         }
       }
-    }).then(function(pc2bim) {
-      // console.log('pc2bim: ' + JSON.stringify(pc2bim, null, 4));
+    }).then(function(runState) {
+      console.log('runState: ' + JSON.stringify(runState, null, 4));
 
-      if (!pc2bim) {
+      // Simluate success:
+      // runState.status = "finished";
+      // return res.send(runState);
+
+      if (!runState) {
         Pc2bim.create({
           inputFile: inputFile,
           outputFile: null,
           status: "pending"
-        }).then(function(pc2bim) {
-          startExtraction(inputFile, duraarkStoragePath).then(function(result) {
-            console.log('Extraction finished: ' + JSON.stringify(result, null, 4));
-            pc2bim.outputFile = result.outputFile;
-            pc2bim.status = "finished";
-            pc2bim.save().then(function(pc2bimRecord) {
-              res.send(pc2bimRecord).status(200);
-            });
-          }).catch(function(err) {
-            console.log('[Pc2bimController] Error:\n' + err);
-
-            pc2bim.status = "error";
-            pc2bim.save().then(function() {
-              res.send(err).status(500);
-            });
+        }).then(function(runState) {
+          startExtraction({
+            runState: runState,
+            inputFile: inputFile,
+            duraarkStoragePath: duraarkStoragePath
           });
 
+          return res.send(runState).status(200);
         });
       } else {
-        if (pc2bim.status === "finished") {
-          console.log('Returning cached result: ' + JSON.stringify(pc2bim, null, 4));
-          res.send(pc2bim).status(201);
+        if (runState.status === "finished") {
+          console.log('Returning cached result: ' + JSON.stringify(runState, null, 4));
+          res.send(runState).status(201);
         }
 
-        if (pc2bim.status === "pending") {
-          console.log('Extraction pending: ' + JSON.stringify(pc2bim, null, 4));
-          res.send(pc2bim).status(200);
+        if (runState.status === "pending") {
+          console.log('Extraction pending: ' + JSON.stringify(runState, null, 4));
+          res.send(runState).status(200);
         }
 
-        if (pc2bim.status === "error") {
-          console.log('Extraction error: ' + JSON.stringify(pc2bim, null, 4));
-          res.send(pc2bim).status(200);
+        if (runState.status === "error") {
+          console.log('Extraction error: ' + JSON.stringify(runState, null, 4));
+          if (restart) {
+            startExtraction({
+              runState: runState,
+              inputFile: inputFile,
+              duraarkStoragePath: duraarkStoragePath,
+              res: res
+            });
+          } else {
+            res.send(runState).status(200);
+          }
         }
       }
     }).catch(function(err) {
