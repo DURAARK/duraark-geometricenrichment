@@ -18,6 +18,7 @@ function startExtraction(config) {
 
     runState.outputFile = result.outputFile;
     runState.status = "finished";
+    runState.downloadUrl = result.outputFile.replace('/duraark-storage', '');
     runState.save().then(function(pc2bimRecord) {
       console.log('[Pc2bimController] Successfully reconstructed BIM model for: ' + pc2bimRecord.inputFile);
     });
@@ -31,8 +32,8 @@ function startExtraction(config) {
     runState.errorText = err;
 
     runState.save().then(function(pc2bimRecord) {
-        console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
-        console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
+      console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
+      console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
     });
   });
 }
@@ -86,18 +87,23 @@ module.exports = {
         }
       }
     }).then(function(runState) {
-      console.log('runState: ' + JSON.stringify(runState, null, 4));
-
-      // Simluate success:
-      // runState.status = "finished";
-      // return res.send(runState);
+      // console.log('runState: ' + JSON.stringify(runState, null, 4));
 
       if (!runState) {
         Pc2bim.create({
           inputFile: inputFile,
           outputFile: null,
-          status: "pending"
+          status: "pending",
+          downloadUrl: null
         }).then(function(runState) {
+
+          // // Simluate success:
+          // runState.status = "finished";
+          // var url = runState.inputFile.replace('.e57', '.ifc');
+          // url = url.replace('/duraark-storage', '');
+          // runState.downloadUrl = url;
+          // return res.send(runState);
+
           startExtraction({
             runState: runState,
             inputFile: inputFile,
@@ -107,6 +113,14 @@ module.exports = {
           return res.send(runState).status(200);
         });
       } else {
+
+        // // Simluate success:
+        // runState.status = "finished";
+        // var url = runState.inputFile.replace('.e57', '.ifc');
+        // url = url.replace('/duraark-storage', '');
+        // runState.downloadUrl = url;
+        // return res.send(runState);
+
         if (runState.status === "finished") {
           console.log('Returning cached result: ' + JSON.stringify(runState, null, 4));
           res.send(runState).status(201);
@@ -123,12 +137,10 @@ module.exports = {
             startExtraction({
               runState: runState,
               inputFile: inputFile,
-              duraarkStoragePath: duraarkStoragePath,
-              res: res
+              duraarkStoragePath: duraarkStoragePath
             });
-          } else {
-            res.send(runState).status(200);
           }
+          res.send(runState).status(200);
         }
       }
     }).catch(function(err) {
