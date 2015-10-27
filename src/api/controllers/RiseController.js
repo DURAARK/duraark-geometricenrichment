@@ -6,36 +6,37 @@
  */
 
 var Orthogen = require('../../bindings/orthogen/index'),
-  Elecdetect = require('../../bindings/elecdetec/index'),
+  Elecdetec = require('../../bindings/elecdetec/index'),
   Wiregen = require('../../bindings/wiregen/index'),
   uuid = require('node-uuid'),
   fs = require('fs'),
   path = require('path'),
-  mkdirp = require('mkdirp'),
-  hardCodedPanoImage = '/tmp/panorama.jpg';
-
-var savePath = '/tmp';
+  mkdirp = require('mkdirp');
+//  hardCodedPanoImage = '/tmp/panorama.jpg';
+//var savePath = '/tmp';
 
 function createSession(session) {
   return new Promise(function(resolve, reject) {
     //var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(), // Bygade72
-    var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
-      homeDir = path.join(savePath, tmp),
-      config = session;
+    //var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
+    //var tmp = 'byg72-1st-scan_fixed', //uuid.v4(),   // Byagde72_2ndscan
+    //  workingDir = path.join(savePath, tmp, '/tools/rise');
 
-    //console.log('configuration: ' + JSON.stringify(config, null, 4));
+    var sessionPath = session.sessionPath;
+    var sessionName = sessionPath.split('/').pop();
+    var workingDir = path.join(sessionPath, 'tools', 'rise');
 
-    mkdirp(homeDir, function(err) {
+    mkdirp(workingDir, function(err) {
       if (!err) {
-        console.log('[SessionController::Created session at path: ' + homeDir + ']');
-        console.log(tmp);
+        console.log('[SessionController::Created session at path: ' + workingDir + ']');
+        console.log(sessionName);
 
-        session.homeDir = homeDir;
-        session.sessionId = tmp;
+        session.workingDir = workingDir;
+        session.sessionId = sessionName;
         session.status = 'created';
 
-        Sessions.create(session, function(err, session) {
-          if (err) return next(err);
+        Rise.create(session, function(err, session) {
+          if (err) return reject(err);
 
           session.status = 'pending';
           session.save(function(err, saved_record) {
@@ -57,11 +58,17 @@ function createSession(session) {
 function initializeSession(session) {
   return new Promise(function(resolve, reject) {
     //todo upload stuff
-    session.basename = "CITY_Byg72_2nd_Scan";
-    session.e57file = path.join(session.homeDir, session.basename + "_e57metadata.json");
-    session.wallfile = path.join(session.homeDir, session.basename + "_wall.json");
-    session.panopath = path.join(session.homeDir, "pano");
-    session.orthoresult = path.join(session.homeDir, "orthoresult");
+    session.basename = "Byg72_All_Scans";
+    session.e57file = path.join(session.workingDir, "..", "..", "metadata", session.basename + "_e57metadata.json");
+    session.wallfile = path.join(session.workingDir, "..", "..", "derivatives", session.basename + "_wall.json");
+    session.panopath = path.join(session.workingDir, "pano");
+    session.orthoresult = path.join(session.workingDir, "orthoresult");
+
+    session.elecDir = 'elecdetect-test-set';
+    session.elecdetecPath = path.join(session.workingDir, session.elecDir); 
+    session.elecResultsDir = 'results';
+    session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
+
     mkdirp(session.orthoresult, function(err) {
       if (!err) {
         resolve(session);
@@ -96,7 +103,7 @@ function createObjectFiles(session) {
           'v ' + ((attr.origin[0] + attr.x[0] * width) / 1000) + ' ' + ((attr.origin[1] + attr.x[1] * width) / 1000) + ' ' + ((attr.origin[2] + attr.x[2] * width) / 1000) + "\n" +
           'f 1 2 3 4';
 
-        var file = path.join(session.homeDir, oneWall.attributes.id + '.obj');
+        var file = path.join(session.workingDir, oneWall.attributes.id + '.obj');
 
         fs.writeFile(file, objFile, function(err) {
           if (err) reject(err);
@@ -155,17 +162,17 @@ function startOrthogen(session) {
 
 }
 
-function startElecdetec(session) {
+function startElecdetect(session) {
   return new Promise(function(resolve, reject) {
-    console.log('[SessionController::starting Elecdetec]');
+    console.log('[SessionController::starting Elecdetect]');
 
-    //var homeDir = session.homeDir;
+    //var workingDir = session.workingDir;
     //var sessionId = session.sessionId;
 
     //console.log('configuration: ' + JSON.stringify(config, null, 4));
 
     // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
-    var elecdetect = new Elecdetect();
+    var elecdetect = new Elecdetec();
     resolve(elecdetect.createElecImages(session));
     console.log("[SessionController::finished]");
   });
@@ -213,7 +220,7 @@ function createInputSymbolList(session) {
         }
       }
 
-      session.wiregenPath = path.join(session.homeDir, 'wiregen');
+      session.wiregenPath = path.join(session.workingDir, 'wiregen');
       session.wireGenFile = path.join(session.wiregenPath, 'wiregenInput.json');
       session.wireGenOutput = path.join(session.wiregenPath, 'output');
       mkdirp(session.wiregenPath, function(err) {
@@ -348,15 +355,15 @@ module.exports = {
   uploadFile: function(req, res, next) {
 
     var config = req.body;
-    var homeDir = path.join(savePath, config.session);
+    var workingDir = path.join(savePath, config.session);
 
-    console.log('HomeDir: ' + homeDir);
+    console.log('HomeDir: ' + workingDir);
 
 
     res.setTimeout(0);
 
     req.file('file').upload({
-      dirname: path.resolve(sails.config.appPath, homeDir)
+      dirname: path.resolve(sails.config.appPath, workingDir)
     }, function(err, uploadedFiles) {
       if (err) return res.negotiate(err);
 
@@ -385,15 +392,15 @@ module.exports = {
    */
   uploadPanoramas: function(req, res, next) {
     var config = req.body;
-    var homeDir = path.join(savePath, config.session);
+    var workingDir = path.join(savePath, config.session);
 
-    console.log('HomeDir: ' + homeDir);
+    console.log('HomeDir: ' + workingDir);
 
 
     res.setTimeout(0);
 
     req.file('file').upload({
-      dirname: path.resolve(sails.config.appPath, homeDir)
+      dirname: path.resolve(sails.config.appPath, workingDir)
     }, function(err, uploadedFiles) {
       if (err) return res.negotiate(err);
 
@@ -426,7 +433,7 @@ module.exports = {
     createSession(session)
       .then(initializeSession)
       .then(startOrthogen)
-      .then(startElecdetec)
+      .then(startElecdetect)
       .then(startWiregen)
       .then(reOrderResult)
       .then(function(argument) {
@@ -478,7 +485,6 @@ module.exports = {
   },
   startOrthogen: function(req, res, next) {
     var session = req.body;
-    session.panoImage = hardCodedPanoImage;
 
     startOrthogen(session).then(function(argument) {
       res.send(200, argument);
@@ -487,11 +493,11 @@ module.exports = {
       res.send(500, err);
     });
   },
-  startElecdetec: function(req, res, next) {
+  startElecdetect: function(req, res, next) {
     var session = req.body;
     req.connection.setTimeout(0);
 
-    startElecdetec(session).then(function(argument) {
+    startElecdetect(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
       console.log('Error: ' + err);
@@ -525,7 +531,7 @@ module.exports = {
     var sessionId = 3,
       roomId = 'room11';
 
-    Sessions.findOne(sessionId).then(function(session) {
+    Rise.findOne(sessionId).then(function(session) {
       console.log('session: ' + JSON.stringify(session, null, 4));
 
       // TODO: find svgs for room

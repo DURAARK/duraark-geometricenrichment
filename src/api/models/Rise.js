@@ -8,7 +8,7 @@
 module.exports = {
 
 	attributes: {
-		homeDir: {
+		workingDir: {
 			type: 'string',
 			required: true
 		},

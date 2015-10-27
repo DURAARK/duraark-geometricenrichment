@@ -30,14 +30,11 @@ function copyFile(source, target) {
 
 Elecdetec.prototype.createElecImages = function(session) {
 
+
   return new Promise(function(resolve, reject) {
 
     session.status = 'pending';
-    session.elecDir = 'elecdetect-test-set';
-    session.elecResultsDir = 'results';
-    session.elecdetecPath = path.join(session.homeDir, session.elecDir);
     session.elecdetecExecutable = path.join(__dirname, '../../../app/ElecDetec-windows/'); //Config.xml, config.ini & elecdetect.exe
-    session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
     session.elecDetecResultImages = [];
     //session.files = session.files;
     //session.sessionId = session.sessionId;
@@ -45,7 +42,9 @@ Elecdetec.prototype.createElecImages = function(session) {
 
     //console.log(session.ElecdetecInputFiles);
 
+    console.log("running mkdirp");
     mkdirp(session.elecdetecPath, function(err) {
+      if (err) { console.log("aösldkgh" + err); }
       if (!err) {
         promises = [];
 
@@ -61,10 +60,9 @@ Elecdetec.prototype.createElecImages = function(session) {
         });
 
         Promise.all(promises).then(function() {
-
+            console.log("working dir:" + JSON.stringify(session, null, 4));
             var cwd = process.cwd();
-
-            process.chdir(session.homeDir);
+            process.chdir(session.workingDir);
 
             var args = ['-m', 'detect',
               '-d', session.elecdetecPath,
@@ -86,7 +84,7 @@ Elecdetec.prototype.createElecImages = function(session) {
               console.log('[Elecdetec-binding] child process exited with code ' + code);
 
               //var md = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
-              //console.log('myhomeDir: ' + JSON.stringify(session));
+              //console.log('myworkingDir: ' + JSON.stringify(session));
 
               session.status = 'Elecdetec-finished';
 
