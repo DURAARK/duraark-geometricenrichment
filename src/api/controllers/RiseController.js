@@ -55,10 +55,12 @@ function createSession(session) {
 
 }
 
-function initializeSession(session) {
-  return new Promise(function(resolve, reject) {
-    //todo upload stuff
-    session.basename = "Byg72_All_Scans";
+function prepareSession(e57master) {
+  var session = {};
+
+    session.basename = path.basename(e57master, '.e57');
+    session.workingDir = path.join(e57master, '..', '..', 'tools', 'rise');
+
     session.e57file = path.join(session.workingDir, "..", "..", "metadata", session.basename + "_e57metadata.json");
     session.wallfile = path.join(session.workingDir, "..", "..", "derivatives", session.basename + "_wall.json");
     session.panopath = path.join(session.workingDir, "pano");
@@ -68,6 +70,16 @@ function initializeSession(session) {
     session.elecdetecPath = path.join(session.workingDir, session.elecDir); 
     session.elecResultsDir = 'results';
     session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
+
+    console.log(JSON.stringify(session));
+
+  return session;
+}
+
+function initializeSession(param) {
+  return new Promise(function(resolve, reject) {
+    
+    session = prepareSession(param.e57master);
 
     mkdirp(session.orthoresult, function(err) {
       if (!err) {
@@ -81,99 +93,35 @@ function initializeSession(session) {
   });
 }
 
-/*
-function createObjectFiles(session) {
-  var promises = [];
-  console.log('[SessionController::Creating Object files]');
 
-  session.poseInformation.objFile = [];
+function startOrthogen(param) {
 
-  _.forEach(session.Walls, function(oneWall) {
-    if (oneWall.label == 'WALL') {
-      var promise = new Promise(function(resolve, reject) {
-        console.log('[SessionController::Found Wall: ' + oneWall.attributes.id + ']');
-
-        var attr = oneWall.attributes;
-        var height = attr.height;
-        var width = attr.width;
-
-        var objFile = 'v ' + (attr.origin[0] / 1000) + ' ' + (attr.origin[1] / 1000) + ' ' + (attr.origin[2] / 1000) + "\n" +
-          'v ' + ((attr.origin[0] + attr.y[0] * height) / 1000) + ' ' + ((attr.origin[1] + attr.y[1] * height) / 1000) + ' ' + ((attr.origin[2] + attr.y[2] * height) / 1000) + "\n" +
-          'v ' + ((attr.origin[0] + attr.y[0] * height + attr.x[0] * width) / 1000) + ' ' + ((attr.origin[1] + attr.y[1] * height + attr.x[1] * width) / 1000) + ' ' + ((attr.origin[2] + attr.y[2] * height + attr.x[2] * width) / 1000) + "\n" +
-          'v ' + ((attr.origin[0] + attr.x[0] * width) / 1000) + ' ' + ((attr.origin[1] + attr.x[1] * width) / 1000) + ' ' + ((attr.origin[2] + attr.x[2] * width) / 1000) + "\n" +
-          'f 1 2 3 4';
-
-        var file = path.join(session.workingDir, oneWall.attributes.id + '.obj');
-
-        fs.writeFile(file, objFile, function(err) {
-          if (err) reject(err);
-          resolve(session.poseInformation.objFile.push(file));
-        });
-      });
-
-      promises.push(promise);
-    }
-  });
-  return Promise.all(promises).then(function(argument) {
-    return session;
-  }).catch(function(err) {
-    console.log('Error: ' + err);
-    throw new Error(err);
-  });
-}
-*/
-
-function startOrthogen(session) {
+  var session = prepareSession(param.e57master);
 
   return new Promise(function(resolve, reject) {
     var orthogen = new Orthogen();
     orthogen.createOrthoImages(session).then(function(orthogen_result) {
-
       resolve(orthogen_result);
     });
   });
-
-  /* var promises = [];
-   session.ElecdetecInputFiles = [];
-   console.log('[SessionController::starting Orthogens]');
-
-   _.forEach(session.poseInformation.objFile, function(oneObj) {
-     var promise = new Promise(function(resolve, reject) {
-
-       var orthogen = new Orthogen();
-       orthogen.createOrthoImages(session, oneObj)
-         .then(function(newFile) {
-           resolve(session.ElecdetecInputFiles.push(newFile));
-         });
-
-
-     });
-
-     promises.push(promise);
-   });
-
-   return Promise.all(promises).then(function(argument) {
-     //console.log(session.ElecdetecInputFiles);
-     return session;
-   }).catch(function(err) {
-     console.log('Error: ' + err);
-     throw new Error(err);
-   });*/
-
+  
 }
 
-function startElecdetect(session) {
+function startElecdetect(param) {
+
+  var session = prepareSession(param.e57master);
+
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::starting Elecdetect]');
 
-    //var workingDir = session.workingDir;
-    //var sessionId = session.sessionId;
-
-    //console.log('configuration: ' + JSON.stringify(config, null, 4));
-
-    // Start async ortho-image creation. Session information is updated within the 'Orthogen' binding:
     var elecdetect = new Elecdetec();
-    resolve(elecdetect.createElecImages(session));
+    var elecdetectConfig = elecdetect.defaultConfig();
+    // parse elecdetect params
+    elecdetectConfig.detection.detection_default_threshold = "0.4";
+    elecdetectConfig.detection.detection_label_thresholds = "0.2, 0.55";
+    //console.log(elecdetect.config2ini(elecdetectConfig));
+
+    resolve(elecdetect.createElecImages(session, elecdetectConfig));
     console.log("[SessionController::finished]");
   });
 }
@@ -199,26 +147,22 @@ function createInputSymbolList(session) {
 
       console.log('reading from ' + session.wallfile);
       walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-      session.Walls = walljson.Walls;
-      session.Windows = walljson.Windows;
-      session.Doors = walljson.Doors;
 
-      listImport = ['Switches', 'Sockets', 'Doors', 'Windows', 'Walls'];
-      //console.log(session);
-
-      //console.log(walljson);
-
-      for (var i = 0; i < listImport.length; i++) {
-        if (session[listImport[i]]) {
-          console.log(listImport[i] + " : " + session[listImport[i]]);
-          var currentList = session[listImport[i]];
-          for (var j = 0; j < currentList.length; j++) {
-            var item = currentList[j];
-            session.wiregenInput.push(item);
-          }
-          console.log("imported " + currentList.length + listImport[i] + ".");
-        }
+      // add symbols from wall json
+      for (var ia in walljson)
+      {
+        walljson[ia].forEach(function(symbol){ 
+          session.wiregenInput.push(symbol); 
+        });
+        console.log("imported " + walljson[ia].length + " " + ia + " symbols.");
       }
+      // add sockets and switches
+      [ 'Sockets', 'Switches'].forEach(function(category){
+        session[category].forEach(function(symbol){ 
+          session.wiregenInput.push(symbol); 
+        });
+        console.log("imported " + session[category].length + " " + category + " symbols.");
+      });
 
       session.wiregenPath = path.join(session.workingDir, 'wiregen');
       session.wireGenFile = path.join(session.wiregenPath, 'wiregenInput.json');
@@ -529,12 +473,13 @@ module.exports = {
     // roomId = req.param('roomId');
 
     var sessionId = 3,
-      roomId = 'room11';
+        roomId = 'room11';
 
     Rise.findOne(sessionId).then(function(session) {
       console.log('session: ' + JSON.stringify(session, null, 4));
 
       // TODO: find svgs for room
+
     })
   }
 };
