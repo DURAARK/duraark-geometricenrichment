@@ -117,9 +117,20 @@ function startElecdetect(param) {
     var elecdetect = new Elecdetec();
     var elecdetectConfig = elecdetect.defaultConfig();
     // parse elecdetect params
-    elecdetectConfig.detection.detection_default_threshold = "0.4";
-    elecdetectConfig.detection.detection_label_thresholds = "0.2, 0.55";
-    //console.log(elecdetect.config2ini(elecdetectConfig));
+    if (param.config) {
+      if (param.config.elecdetect) {
+        console.log("reading elecdetect config:");
+        for (var category in param.config.elecdetect) {
+          for (var key in param.config.elecdetect[category]) {
+            console.log(key + " : " + elecdetectConfig[category][key] +  " -> " + param.config.elecdetect[category][key]);
+            elecdetectConfig[category][key] = param.config.elecdetect[category][key];
+          }
+        }
+      }
+    //elecdetectConfig.detection.detection_default_threshold = "0.4";
+    //elecdetectConfig.detection.detection_label_thresholds = "0.2, 0.55";
+    }
+    console.log(elecdetect.config2ini(elecdetectConfig));
 
     resolve(elecdetect.createElecImages(session, elecdetectConfig));
     console.log("[SessionController::finished]");
