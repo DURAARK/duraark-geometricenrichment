@@ -101,10 +101,6 @@ Orthogen.prototype.createOrthoImages = function(session) {
         }
         resolve(session);
       });
-
-      //this.session.save(function(err, record) {
-      //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
-      //});
     });
   });
 };

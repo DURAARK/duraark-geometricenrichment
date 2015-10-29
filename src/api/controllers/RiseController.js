@@ -137,11 +137,24 @@ function startElecdetect(param) {
   });
 }
 
-function startWiregen(session) {
+function startWiregen(param) {
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::start Wiregen]');
-    //console.log(session);
+    var session = prepareSession(param.e57master);
+
     var wiregen = new Wiregen();
+
+    // collect elecdetect results
+    var files = fs.readdirSync(session.elecdetecResults);
+    session.elecDetecResultImages = [];
+    for (var key in files) {
+      var fileResult = {
+        file: files[key],
+        link: 'session/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
+      };
+      session.elecDetecResultImages.push(fileResult);
+    }
+
     resolve(wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
