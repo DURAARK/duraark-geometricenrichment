@@ -38,7 +38,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--e57metadata', session.e57file,
       '--walljson', session.wallfile,
       '--panopath', session.panopath,
-      '--align', '../../../app/orthogen-windows/panoalign',
+      '--align', path.resolve(process.cwd(), '../app/orthogen-windows/panoalign'),   //'../../../app/orthogen-windows/panoalign',
       '--output', session.basename,
       '--exgeom', '1'
     ];
@@ -85,26 +85,20 @@ Orthogen.prototype.createOrthoImages = function(session) {
         }
 
         console.log('[Orthogen-finished] Read directory and return result ' + JSON.stringify(files));
+        // session.resultImages = [];
 
-
-        session.resultImages = [];
-
-        for (key in files) {
-          if (files[key].substr(-4)==".jpg") {
-            var fileResult = {
-              file: files[key],
-              //TODO: don't like this style alternatives?
-              link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
-            };
-            session.resultImages.push(fileResult);
-          }
-        }
+        // for (key in files) {
+        //   if (files[key].substr(-4)==".jpg") {
+        //     var fileResult = {
+        //       file: files[key],
+        //       //TODO: don't like this style alternatives?
+        //       link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
+        //     };
+        //     session.resultImages.push(fileResult);
+        //   }
+        // }
         resolve(session);
       });
-
-      //this.session.save(function(err, record) {
-      //    console.log('[Orthogen::binding] created ortho-images: ' + JSON.stringify(session.resultImages, null, 4));
-      //});
     });
   });
 };

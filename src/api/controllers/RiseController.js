@@ -15,45 +15,46 @@ var Orthogen = require('../../bindings/orthogen/index'),
 //  hardCodedPanoImage = '/tmp/panorama.jpg';
 //var savePath = '/tmp';
 
-function createSession(session) {
-  return new Promise(function(resolve, reject) {
-    //var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(), // Bygade72
-    //var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
-    //var tmp = 'byg72-1st-scan_fixed', //uuid.v4(),   // Byagde72_2ndscan
-    //  workingDir = path.join(savePath, tmp, '/tools/rise');
+// function createSession(param) {
 
-    var sessionPath = session.sessionPath;
-    var sessionName = sessionPath.split('/').pop();
-    var workingDir = path.join(sessionPath, 'tools', 'rise');
+//   return new Promise(function(resolve, reject) {
+//     //var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(), // Bygade72
+//     //var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
+//     //var tmp = 'byg72-1st-scan_fixed', //uuid.v4(),   // Byagde72_2ndscan
+//     //  workingDir = path.join(savePath, tmp, '/tools/rise');
 
-    mkdirp(workingDir, function(err) {
-      if (!err) {
-        console.log('[SessionController::Created session at path: ' + workingDir + ']');
-        console.log(sessionName);
+//     var sessionPath = session.sessionPath;
+//     var sessionName = sessionPath.split('/').pop();
+//     var workingDir = path.join(sessionPath, 'tools', 'rise');
 
-        session.workingDir = workingDir;
-        session.sessionId = sessionName;
-        session.status = 'created';
+//     mkdirp(workingDir, function(err) {
+//       if (!err) {
+//         console.log('[SessionController::Created session at path: ' + workingDir + ']');
+//         console.log(sessionName);
 
-        Rise.create(session, function(err, session) {
-          if (err) return reject(err);
+//         session.workingDir = workingDir;
+//         session.sessionId = sessionName;
+//         session.status = 'created';
 
-          session.status = 'pending';
-          session.save(function(err, saved_record) {
-            //console.log('session: ' + JSON.stringify(saved_record, null, 4));
-            resolve(session);
-          });
-        });
-      } else {
-        console.log('Error creating session directory. Aborting!');
-        console.log('  Error message: ' + err);
-        reject(err);
-      }
+//         Rise.create(session, function(err, session) {
+//           if (err) return reject(err);
 
-    });
-  });
+//           session.status = 'pending';
+//           session.save(function(err, saved_record) {
+//             //console.log('session: ' + JSON.stringify(saved_record, null, 4));
+//             resolve(session);
+//           });
+//         });
+//       } else {
+//         console.log('Error creating session directory. Aborting!');
+//         console.log('  Error message: ' + err);
+//         reject(err);
+//       }
 
-}
+//     });
+//   });
+
+// }
 
 function prepareSession(e57master) {
   var session = {};
@@ -70,26 +71,14 @@ function prepareSession(e57master) {
     session.elecdetecPath = path.join(session.workingDir, session.elecDir); 
     session.elecResultsDir = 'results';
     session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
-
-    console.log(JSON.stringify(session));
-
+    //console.log(JSON.stringify(session));
   return session;
 }
 
 function initializeSession(param) {
   return new Promise(function(resolve, reject) {
-    
     session = prepareSession(param.e57master);
-
-    mkdirp(session.orthoresult, function(err) {
-      if (!err) {
-        resolve(session);
-      } else {
-        console.log('Error creating session directory. Aborting!');
-        console.log('  Error message: ' + err);
-        reject(err);
-      }
-    });
+    resolve(session);
   });
 }
 
@@ -98,13 +87,22 @@ function startOrthogen(param) {
 
   var session = prepareSession(param.e57master);
 
-  return new Promise(function(resolve, reject) {
-    var orthogen = new Orthogen();
-    orthogen.createOrthoImages(session).then(function(orthogen_result) {
-      resolve(orthogen_result);
+    mkdirp(session.orthoresult, function(err) {
+      if (!err) {
+
+        return new Promise(function(resolve, reject) {
+          var orthogen = new Orthogen();
+          orthogen.createOrthoImages(session).then(function(orthogen_result) {
+            resolve(orthogen_result);
+          });
+        });
+
+      } else {
+        console.log('Error creating orthogen result directory. Aborting!');
+        console.log('  Error message: ' + err);
+        reject(err);
+      }
     });
-  });
-  
 }
 
 function startElecdetect(param) {
@@ -137,11 +135,24 @@ function startElecdetect(param) {
   });
 }
 
-function startWiregen(session) {
+function startWiregen(param) {
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::start Wiregen]');
-    //console.log(session);
+    var session = prepareSession(param.e57master);
+
     var wiregen = new Wiregen();
+
+    // collect elecdetect results
+    var files = fs.readdirSync(session.elecdetecResults);
+    session.elecDetecResultImages = [];
+    for (var key in files) {
+      var fileResult = {
+        file: files[key],
+        link: 'session/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
+      };
+      session.elecDetecResultImages.push(fileResult);
+    }
+
     resolve(wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
@@ -196,102 +207,102 @@ function createInputSymbolList(session) {
   });
 }
 
-function wireGenResultSvg_grammar(session) {
-  return new Promise(function(resolve, reject) {
-    session.wireGenResultGrammar = [];
-    fs.readdir(path.join(session.wireGenOutput, 'svg_grammar'), function(err, files) {
-      for (var key in files) {
-        var fileResult = {
-          file: files[key],
-          link: 'session/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
-        };
-        session.wireGenResultGrammar.push(fileResult);
-      }
-      resolve(session);
-    });
-  });
-}
+// function wireGenResultSvg_grammar(session) {
+//   return new Promise(function(resolve, reject) {
+//     session.wireGenResultGrammar = [];
+//     fs.readdir(path.join(session.wireGenOutput, 'svg_grammar'), function(err, files) {
+//       for (var key in files) {
+//         var fileResult = {
+//           file: files[key],
+//           link: 'session/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
+//         };
+//         session.wireGenResultGrammar.push(fileResult);
+//       }
+//       resolve(session);
+//     });
+//   });
+// }
 
-function wireGenResultSvg_hypothesis(session) {
-  return new Promise(function(resolve, reject) {
-    session.wireGenResultHypothesis = [];
-    fs.readdir(path.join(session.wireGenOutput, 'svg_hypothesis'), function(err, files) {
-      for (var key in files) {
-        var fileResult = {
-          file: files[key],
-          link: 'session/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
-        };
-        session.wireGenResultHypothesis.push(fileResult);
-      }
-      resolve(session);
-    });
-  });
-}
+// function wireGenResultSvg_hypothesis(session) {
+//   return new Promise(function(resolve, reject) {
+//     session.wireGenResultHypothesis = [];
+//     fs.readdir(path.join(session.wireGenOutput, 'svg_hypothesis'), function(err, files) {
+//       for (var key in files) {
+//         var fileResult = {
+//           file: files[key],
+//           link: 'session/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
+//         };
+//         session.wireGenResultHypothesis.push(fileResult);
+//       }
+//       resolve(session);
+//     });
+//   });
+// }
 
-function reOrderResult(session) {
-  return new Promise(function(resolve, reject) {
-    try {
-
-
-      session.resultArray = {};
-      session.resultArray.elecDetecResults = [];
-      session.resultArray.orthogenResults = [];
-      session.resultArray.wireGenResultHypothesis = [];
-      session.resultArray.wireGenResultGrammar = [];
-
-      var baseUrl = 'session/' + session.sessionId + '/';
-      var wireGenGramarUrl = baseUrl + 'wiregen/output/svg_grammar/';
-      var wireGenHypothesisUrl = baseUrl + 'wiregen/output/svg_hypothesis/';
-      var elecDetedtUrl = baseUrl + '/elecdetect-test-set/results/';
-
-      var orderedResult = orderSession(session);
-
-      for (var i = 0; i < orderedResult.length; i++) {
-        var picture = orderedResult[i].attributes.id;
-        session.resultArray.wireGenResultGrammar.push(wireGenGramarUrl + picture + '.svg');
-        session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl + picture + '.svg');
-        session.resultArray.elecDetecResults.push(elecDetedtUrl + picture + '-result.jpg');
-        session.resultArray.orthogenResults.push(baseUrl + picture + '.jpg');
-      }
-
-      resolve(session);
-    } catch (e) {
-      console.log(e);
-      reject(session);
-    }
-  });
-}
-
-function orderSession(session) {
-  var tempWalls = session.Walls.slice(0);
-  var sorted = [];
+// function reOrderResult(session) {
+//   return new Promise(function(resolve, reject) {
+//     try {
 
 
-  while (tempWalls.length > 0) {
-    var first = tempWalls.pop();
-    sorted.push(first);
-    var corner = first.right;
-    while (corner != first.left) {
-      // find wall with left corner
-      var found = false;
-      for (var w in tempWalls) {
-        var wall = tempWalls[w];
-        if (wall.left == corner) {
-          sorted.push(wall);
-          corner = wall.right;
-          tempWalls.splice(w, 1);
-          found = true;
-          break;
-        }
-      }
-      if (found === false) {
-        console.log("loop not closed.");
-        break;
-      }
-    }
-  }
-  return sorted;
-}
+//       session.resultArray = {};
+//       session.resultArray.elecDetecResults = [];
+//       session.resultArray.orthogenResults = [];
+//       session.resultArray.wireGenResultHypothesis = [];
+//       session.resultArray.wireGenResultGrammar = [];
+
+//       var baseUrl = 'session/' + session.sessionId + '/';
+//       var wireGenGramarUrl = baseUrl + 'wiregen/output/svg_grammar/';
+//       var wireGenHypothesisUrl = baseUrl + 'wiregen/output/svg_hypothesis/';
+//       var elecDetedtUrl = baseUrl + '/elecdetect-test-set/results/';
+
+//       var orderedResult = orderSession(session);
+
+//       for (var i = 0; i < orderedResult.length; i++) {
+//         var picture = orderedResult[i].attributes.id;
+//         session.resultArray.wireGenResultGrammar.push(wireGenGramarUrl + picture + '.svg');
+//         session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl + picture + '.svg');
+//         session.resultArray.elecDetecResults.push(elecDetedtUrl + picture + '-result.jpg');
+//         session.resultArray.orthogenResults.push(baseUrl + picture + '.jpg');
+//       }
+
+//       resolve(session);
+//     } catch (e) {
+//       console.log(e);
+//       reject(session);
+//     }
+//   });
+// }
+
+// function orderSession(session) {
+//   var tempWalls = session.Walls.slice(0);
+//   var sorted = [];
+
+
+//   while (tempWalls.length > 0) {
+//     var first = tempWalls.pop();
+//     sorted.push(first);
+//     var corner = first.right;
+//     while (corner != first.left) {
+//       // find wall with left corner
+//       var found = false;
+//       for (var w in tempWalls) {
+//         var wall = tempWalls[w];
+//         if (wall.left == corner) {
+//           sorted.push(wall);
+//           corner = wall.right;
+//           tempWalls.splice(w, 1);
+//           found = true;
+//           break;
+//         }
+//       }
+//       if (found === false) {
+//         console.log("loop not closed.");
+//         break;
+//       }
+//     }
+//   }
+//   return sorted;
+// }
 
 module.exports = {
   /**
@@ -482,15 +493,100 @@ module.exports = {
   roomInfo: function(req, res, next) {
     // var sessionId = req.param('sessionId'),
     // roomId = req.param('roomId');
-
-    var sessionId = 3,
-        roomId = 'room11';
-
-    Rise.findOne(sessionId).then(function(session) {
-      console.log('session: ' + JSON.stringify(session, null, 4));
+    //var sessionId = 3,
+    //    roomId = 'room11';
+    //Rise.findOne(sessionId).then(function(session) {
+    //  console.log('session: ' + JSON.stringify(session, null, 4));
 
       // TODO: find svgs for room
+      var session = prepareSession(req.body.e57master);
+      //console.log(JSON.stringify(session, null, 4));
 
-    })
-  }
+      // read wall JSON
+      walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+
+      var ROOMS = {};
+      var room2wall = {};
+      
+      // build room wall cycles
+      for (var i in walljson.Walls)
+      {
+        var wall = walljson.Walls[i];
+        // build room->walls index
+        if (!room2wall[wall.attributes.roomid]) 
+          room2wall[wall.attributes.roomid]=[];
+          
+        room2wall[wall.attributes.roomid].push(wall);
+      }
+  
+      for (var roomid in room2wall)
+      {
+          // create new room
+          room = {
+            "label" : roomid,
+            "walls" : []
+          }
+          // get ordered wall cycle
+          unordered = room2wall[roomid].slice();
+          ordered = [];
+          while(unordered.length > 0)
+          {
+            var nocycle=true;
+            if (ordered.length==0) {
+              // start with any element
+              ordered.push(unordered.pop());
+            } else {
+              var current = ordered[ordered.length-1];
+              // find element "right" to the current one
+              for (var i in unordered) {
+                if (unordered[i].left == current.right) {
+                  ordered.push(unordered[i]);
+                  unordered.splice(i,1);
+                  nocycle=false;
+                  break;
+                }
+              }
+              if (nocycle)  {
+                console.log("error: non-closing cycle!");
+                ordered.push(unordered.pop());
+              }
+            }
+          }
+          room.walls = ordered;
+          ROOMS[room.label] = room;
+      }
+
+      var Room = ROOMS[req.body.roomid];
+      if (Room) {
+
+        // initialize roomdata
+        roomdata = {
+          "roomid" : Room.label,
+          "rise" : {
+            "wallids" : [],
+            "orthophoto" : { "walls" : [ ] },
+            "grammar"    : { "walls" : [ ] },
+            "hypothesis" : { "walls" : [ ] }
+          }
+        };
+
+        for (i=0; i<Room.walls.length; ++i)
+        {
+          var wallid = Room.walls[i].attributes.id;
+          roomdata.rise.wallids.push(wallid);
+          var httpbase = "/rise/";
+          roomdata.rise.orthophoto.walls.push(httpbase + "orthoresult/" + session.basename + "_" + wallid + ".jpg");
+          roomdata.rise.grammar.walls.push(httpbase + "wiregen/output/svg_grammar/" + wallid + ".svg");
+          roomdata.rise.hypothesis.walls.push(httpbase + "wiregen/output/svg_hypothesis/" + wallid + ".svg");
+        }
+
+        console.log(JSON.stringify(roomdata, null, 4));
+
+        res.send(200, roomdata);
+      } else {
+        // Room id not found
+        res.send(404, "room id not found.");
+      }
+
+    }
 };
