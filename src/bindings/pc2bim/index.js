@@ -22,9 +22,9 @@ PC2BIM.prototype.extract = function(filename) {
     var outputfile = filename.slice(0, -4) + '_RECONSTRUCTED.ifc',
       errorText = '';
 
-    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ubo/pc2bim pc2bim --input ' + filename + ' --output ' + outputfile);
+    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + filename + ' --output ' + outputfile);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ubo/pc2bim', 'pc2bim', '--input', filename, '--output', outputfile]);
+    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', filename, '--output', outputfile]);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
