@@ -2,25 +2,24 @@
  * Pc2bimController
  */
 
-var PC2BIM = require('../../bindings/pc2bim');
+var PC2BIM = require('../../bindings/pc2bim'),
+  isThere = require('is-there');
 
 var _SIMULATE_SUCCESS = false;
 
-function pc2bimRun(filename, duraarkStoragePath) {
-  var pc2bim = new PC2BIM(duraarkStoragePath);
-  return pc2bim.extract(filename);
+function pc2bimRun(config) {
+  var pc2bim = new PC2BIM(config.duraarkStoragePath);
+  return pc2bim.extract(config);
 }
 
-function startExtraction(config) {
-  var runState = config.runState,
-    inputFile = config.inputFile;
-
-  pc2bimRun(config.inputFile, config.duraarkStoragePath).then(function(result) {
+function startExtraction(runState, config) {
+  pc2bimRun(config).then(function(result) {
     console.log('Extraction finished: ' + JSON.stringify(result, null, 4));
 
     runState.outputFile = result.outputFile;
     runState.status = "finished";
     runState.downloadUrl = result.outputFile.replace('/duraark-storage', '');
+    runState.downloadUrlWallJSON = result.outputWallJSON.replace('/duraark-storage', '');
     runState.save().then(function(pc2bimRecord) {
       console.log('[Pc2bimController] Successfully reconstructed BIM model for: ' + pc2bimRecord.inputFile);
     });
@@ -95,9 +94,12 @@ module.exports = {
         Pc2bim.create({
           inputFile: inputFile,
           outputFile: null,
-          status: "pending",
+          outputWallJSON: null,
+          status: 'pending',
           downloadUrl: null
         }).then(function(runState) {
+          var outputFile = runState.inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
+            outputWallJSON = runState.inputFile.replace('.e57', '_wall.json').replace('master', 'derivative_copy');
 
           if (_SIMULATE_SUCCESS) {
             runState.status = "finished";
@@ -107,19 +109,34 @@ module.exports = {
             return res.send(runState);
           }
 
-          startExtraction({
-            runState: runState,
-            inputFile: inputFile,
-            duraarkStoragePath: duraarkStoragePath
-          });
+          // Check if reconstructed IFC file is already present:
+          if (isThere(outputFile)) {
+            runState.outputFile = outputFile;
+            runState.status = 'finished';
+            runState.downloadUrl = outputFile.replace('/duraark-storage', '');
 
-          return res.send(runState).status(200);
+            runState.save().then(function() {
+              return res.send(runState).status(200);
+            });
+          } else {
+            console.log('asdfasdf: ' + inputFile);
+            startExtraction(runState, {
+              inputFile: runState.inputFile,
+              outputFile: outputFile,
+              outputWallJSON: outputWallJSON,
+              duraarkStoragePath: duraarkStoragePath
+            });
+
+            return res.send(runState).status(200);
+          }
         });
       } else {
+        var outputFile = runState.inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
+          outputWallJSON = runState.inputFile.replace('.e57', '_wall.json').replace('master', 'derivative_copy');
 
         if (_SIMULATE_SUCCESS) {
           runState.status = "finished";
-          var url = runState.inputFile.replace('.e57', '.ifc');
+          var url = runState.inputFile.replace('.e57', '.ifc').replace('master', 'derivative_copy');
           url = url.replace('/duraark-storage', '');
           runState.downloadUrl = url;
           return res.send(runState);
@@ -138,9 +155,10 @@ module.exports = {
         if (runState.status === "error") {
           console.log('Extraction error: ' + JSON.stringify(runState, null, 4));
           if (restart) {
-            startExtraction({
-              runState: runState,
-              inputFile: inputFile,
+            startExtraction(runState, {
+              inputFile: runState.inputFile,
+              outputFile: outputFile,
+              outputWallJSON: outputWallJSON,
               duraarkStoragePath: duraarkStoragePath
             });
           }

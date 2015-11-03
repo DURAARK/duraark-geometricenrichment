@@ -11,20 +11,19 @@ var PC2BIM = module.exports = function(storagePath) {
   console.log('[PC2BIM] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
-PC2BIM.prototype.extract = function(filename) {
+PC2BIM.prototype.extract = function(config) {
   var that = this;
   return new Promise(function(resolve, reject) {
-    console.log('[PC2BIM::convert] input file: ' + filename);
+    console.log('[PC2BIM::convert] input file: ' + config.inputFile);
 
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
     //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc
-    var outputfile = filename.slice(0, -4) + '_RECONSTRUCTED.ifc',
-      errorText = '';
+    var errorText = '';
 
-    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + filename + ' --output ' + outputfile);
+    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + config.inputFile + ' --output ' + config.outputFile + ' --outputjson ' + config.outputWallJSON);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', filename, '--output', outputfile]);
+    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--output', config.outputFile + ' --outputjson ' + config.outputWallJSON]);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
@@ -41,8 +40,9 @@ PC2BIM.prototype.extract = function(filename) {
       if (code === 0) {
         console.log('[PC2BIM-binding] successfully finished');
         resolve({
-          inputFile: filename,
-          outputFile: outputfile,
+          inputFile: config.inputFile,
+          outputFile: config.outputFile,
+          outputWallJSON: config.outputWallJSON,
           error: null
         });
       } else {
