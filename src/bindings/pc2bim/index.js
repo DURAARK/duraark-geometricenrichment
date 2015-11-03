@@ -23,7 +23,7 @@ PC2BIM.prototype.extract = function(config) {
 
     console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + config.inputFile + ' --output ' + config.outputFile + ' --outputjson ' + config.outputWallJSON);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--output', config.outputFile + ' --outputjson ' + config.outputWallJSON]);
+    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--output', config.outputFile, ' --outputjson ', config.outputWallJSON]);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
@@ -45,8 +45,12 @@ PC2BIM.prototype.extract = function(config) {
           outputWallJSON: config.outputWallJSON,
           error: null
         });
+      } else if (code === 132) {
+        var err = "'pc2bim' could not start. Are you sure that your CPU is from Intel? AMD is not supported at the moment."
+        console.log('[PC2BIM::convert] ' + err);
+        reject(err);
       } else {
-        console.log('[PC2BIM-binding] finished with error code: ' + code);
+        console.log('[PC2BIM::convert] ' + errorText);
         reject(errorText);
       }
     });
