@@ -23,7 +23,7 @@ PC2BIM.prototype.extract = function(config) {
 
     console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + config.inputFile + ' --output ' + config.outputFile + ' --outputjson ' + config.outputWallJSON);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--output', config.outputFile, ' --outputjson ', config.outputWallJSON]);
+    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--outputjson', config.outputWallJSON, '--output', config.outputFile]);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
