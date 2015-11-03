@@ -10,7 +10,7 @@ module.exports = {
   attributes: {
     inputFile: 'string',
     outputFile: 'string',
-    outputWallJSON: 'string',
+    downloadUrlWallJSON: 'string',
     downloadUrl: 'string',
     status: 'string',
     errorText: 'string'
