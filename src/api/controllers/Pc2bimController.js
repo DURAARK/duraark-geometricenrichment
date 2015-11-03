@@ -27,7 +27,7 @@ function startExtraction(runState, config) {
     console.log('[Pc2bimController] Error:\n' + err);
 
     if (err === "") {
-      err = "'pc2bim' could not start. Are you sure that your CPU is from Intel? AMD is not supported at the moment."
+      err = "No explicit error given"
     }
     runState.status = "error";
     runState.errorText = err;
@@ -120,6 +120,7 @@ module.exports = {
             });
           } else {
             console.log('asdfasdf: ' + inputFile);
+              console.log('de66bug: wallJSON: ' + outputWallJSON);
             startExtraction(runState, {
               inputFile: runState.inputFile,
               outputFile: outputFile,
@@ -155,6 +156,7 @@ module.exports = {
         if (runState.status === "error") {
           console.log('Extraction error: ' + JSON.stringify(runState, null, 4));
           if (restart) {
+            console.log('debug: wallJSON: ' + outputWallJSON);
             startExtraction(runState, {
               inputFile: runState.inputFile,
               outputFile: outputFile,
