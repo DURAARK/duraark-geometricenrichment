@@ -9,9 +9,10 @@ module.exports = {
 
   attributes: {
     inputFile: 'string',
-    outputFile: 'string',
-    downloadUrlWallJSON: 'string',
-    downloadUrl: 'string',
+    bimFilePath: 'string',
+    wallFilePath: 'string',
+    bimDownloadUrl: 'string',
+    wallsDownloadUrl: 'string',
     status: 'string',
     errorText: 'string'
   }

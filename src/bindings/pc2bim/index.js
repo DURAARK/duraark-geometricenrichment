@@ -39,10 +39,11 @@ PC2BIM.prototype.extract = function(config) {
 
       if (code === 0) {
         console.log('[PC2BIM-binding] successfully finished');
+
         resolve({
           inputFile: config.inputFile,
-          outputFile: config.outputFile,
-          outputWallJSON: config.outputWallJSON,
+          bimFilePath: config.bimFilePath,
+          wallsFilePath: config.wallsFilePath,
           error: null
         });
       } else if (code === 132) {
