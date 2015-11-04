@@ -81,7 +81,7 @@ module.exports = {
     // console.log('inputFile: ' + inputFile);
     // console.log('restart: ' + restart);
 
-    console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
+    // console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
 
     res.setTimeout(0);
 
