@@ -81,7 +81,7 @@ module.exports = {
     // console.log('inputFile: ' + inputFile);
     // console.log('restart: ' + restart);
 
-    console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
+    // console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
 
     res.setTimeout(0);
 
@@ -109,7 +109,7 @@ module.exports = {
         var url = derivativeState.inputFile.replace('.e57', '.ifc');
         url = url.replace('/duraark-storage', '');
         derivativeState.bimDownloadUrl = url;
-        return res.send(derivativeState);
+        return res.send(derivativeState).status(200);
       }
 
       if (!derivativeState) {
@@ -153,21 +153,22 @@ module.exports = {
             duraarkStoragePath: duraarkStoragePath
           };
 
-          console.log('[Pc2bimController] Starting new job: ' + JSON.stringify(config, null, 4));
+          console.log('[Pc2bimController] Starting new job: ' + JSON.stringify(jobConfig, null, 4));
 
           startExtraction(derivativeState, jobConfig);
+          return res.send(derivativeState).status(201);
         });
 
       } else {
 
         if (derivativeState.status === "finished") {
           console.log('[Pc2bimController] Found finished job: ' + JSON.stringify(derivativeState, null, 4));
-          res.send(derivativeState).status(201);
+          return res.send(derivativeState).status(200);
         }
 
         if (derivativeState.status === "pending") {
           // console.log('[Pc2bimController] Job is pending: ' + JSON.stringify(derivativeState, null, 4));
-          res.send(derivativeState).status(200);
+          return res.send(derivativeState).status(200);
         }
 
         if (derivativeState.status === "error") {
@@ -181,11 +182,12 @@ module.exports = {
               duraarkStoragePath: duraarkStoragePath
             });
           }
-          res.send(derivativeState).status(200);
+          return res.send(derivativeState).status(200);
         }
       }
     }).catch(function(err) {
       console.log('[PC2BIMController] Internal error: ' + err);
+      return res.send(err).status(500);
     });
   }
 }

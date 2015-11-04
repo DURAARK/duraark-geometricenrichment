@@ -11,19 +11,19 @@ var PC2BIM = module.exports = function(storagePath) {
   console.log('[PC2BIM] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
-PC2BIM.prototype.extract = function(config) {
+PC2BIM.prototype.extract = function(jobConfig) {
   var that = this;
   return new Promise(function(resolve, reject) {
-    console.log('[PC2BIM::convert] input file: ' + config.inputFile);
+    console.log('[PC2BIM::convert] input file: ' + jobConfig.inputFile);
 
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
     //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc
     var errorText = '';
 
-    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + config.inputFile + ' --output ' + config.outputFile + ' --outputjson ' + config.outputWallJSON);
+    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + jobConfig.inputFile + ' --output ' + jobConfig.bimFilePath + ' --outputjson ' + jobConfig.wallsFilePath);
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', config.inputFile, '--outputjson', config.outputWallJSON, '--output', config.outputFile]);
+    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', jobConfig.inputFile, , '--output', jobConfig.bimFilePath, '--outputjson', jobConfig.wallsFilePath]);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
@@ -41,9 +41,9 @@ PC2BIM.prototype.extract = function(config) {
         console.log('[PC2BIM-binding] successfully finished');
 
         resolve({
-          inputFile: config.inputFile,
-          bimFilePath: config.bimFilePath,
-          wallsFilePath: config.wallsFilePath,
+          inputFile: jobConfig.inputFile,
+          bimFilePath: jobConfig.bimFilePath,
+          wallsFilePath: jobConfig.wallsFilePath,
           error: null
         });
       } else if (code === 132) {
