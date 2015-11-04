@@ -12,15 +12,16 @@ function pc2bimRun(config) {
   return pc2bim.extract(config);
 }
 
-function startExtraction(runState, config) {
+function startExtraction(derivativeState, config) {
   pc2bimRun(config).then(function(result) {
     console.log('Extraction finished: ' + JSON.stringify(result, null, 4));
 
-    runState.outputFile = result.outputFile;
-    runState.status = "finished";
-    runState.downloadUrl = result.outputFile.replace('/duraark-storage', '');
-    runState.downloadUrlWallJSON = result.outputWallJSON.replace('/duraark-storage', '');
-    runState.save().then(function(pc2bimRecord) {
+    derivativeState.bimFilePath = result.bimFilePath;
+    derivativeState.wallsFilePath = result.wallsFilePath;
+    derivativeState.status = "finished";
+    derivativeState.bimDownloadUrl = result.bimFilePath.replace('/duraark-storage', '');
+    derivativeState.wallsDownloadUrl = result.wallsFilePath.replace('/duraark-storage', '');
+    derivativeState.save().then(function(pc2bimRecord) {
       console.log('[Pc2bimController] Successfully reconstructed BIM model for: ' + pc2bimRecord.inputFile);
     });
   }).catch(function(err) {
@@ -29,10 +30,10 @@ function startExtraction(runState, config) {
     if (err === "") {
       err = "No explicit error given"
     }
-    runState.status = "error";
-    runState.errorText = err;
+    derivativeState.status = "error";
+    derivativeState.errorText = err;
 
-    runState.save().then(function(pc2bimRecord) {
+    derivativeState.save().then(function(pc2bimRecord) {
       console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
       console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
     });
@@ -71,7 +72,10 @@ module.exports = {
   create: function(req, res, next) {
     var inputFile = req.param('inputFile'),
       restart = req.param('restart'),
-      duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage';
+      duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage',
+      bimFilePath = inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
+      wallsFilePath = inputFile.replace('.e57', '_wall.json').replace('master', 'tmp'),
+      isAlreadyReconstructed = false;
 
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
     // console.log('inputFile: ' + inputFile);
@@ -81,94 +85,107 @@ module.exports = {
 
     res.setTimeout(0);
 
+    // Check if reconstructed IFC file is already present:
+    isAlreadyReconstructed = isThere(bimFilePath) && isThere(wallsFilePath);
+
+    // console.log('bim: ' + bimFilePath);
+    // console.log('wall: ' + wallsFilePath);
+    // console.log('bim there: ' + isThere(bimFilePath));
+    // console.log('wall there: ' + isThere(wallsFilePath));
+    //
+    // console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
+
     Pc2bim.findOne({
       "where": {
         "inputFile": {
           "equals": inputFile
         }
       }
-    }).then(function(runState) {
-      // console.log('runState: ' + JSON.stringify(runState, null, 4));
+    }).then(function(derivativeState) {
+      // console.log('derivativeState: ' + JSON.stringify(derivativeState, null, 4));
 
-      if (!runState) {
+      if (_SIMULATE_SUCCESS) {
+        derivativeState.status = "finished";
+        var url = derivativeState.inputFile.replace('.e57', '.ifc');
+        url = url.replace('/duraark-storage', '');
+        derivativeState.bimDownloadUrl = url;
+        return res.send(derivativeState);
+      }
+
+      if (!derivativeState) {
+        console.log('[Pc2bimController] No job found for input file: ' + inputFile);
+        console.log('[Pc2bimController] Creating new database entry ...');
         Pc2bim.create({
           inputFile: inputFile,
-          outputFile: null,
-          outputWallJSON: null,
+          bimFilePath: null,
+          wallsFilePath: null,
           status: 'pending',
-          downloadUrl: null
-        }).then(function(runState) {
-          var outputFile = runState.inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
-            outputWallJSON = runState.inputFile.replace('.e57', '_wall.json').replace('master', 'derivative_copy');
+          bimDownloadUrl: null
+        }).then(function(derivativeState) {
+          if (isAlreadyReconstructed) {
+            console.log('[Pc2bimController] Found existing reconstruction, reusing:');
+            console.log('[Pc2bimController]   * BIM model: ' + bimFilePath);
+            console.log('[Pc2bimController]   * Wall JSON: ' + wallsFilePath);
 
-          if (_SIMULATE_SUCCESS) {
-            runState.status = "finished";
-            var url = runState.inputFile.replace('.e57', '.ifc');
-            url = url.replace('/duraark-storage', '');
-            runState.downloadUrl = url;
-            return res.send(runState);
-          }
+            // Take the new database entry and update it with the existing data files:
+            derivativeState.bimFilePath = bimFilePath;
+            derivativeState.wallsFilePath = wallsFilePath;
+            derivativeState.bimDownloadUrl = bimFilePath.replace('/duraark-storage', '');
+            derivativeState.wallsDownloadUrl = wallsFilePath.replace('/duraark-storage', '');
+            derivativeState.status = 'finished';
 
-          // Check if reconstructed IFC file is already present:
-          if (isThere(outputFile)) {
-            runState.outputFile = outputFile;
-            runState.status = 'finished';
-            runState.downloadUrl = outputFile.replace('/duraark-storage', '');
-
-            runState.save().then(function() {
-              return res.send(runState).status(200);
-            });
-          } else {
-            console.log('asdfasdf: ' + inputFile);
-              console.log('de66bug: wallJSON: ' + outputWallJSON);
-            startExtraction(runState, {
-              inputFile: runState.inputFile,
-              outputFile: outputFile,
-              outputWallJSON: outputWallJSON,
-              duraarkStoragePath: duraarkStoragePath
+            derivativeState.save().catch(function(err) {
+              console.log('[Pc2BimController] When this error occurs the database and client app are not syncronized correctly anymore ...')
+              throw new Error(err);
             });
 
-            return res.send(runState).status(200);
+            console.log('[Pc2bimController] Updated database with existing data');
+
+            // FIXXME: The 'save()' method above could go wrong. This return statement is directly triggered
+            // here and not in the resolved promise above only because of the execution flow.
+            return res.send(derivativeState).status(200);
           }
+
+          var jobConfig = {
+            inputFile: derivativeState.inputFile,
+            bimFilePath: bimFilePath,
+            wallsFilePath: wallsFilePath,
+            duraarkStoragePath: duraarkStoragePath
+          };
+
+          console.log('[Pc2bimController] Starting new job: ' + JSON.stringify(config, null, 4));
+
+          startExtraction(derivativeState, jobConfig);
         });
+
       } else {
-        var outputFile = runState.inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
-          outputWallJSON = runState.inputFile.replace('.e57', '_wall.json').replace('master', 'derivative_copy');
 
-        if (_SIMULATE_SUCCESS) {
-          runState.status = "finished";
-          var url = runState.inputFile.replace('.e57', '.ifc').replace('master', 'derivative_copy');
-          url = url.replace('/duraark-storage', '');
-          runState.downloadUrl = url;
-          return res.send(runState);
+        if (derivativeState.status === "finished") {
+          console.log('[Pc2bimController] Found finished job: ' + JSON.stringify(derivativeState, null, 4));
+          res.send(derivativeState).status(201);
         }
 
-        if (runState.status === "finished") {
-          console.log('Returning cached result: ' + JSON.stringify(runState, null, 4));
-          res.send(runState).status(201);
+        if (derivativeState.status === "pending") {
+          // console.log('[Pc2bimController] Job is pending: ' + JSON.stringify(derivativeState, null, 4));
+          res.send(derivativeState).status(200);
         }
 
-        if (runState.status === "pending") {
-          console.log('Extraction pending: ' + JSON.stringify(runState, null, 4));
-          res.send(runState).status(200);
-        }
-
-        if (runState.status === "error") {
-          console.log('Extraction error: ' + JSON.stringify(runState, null, 4));
+        if (derivativeState.status === "error") {
+          console.log('[Pc2bimController] Found failed job: ' + JSON.stringify(derivativeState, null, 4));
           if (restart) {
-            console.log('debug: wallJSON: ' + outputWallJSON);
-            startExtraction(runState, {
-              inputFile: runState.inputFile,
-              outputFile: outputFile,
-              outputWallJSON: outputWallJSON,
+            console.log('[Pc2bimController] Reschedule job as requested');
+            startExtraction(derivativeState, {
+              inputFile: derivativeState.inputFile,
+              bimFilePath: bimFilePath,
+              wallsFilePath: wallsFilePath,
               duraarkStoragePath: duraarkStoragePath
             });
           }
-          res.send(runState).status(200);
+          res.send(derivativeState).status(200);
         }
       }
     }).catch(function(err) {
-      console.log('[PC2BIMController] Error: ' + err);
+      console.log('[PC2BIMController] Internal error: ' + err);
     });
   }
 }
