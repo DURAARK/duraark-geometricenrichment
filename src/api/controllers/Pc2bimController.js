@@ -153,7 +153,7 @@ module.exports = {
             duraarkStoragePath: duraarkStoragePath
           };
 
-          console.log('[Pc2bimController] Starting new job: ' + JSON.stringify(config, null, 4));
+          console.log('[Pc2bimController] Starting new job: ' + JSON.stringify(jobConfig, null, 4));
 
           startExtraction(derivativeState, jobConfig);
         });
