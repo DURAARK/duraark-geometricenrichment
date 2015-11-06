@@ -68,7 +68,6 @@ Elecdetec.prototype.config2ini = config2ini;
 
 Elecdetec.prototype.createElecImages = function(session, config) {
 
-
   return new Promise(function(resolve, reject) {
 
     session.status = 'pending';
