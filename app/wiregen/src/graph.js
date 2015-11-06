@@ -42,13 +42,20 @@ Edge.prototype.isAdjacentTo = function(v)
 }
 
 
-function Graph()
+function Graph(state)
 {
-    this.N = {};    // nodes
-    this.E = {};    // edges
-    this.A = {};    // adjacency
-    
-    this.nodeid = 0;    // node id counter
+  if (state)
+  {
+    for (var attr in state)
+    {
+      this[attr] = state[attr];
+    }
+  } else {
+    this.N = {};      // nodes
+    this.E = {};      // edges
+    this.A = {};      // adjacency
+    this.nodeid = 0;  // node id counter
+  }
 }
 Graph.prototype.newNodeID = function()
 {
@@ -227,6 +234,11 @@ Graph.prototype.exportToGraphViz = function ()
     }
     dot += "}\n";
     return dot;
+}
+
+Graph.prototype.statistics = function() 
+{
+  return "Graph contains " + Object.keys(this.N).length + " nodes and " + Object.keys(this.E).length + " edges.";
 }
 
 module.exports =

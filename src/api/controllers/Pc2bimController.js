@@ -88,12 +88,12 @@ module.exports = {
     // Check if reconstructed IFC file is already present:
     isAlreadyReconstructed = isThere(bimFilePath) && isThere(wallsFilePath);
 
-    // console.log('bim: ' + bimFilePath);
-    // console.log('wall: ' + wallsFilePath);
-    // console.log('bim there: ' + isThere(bimFilePath));
-    // console.log('wall there: ' + isThere(wallsFilePath));
-    //
-    // console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
+    console.log('bim: ' + bimFilePath);
+    console.log('wall: ' + wallsFilePath);
+    console.log('bim there: ' + isThere(bimFilePath));
+    console.log('wall there: ' + isThere(wallsFilePath));
+
+    console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
 
     Pc2bim.findOne({
       "where": {
@@ -160,7 +160,29 @@ module.exports = {
         });
 
       } else {
+        if (isAlreadyReconstructed) {
+          console.log('[Pc2bimController] Found existing reconstruction, reusing:');
+          console.log('[Pc2bimController]   * BIM model: ' + bimFilePath);
+          console.log('[Pc2bimController]   * Wall JSON: ' + wallsFilePath);
 
+          // Take the new database entry and update it with the existing data files:
+          derivativeState.bimFilePath = bimFilePath;
+          derivativeState.wallsFilePath = wallsFilePath;
+          derivativeState.bimDownloadUrl = bimFilePath.replace('/duraark-storage', '');
+          derivativeState.wallsDownloadUrl = wallsFilePath.replace('/duraark-storage', '');
+          derivativeState.status = 'finished';
+
+          derivativeState.save().catch(function(err) {
+            console.log('[Pc2BimController] When this error occurs the database and client app are not syncronized correctly anymore ...')
+            throw new Error(err);
+          });
+
+          console.log('[Pc2bimController] Updated database with existing data');
+
+          // FIXXME: The 'save()' method above could go wrong. This return statement is directly triggered
+          // here and not in the resolved promise above only because of the execution flow.
+          return res.send(derivativeState).status(200);
+        }
         if (derivativeState.status === "finished") {
           console.log('[Pc2bimController] Found finished job: ' + JSON.stringify(derivativeState, null, 4));
           return res.send(derivativeState).status(200);

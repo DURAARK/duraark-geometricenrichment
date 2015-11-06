@@ -8,6 +8,8 @@
 var Orthogen = require('../../bindings/orthogen/index'),
   Elecdetec = require('../../bindings/elecdetec/index'),
   Wiregen = require('../../bindings/wiregen/index'),
+  Rise2X3D = require('../../lib/rise2x3d/index'),
+  Graph = require('../../../app/wiregen/src/graph'),
   uuid = require('node-uuid'),
   fs = require('fs'),
   path = require('path'),
@@ -71,6 +73,8 @@ function prepareSession(e57master) {
     session.elecdetecPath = path.join(session.workingDir, session.elecDir); 
     session.elecResultsDir = 'results';
     session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
+
+    session.wiregenHypothesisGraph = path.join(session.workingDir, "wiregen", "output", "hypothesis-graph.json");
     //console.log(JSON.stringify(session));
   return session;
 }
@@ -207,102 +211,6 @@ function createInputSymbolList(session) {
   });
 }
 
-// function wireGenResultSvg_grammar(session) {
-//   return new Promise(function(resolve, reject) {
-//     session.wireGenResultGrammar = [];
-//     fs.readdir(path.join(session.wireGenOutput, 'svg_grammar'), function(err, files) {
-//       for (var key in files) {
-//         var fileResult = {
-//           file: files[key],
-//           link: 'session/' + session.sessionId + '/wiregen/output/svg_grammar/' + files[key]
-//         };
-//         session.wireGenResultGrammar.push(fileResult);
-//       }
-//       resolve(session);
-//     });
-//   });
-// }
-
-// function wireGenResultSvg_hypothesis(session) {
-//   return new Promise(function(resolve, reject) {
-//     session.wireGenResultHypothesis = [];
-//     fs.readdir(path.join(session.wireGenOutput, 'svg_hypothesis'), function(err, files) {
-//       for (var key in files) {
-//         var fileResult = {
-//           file: files[key],
-//           link: 'session/' + session.sessionId + '/wiregen/output/svg_hypothesis/' + files[key]
-//         };
-//         session.wireGenResultHypothesis.push(fileResult);
-//       }
-//       resolve(session);
-//     });
-//   });
-// }
-
-// function reOrderResult(session) {
-//   return new Promise(function(resolve, reject) {
-//     try {
-
-
-//       session.resultArray = {};
-//       session.resultArray.elecDetecResults = [];
-//       session.resultArray.orthogenResults = [];
-//       session.resultArray.wireGenResultHypothesis = [];
-//       session.resultArray.wireGenResultGrammar = [];
-
-//       var baseUrl = 'session/' + session.sessionId + '/';
-//       var wireGenGramarUrl = baseUrl + 'wiregen/output/svg_grammar/';
-//       var wireGenHypothesisUrl = baseUrl + 'wiregen/output/svg_hypothesis/';
-//       var elecDetedtUrl = baseUrl + '/elecdetect-test-set/results/';
-
-//       var orderedResult = orderSession(session);
-
-//       for (var i = 0; i < orderedResult.length; i++) {
-//         var picture = orderedResult[i].attributes.id;
-//         session.resultArray.wireGenResultGrammar.push(wireGenGramarUrl + picture + '.svg');
-//         session.resultArray.wireGenResultHypothesis.push(wireGenHypothesisUrl + picture + '.svg');
-//         session.resultArray.elecDetecResults.push(elecDetedtUrl + picture + '-result.jpg');
-//         session.resultArray.orthogenResults.push(baseUrl + picture + '.jpg');
-//       }
-
-//       resolve(session);
-//     } catch (e) {
-//       console.log(e);
-//       reject(session);
-//     }
-//   });
-// }
-
-// function orderSession(session) {
-//   var tempWalls = session.Walls.slice(0);
-//   var sorted = [];
-
-
-//   while (tempWalls.length > 0) {
-//     var first = tempWalls.pop();
-//     sorted.push(first);
-//     var corner = first.right;
-//     while (corner != first.left) {
-//       // find wall with left corner
-//       var found = false;
-//       for (var w in tempWalls) {
-//         var wall = tempWalls[w];
-//         if (wall.left == corner) {
-//           sorted.push(wall);
-//           corner = wall.right;
-//           tempWalls.splice(w, 1);
-//           found = true;
-//           break;
-//         }
-//       }
-//       if (found === false) {
-//         console.log("loop not closed.");
-//         break;
-//       }
-//     }
-//   }
-//   return sorted;
-// }
 
 module.exports = {
   /**
@@ -390,9 +298,7 @@ module.exports = {
    *
    */
   rise: function(req, res, next) {
-
     req.connection.setTimeout(0);
-
     var session = req.body;
     session.panoImage = hardCodedPanoImage;
 
@@ -413,9 +319,7 @@ module.exports = {
 
 
   createSession: function(req, res, next) {
-
     var session = req.body;
-
     createSession(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
@@ -426,9 +330,7 @@ module.exports = {
   },
 
   initializeSession: function(req, res, next) {
-
     var session = req.body;
-
     initializeSession(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
@@ -438,17 +340,16 @@ module.exports = {
 
   },
 
+  // createObjectFiles: function(req, res, next) {
+  //   var session = req.body;
 
-  createObjectFiles: function(req, res, next) {
-    var session = req.body;
-
-    createObjectFiles(session).then(function(argument) {
-      res.send(200, argument);
-    }).catch(function(err) {
-      console.log('Error: ' + err);
-      res.send(500, err);
-    });
-  },
+  //   createObjectFiles(session).then(function(argument) {
+  //     res.send(200, argument);
+  //   }).catch(function(err) {
+  //     console.log('Error: ' + err);
+  //     res.send(500, err);
+  //   });
+  // },
   startOrthogen: function(req, res, next) {
     var session = req.body;
 
@@ -481,13 +382,22 @@ module.exports = {
     });
 
   },
-  reOrderResult: function(req, res, next) {
-    reOrderResult(session).then(function(argument) {
-      res.send(200, argument);
-    }).catch(function(err) {
-      console.log('Error: ' + err);
-      res.send(500, err);
-    });
+
+  floorInfo: function(req, res, next) {
+      var rise2x3d = new Rise2X3D();
+      var session = prepareSession(req.body.e57master);
+      var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      var rooms = rise2x3d.parseRooms(walljson);
+      // extract short floorinfo
+      var floorinfo = {};
+      for (room in rooms) {
+        var walls = [];
+        for (wall in rooms[room].walls) {
+          walls.push(rooms[room].walls[wall].attributes.id);
+        }
+        floorinfo[room] = walls;
+      }
+      res.send(200, floorinfo);
   },
 
   roomInfo: function(req, res, next) {
@@ -497,64 +407,14 @@ module.exports = {
     //    roomId = 'room11';
     //Rise.findOne(sessionId).then(function(session) {
     //  console.log('session: ' + JSON.stringify(session, null, 4));
-
+      var rise2x3d = new Rise2X3D();
       // TODO: find svgs for room
       var session = prepareSession(req.body.e57master);
       //console.log(JSON.stringify(session, null, 4));
 
       // read wall JSON
-      walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-
-      var ROOMS = {};
-      var room2wall = {};
-      
-      // build room wall cycles
-      for (var i in walljson.Walls)
-      {
-        var wall = walljson.Walls[i];
-        // build room->walls index
-        if (!room2wall[wall.attributes.roomid]) 
-          room2wall[wall.attributes.roomid]=[];
-          
-        room2wall[wall.attributes.roomid].push(wall);
-      }
-  
-      for (var roomid in room2wall)
-      {
-          // create new room
-          room = {
-            "label" : roomid,
-            "walls" : []
-          }
-          // get ordered wall cycle
-          unordered = room2wall[roomid].slice();
-          ordered = [];
-          while(unordered.length > 0)
-          {
-            var nocycle=true;
-            if (ordered.length==0) {
-              // start with any element
-              ordered.push(unordered.pop());
-            } else {
-              var current = ordered[ordered.length-1];
-              // find element "right" to the current one
-              for (var i in unordered) {
-                if (unordered[i].left == current.right) {
-                  ordered.push(unordered[i]);
-                  unordered.splice(i,1);
-                  nocycle=false;
-                  break;
-                }
-              }
-              if (nocycle)  {
-                console.log("error: non-closing cycle!");
-                ordered.push(unordered.pop());
-              }
-            }
-          }
-          room.walls = ordered;
-          ROOMS[room.label] = room;
-      }
+      var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      var ROOMS = rise2x3d.parseRooms(walljson);
 
       var Room = ROOMS[req.body.roomid];
       if (Room) {
@@ -588,5 +448,23 @@ module.exports = {
         res.send(404, "room id not found.");
       }
 
+    },
+
+    x3d : function(req, res, next) {
+
+      var rise2x3d = new Rise2X3D();
+      var session = prepareSession(req.body.e57master);
+      // parse wall json
+      var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      var rooms    = rise2x3d.parseRooms(walljson);
+      // parse hypothesis power line graph
+      var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
+
+      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson);
+      //console.log(x3d);
+      res.send(200, x3d);
     }
+
+
+
 };
