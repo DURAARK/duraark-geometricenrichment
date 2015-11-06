@@ -8,7 +8,7 @@
 var Orthogen = require('../../bindings/orthogen/index'),
   Elecdetec = require('../../bindings/elecdetec/index'),
   Wiregen = require('../../bindings/wiregen/index'),
-  Rise2X3D = require('../../lib/rise2x3d/index'),
+  // Rise2X3D = require('../../lib/rise2x3d/index'),
   Graph = require('../../../app/wiregen/src/graph'),
   uuid = require('node-uuid'),
   fs = require('fs'),
@@ -70,7 +70,7 @@ function prepareSession(e57master) {
     session.orthoresult = path.join(session.workingDir, "orthoresult");
 
     session.elecDir = 'elecdetect-test-set';
-    session.elecdetecPath = path.join(session.workingDir, session.elecDir); 
+    session.elecdetecPath = path.join(session.workingDir, session.elecDir);
     session.elecResultsDir = 'results';
     session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
 
@@ -177,15 +177,15 @@ function createInputSymbolList(session) {
       // add symbols from wall json
       for (var ia in walljson)
       {
-        walljson[ia].forEach(function(symbol){ 
-          session.wiregenInput.push(symbol); 
+        walljson[ia].forEach(function(symbol){
+          session.wiregenInput.push(symbol);
         });
         console.log("imported " + walljson[ia].length + " " + ia + " symbols.");
       }
       // add sockets and switches
       [ 'Sockets', 'Switches'].forEach(function(category){
-        session[category].forEach(function(symbol){ 
-          session.wiregenInput.push(symbol); 
+        session[category].forEach(function(symbol){
+          session.wiregenInput.push(symbol);
         });
         console.log("imported " + session[category].length + " " + category + " symbols.");
       });
@@ -383,22 +383,22 @@ module.exports = {
 
   },
 
-  floorInfo: function(req, res, next) {
-      var rise2x3d = new Rise2X3D();
-      var session = prepareSession(req.body.e57master);
-      var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-      var rooms = rise2x3d.parseRooms(walljson);
-      // extract short floorinfo
-      var floorinfo = {};
-      for (room in rooms) {
-        var walls = [];
-        for (wall in rooms[room].walls) {
-          walls.push(rooms[room].walls[wall].attributes.id);
-        }
-        floorinfo[room] = walls;
-      }
-      res.send(200, floorinfo);
-  },
+  // floorInfo: function(req, res, next) {
+  //     var rise2x3d = new Rise2X3D();
+  //     var session = prepareSession(req.body.e57master);
+  //     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+  //     var rooms = rise2x3d.parseRooms(walljson);
+  //     // extract short floorinfo
+  //     var floorinfo = {};
+  //     for (room in rooms) {
+  //       var walls = [];
+  //       for (wall in rooms[room].walls) {
+  //         walls.push(rooms[room].walls[wall].attributes.id);
+  //       }
+  //       floorinfo[room] = walls;
+  //     }
+  //     res.send(200, floorinfo);
+  // },
 
   roomInfo: function(req, res, next) {
     // var sessionId = req.param('sessionId'),
