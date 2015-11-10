@@ -8,55 +8,13 @@
 var Orthogen = require('../../bindings/orthogen/index'),
   Elecdetec = require('../../bindings/elecdetec/index'),
   Wiregen = require('../../bindings/wiregen/index'),
-  // Rise2X3D = require('../../lib/rise2x3d/index'),
+  Rise2X3D = require('../../lib/rise2x3d/index'),
   Graph = require('../../../app/wiregen/src/graph'),
   uuid = require('node-uuid'),
   fs = require('fs'),
   path = require('path'),
-  mkdirp = require('mkdirp');
-//  hardCodedPanoImage = '/tmp/panorama.jpg';
-//var savePath = '/tmp';
-
-// function createSession(param) {
-
-//   return new Promise(function(resolve, reject) {
-//     //var tmp = '73fe3ef2-4614-4830-bf40-b58147d52d47', //uuid.v4(), // Bygade72
-//     //var tmp = '54334197-c970-42ff-a56f-384d0cc064c4', //uuid.v4(),   // Byagde72_2ndscan
-//     //var tmp = 'byg72-1st-scan_fixed', //uuid.v4(),   // Byagde72_2ndscan
-//     //  workingDir = path.join(savePath, tmp, '/tools/rise');
-
-//     var sessionPath = session.sessionPath;
-//     var sessionName = sessionPath.split('/').pop();
-//     var workingDir = path.join(sessionPath, 'tools', 'rise');
-
-//     mkdirp(workingDir, function(err) {
-//       if (!err) {
-//         console.log('[SessionController::Created session at path: ' + workingDir + ']');
-//         console.log(sessionName);
-
-//         session.workingDir = workingDir;
-//         session.sessionId = sessionName;
-//         session.status = 'created';
-
-//         Rise.create(session, function(err, session) {
-//           if (err) return reject(err);
-
-//           session.status = 'pending';
-//           session.save(function(err, saved_record) {
-//             //console.log('session: ' + JSON.stringify(saved_record, null, 4));
-//             resolve(session);
-//           });
-//         });
-//       } else {
-//         console.log('Error creating session directory. Aborting!');
-//         console.log('  Error message: ' + err);
-//         reject(err);
-//       }
-
-//     });
-//   });
-
-// }
+  mkdirp = require('mkdirp'),
+  easyimage = require('easyimage');
 
 function prepareSession(e57master) {
   var session = {};
@@ -64,8 +22,8 @@ function prepareSession(e57master) {
     session.basename = path.basename(e57master, '.e57');
     session.workingDir = path.join(e57master, '..', '..', 'tools', 'rise');
 
-    session.e57file = path.join(session.workingDir, "..", "..", "metadata", session.basename + "_e57metadata.json");
-    session.wallfile = path.join(session.workingDir, "..", "..", "derivatives", session.basename + "_wall.json");
+    session.e57file = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_e57metadata.json");
+    session.wallfile = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_wall.json");
     session.panopath = path.join(session.workingDir, "pano");
     session.orthoresult = path.join(session.workingDir, "orthoresult");
 
@@ -86,6 +44,26 @@ function initializeSession(param) {
   });
 }
 
+function createOrthoLowRes(session) {
+  console.log("[createOrthoLowRes]");
+  var cwd = process.cwd();
+
+  mkdirp( path.join(session.orthoresult,'lowres') );
+  process.chdir(session.orthoresult);
+  promises = [];
+  var files = fs.readdirSync(session.orthoresult);
+  
+  files.forEach(function(oldFile) {
+    if (path.extname(oldFile) == '.jpg') {
+      var destFile = path.join('lowres', path.basename(oldFile));
+      console.log(JSON.stringify({src:oldFile, dst:destFile, width:500}));
+      promises.push(easyimage.resize({src:oldFile, dst:destFile, width:500}));
+    }
+  });
+  Promise.all(promises).then(function() {
+    process.chdir(cwd);    
+  });
+}
 
 function startOrthogen(param) {
 
@@ -97,6 +75,7 @@ function startOrthogen(param) {
         return new Promise(function(resolve, reject) {
           var orthogen = new Orthogen();
           orthogen.createOrthoImages(session).then(function(orthogen_result) {
+            createOrthoLowRes(session);
             resolve(orthogen_result);
           });
         });
@@ -383,22 +362,22 @@ module.exports = {
 
   },
 
-  // floorInfo: function(req, res, next) {
-  //     var rise2x3d = new Rise2X3D();
-  //     var session = prepareSession(req.body.e57master);
-  //     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-  //     var rooms = rise2x3d.parseRooms(walljson);
-  //     // extract short floorinfo
-  //     var floorinfo = {};
-  //     for (room in rooms) {
-  //       var walls = [];
-  //       for (wall in rooms[room].walls) {
-  //         walls.push(rooms[room].walls[wall].attributes.id);
-  //       }
-  //       floorinfo[room] = walls;
-  //     }
-  //     res.send(200, floorinfo);
-  // },
+  floorInfo: function(req, res, next) {
+      var rise2x3d = new Rise2X3D();
+      var session = prepareSession(req.body.e57master);
+      var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+      var rooms = rise2x3d.parseRooms(walljson);
+      // extract short floorinfo
+      var floorinfo = {};
+      for (room in rooms) {
+        var walls = [];
+        for (wall in rooms[room].walls) {
+          walls.push(rooms[room].walls[wall].attributes.id);
+        }
+        floorinfo[room] = walls;
+      }
+      res.send(200, floorinfo);
+  },
 
   roomInfo: function(req, res, next) {
     // var sessionId = req.param('sessionId'),
@@ -460,7 +439,7 @@ module.exports = {
       // parse hypothesis power line graph
       var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
 
-      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson);
+      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, "/sessions/nygade-1001/tools/rise/orthoresult/lowres/" + session.basename + "_");
       //console.log(x3d);
       res.send(200, x3d);
     }
