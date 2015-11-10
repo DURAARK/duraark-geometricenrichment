@@ -38,7 +38,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--e57metadata', session.e57file,
       '--walljson', session.wallfile,
       '--panopath', session.panopath,
-      '--align', path.resolve(process.cwd(), '../app/orthogen-windows/panoalign'),   //'../../../app/orthogen-windows/panoalign',
+      '--align', path.resolve(process.cwd(), '../app/orthogen-windows/panoalign'),
       '--output', session.basename,
       '--exgeom', '1'
     ];
@@ -84,7 +84,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
           throw err;
         }
 
-        console.log('[Orthogen-finished] Read directory and return result ' + JSON.stringify(files));
+        console.log('[Orthogen-finished]'); //'Read directory and return result ' + JSON.stringify(files));
         // session.resultImages = [];
 
         // for (key in files) {

@@ -13,6 +13,7 @@
   "dependencies": {
     "bluebird": "^2.9.34",
     "chai": "~1.10.0",
+    "easyimage": "^2.1.0",
     "ejs": "~0.8.4",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
