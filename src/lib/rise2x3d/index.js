@@ -109,31 +109,41 @@ IndexedSet.prototype.addSymbol = function(wall, symbol)
 
 IndexedSet.prototype.writeX3D = function(xml, set_type) {
 	xml.startElement('Shape');
-	if (this.material) {
 		xml.startElement('Appearance');
-			xml.startElement('Material');
-			for (attribute in this.material) {
-				xml.writeAttribute(attribute,this.material[attribute]);
+			if (this.material) {
+				xml.startElement('Material');
+				for (attribute in this.material) {
+					xml.writeAttribute(attribute,this.material[attribute]);
+				}
+				xml.endElement();
 			}
-			xml.endElement();
+			if (this.texture) {
+				xml.startElement('ImageTexture');
+				for (attribute in this.texture) {
+					xml.writeAttribute(attribute,this.texture[attribute]);
+				}
+				xml.endElement();
+			}
 		xml.endElement();	// /appearance
-	}
 
 		xml.startElement(set_type);
-		xml.writeAttribute('coordIndex', this.I)
-		for (var att in this.attributes) {
-			xml.writeAttribute(att, this.attributes[att]);
-		}
+			xml.writeAttribute('coordIndex', this.I)
+			for (var att in this.attributes) {
+				xml.writeAttribute(att, this.attributes[att]);
+			}
 			xml.startElement('Coordinate');
-			xml.writeAttribute('point', this.V);
-			xml.endElement();
-		xml.endElement();
+				xml.writeAttribute('point', this.V);
+			xml.endElement();	// /coordinate
+			if (this.texCoord) {
+				xml.startElement('TextureCoordinate');
+					xml.writeAttribute('point', this.texCoord);
+				xml.endElement();	// /coordinate
+			}
+		xml.endElement();	// /set_type
 	xml.endElement();	// /shape
 }
 
-
-
-Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
+Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath) {
 
 	xw = new XMLWriter();
 	xw.startDocument();
@@ -143,7 +153,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
 
 	xw.startElement('Scene').startElement('Group');
 
-	var WG = new IndexedSet();		// wall geometry
+	var WG = []; // new IndexedSet();		// wall geometry
 	var FG = new IndexedSet();		// floor geometry
 	var DG = new IndexedSet(); 		// door geometry
 	var WIG = new IndexedSet();		// window geometry
@@ -169,12 +179,22 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
 				var v2 = O.add(vx).add(vy).add(n.scale(2));
 				var v3 = O.add(vy).add(n.scale(2));
 
-				WG.addVertex(v0, n);
-				WG.addVertex(v1, n);
-				WG.addVertex(v2, n);
-				WG.addVertex(v3, n);
-				WG.endFace();
-
+				var newwall = new IndexedSet();
+				newwall.addVertex(v0, n);
+				newwall.addVertex(v1, n);
+				newwall.addVertex(v2, n);
+				newwall.addVertex(v3, n);
+				newwall.endFace();
+				newwall.texture = { "url": texturepath + wall.attributes.id + ".jpg" };
+				newwall.attributes.texCoordIndex = " 3 2 1 0 -1";
+				newwall.texCoord = "0.0 0.0  1.0 0.0  1.0 1.0  0.0 1.0";
+			    console.log(newwall.texture);
+				newwall.material = {
+					"diffuseColor" : "0.3 0.3 0.3",
+					"ambientIntensity" : "0.8",
+					"transparency" : ".5"
+				}
+				WG.push(newwall);
 				floor.push(v3);
 
 				WALLS[wall.attributes.id] = {
@@ -208,7 +228,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
 		var G = null;
 		var wall = WALLS[S.attributes.wallid];
 		switch(S.label) {
-			case "DOOR" : G = DG; break;
+			case "DOOR" :   G = DG; break;
 			case "WINDOW" : G = WIG; break;
 			default:
 				console.log('unknown opening symbol: ' + JSON.stringify(S));
@@ -217,12 +237,8 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
 	}
 
 	// write WALLS
-	WG.material = {
-		"diffuseColor" : "0.9 0.9 0.8",
-		"ambientIntensity" : "0.8",
-		"transparency" : ".5"
-	}
-	WG.writeX3D(xw, "IndexedFaceSet");
+	WG.forEach(function(wg) { wg.writeX3D(xw, "IndexedFaceSet"); });
+	
 	// write FLOORS
 	FG.material = {
 		"diffuseColor" : "0.6 0.6 0.6",
@@ -234,14 +250,14 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson) {
 	DG.material = {
 		"diffuseColor" : "0.6 0.4 0.2",
 		"ambientIntensity" : "0.5",
-		"transparency" : ".8"
+		"transparency" : "0"
 	}
 	DG.writeX3D(xw, "IndexedFaceSet");
 
 	WIG.material = {
 		"diffuseColor" : "0.2 0.2 0.6",
 		"ambientIntensity" : "0.5",
-		"transparency" : ".8"
+		"transparency" : "0"
 	}
 	WIG.writeX3D(xw, "IndexedFaceSet");
 

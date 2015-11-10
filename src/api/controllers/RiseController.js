@@ -439,7 +439,7 @@ module.exports = {
       // parse hypothesis power line graph
       var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
 
-      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson);
+      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, "/sessions/nygade-1001/tools/rise/orthoresult/lowres/" + session.basename + "_");
       //console.log(x3d);
       res.send(200, x3d);
     }
