@@ -89,21 +89,28 @@ IndexedSet.prototype.endFace = function() {
 	this.I = this.I + " -1";
 }
 
-IndexedSet.prototype.addSymbol = function(wall, symbol)
+IndexedSet.prototype.addSymbol = function(wall, symbol, closed)
 {
+	//console.log("[addSymbol] : wall: " + JSON.stringify(wall) + " symbol:" + JSON.stringify(symbol));
 	var TL = wall.O.add(wall.X.scale(symbol.attributes.left)).add(wall.Y.scale(symbol.attributes.top));
 	var W  = wall.X.scale(symbol.attributes.width);
 	var H  = wall.Y.scale(symbol.attributes.height);
+	//console.log(" TL:" + TL + " W:" + W + " H:" + H);
 
 	var v0 = TL.add( wall.N.scale(10));
 	var v1 = TL.add(W).add(wall.N.scale(10));
 	var v2 = TL.add(W).add(H).add(wall.N.scale(10));
 	var v3 = TL.add(H).add(wall.N.scale(10));
 
+	//console.log("adding vertices");
 	this.addVertex(v0);
 	this.addVertex(v1);
 	this.addVertex(v2);
 	this.addVertex(v3);
+	if (closed==true) {
+		this.addVertex(v0);
+	}
+	//console.log("end face");
 	this.endFace();
 }
 
@@ -143,8 +150,9 @@ IndexedSet.prototype.writeX3D = function(xml, set_type) {
 	xml.endElement();	// /shape
 }
 
-Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath) {
+Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath, session) {
 
+	console.log("[rooms2x3D] started.");
 	xw = new XMLWriter();
 	xw.startDocument();
 	xw.writeDocType("X3D", "ISO//Web3D//DTD X3D 3.0//EN", 
@@ -157,6 +165,8 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	var FG = new IndexedSet();		// floor geometry
 	var DG = new IndexedSet(); 		// door geometry
 	var WIG = new IndexedSet();		// window geometry
+	var SKT = new IndexedSet();		// sockets
+	var SWI = new IndexedSet();		// switches
 	
 	// -------------------------------- WALLS
     WALLS = {};
@@ -222,6 +232,8 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 		}
 	}
 
+	console.log("creating openings")
+	// doors and windows
 	var openings = walljson['Openings'];
 	for (var i=0; i<openings.length; ++i) {
 		var S = openings[i];
@@ -234,6 +246,18 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 				console.log('unknown opening symbol: ' + JSON.stringify(S));
 		}
 		G.addSymbol(wall, S);
+	}
+
+	// detections: sockets and switches
+	for (var i=0;i<session.Sockets.length; ++i) {
+		var socket = session.Sockets[i];
+		var wall = WALLS[socket.attributes.wallid];
+		SKT.addSymbol(wall, socket, true);
+	}
+	for (var i=0;i<session.Switches.length; ++i) {
+		var swt= session.Switches[i];
+		var wall = WALLS[swt.attributes.wallid];
+		SWI.addSymbol(wall, swt, true);
 	}
 
 	// write WALLS
@@ -260,6 +284,15 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 		"transparency" : "0"
 	}
 	WIG.writeX3D(xw, "IndexedFaceSet");
+
+	SKT.material = {
+		'emissiveColor': '0 0 1'
+	}
+	SKT.writeX3D(xw, "IndexedLineSet");
+	SWI.material = {
+		'emissiveColor': '0 1 0'
+	}
+	SWI.writeX3D(xw, "IndexedLineSet");
 
 	// -------------------------------- POWER LINES
 	xw.startElement("Shape");
@@ -306,6 +339,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	xw.endElement();	// /shape
 
 	xw.endDocument();
+	console.log("[rooms2x3D] finished.");	
 	return xw.toString();
 }
 
