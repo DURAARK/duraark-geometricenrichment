@@ -124,12 +124,7 @@ function startElecdetect(session) {
   });
 }
 
-function startWiregen(session) {
-  return new Promise(function(resolve, reject) {
-    console.log('[SessionController::start Wiregen]');
-
-    var wiregen = new Wiregen();
-
+function prepareWiregen(session) {
     // collect elecdetect results
     var files = fs.readdirSync(session.elecdetecResults);
     session.elecDetecResultImages = [];
@@ -141,6 +136,13 @@ function startWiregen(session) {
       session.elecDetecResultImages.push(fileResult);
     }
 
+}
+
+function startWiregen(session) {
+  return new Promise(function(resolve, reject) {
+    console.log('[SessionController::start Wiregen]');
+    prepareWiregen(session);
+    var wiregen = new Wiregen();
     resolve(wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
@@ -444,15 +446,22 @@ module.exports = {
 
     var rise2x3d = new Rise2X3D();
     var session = prepareSession(req.body.e57master);
+
     // parse wall json
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
     var rooms = rise2x3d.parseRooms(walljson);
     // parse hypothesis power line graph
     var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
 
-    var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, "/sessions/nygade-1001/tools/rise/orthoresult/lowres/" + session.basename + "_");
-    //console.log(x3d);
-    res.send(200, x3d);
+    // parse elecdetect results
+    prepareWiregen(session);
+    var wiregen = new Wiregen();
+    wiregen.importDetections(session).then(function() {
+      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, 
+        "/sessions/nygade-1001/tools/rise/orthoresult/lowres/" + session.basename + "_", session);
+      //console.log(x3d);
+      res.send(200, x3d);
+    });
   }
 
 
