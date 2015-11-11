@@ -38,30 +38,20 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--e57metadata', session.e57file,
       '--walljson', session.wallfile,
       '--panopath', session.panopath,
-      '--align', path.resolve(process.cwd(), '../app/orthogen-windows/panoalign'),
+      '--align', 'panoalign',
       '--output', session.basename,
       '--exgeom', '1'
     ];
-
-    console.log('args: ' + JSON.stringify(args, null, 4));
 
     // TODO: change to session directory here?
     var cwd = process.cwd();
 
     process.chdir(session.orthoresult);
 
-    // orthogen --im=pano.jpg
-    // --ig=geometry.obj
-    // --rot 0.9592315236 -0.00766527459 -0.007286718304 0.2824234966
-    // --trans 0 0 141.6600828
-    // --res 1
-    // --elevation -1.5707963 1.5707963
-    // --scale m
-    // --exgeom 1
-    // --exsphere 1
-    // --exquad 1
+    // FIXXME: check ic --poanopath exists and contains images. If not return error message to caller!
+    console.log('[Orthogen-binding] about to run: orthogen ' + args.join(' '));
 
-    var executable = spawn(path.join(__dirname, '../../../app/orthogen-windows/orthogen'), args);
+    var executable = spawn('orthogen', args);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
