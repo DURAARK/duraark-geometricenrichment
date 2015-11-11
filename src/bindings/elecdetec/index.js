@@ -28,6 +28,7 @@ function copyFile(source, target) {
 }
 
 function defaultConfig() {
+  // FIXXME: read from config.ini
   return {
     "detection" : {
       "result_directory_name" : "results",
@@ -38,7 +39,7 @@ function defaultConfig() {
       "detection_default_threshold" : "0.5",
       "detection_label_thresholds" : "0.26, 0.65",
       "detection_labels" : "1, 2"
-    }, 
+    },
     "training" : {
       "label_delimiter" : "_ ",
       "max_bootstrap_stages" : "10"
@@ -77,7 +78,7 @@ Elecdetec.prototype.createElecImages = function(session, config) {
     mkdirp(session.elecdetecPath, function(err) {
       if (err) { console.log("aösldkgh" + err); }
       if (!err) {
-        
+
         promises = [];
 
         // get orthogen images
@@ -91,13 +92,13 @@ Elecdetec.prototype.createElecImages = function(session, config) {
             if ((dimensions.width > 128) && (dimensions.height > 128)) {
               console.log(oldFile + '-->' + newFile)
               promises.push(copyFile(oldFile, newFile));
-            }            
+            }
           }
         });
 
         Promise.all(promises).then(function() {
 
-            // write config            
+            // write config
             process.chdir(session.workingDir);
             if (!config) {
               config = defaultConfig();
@@ -110,7 +111,7 @@ Elecdetec.prototype.createElecImages = function(session, config) {
               '-i', path.join(session.workingDir, 'config.ini')
             ];
 
-            var executable = spawn(path.join(session.elecdetecExecutable, 'ElecDetec.exe'), args);
+            var executable = spawn('Elecdetec', args);
 
             executable.stdout.on('data', function(data) {
               console.log(data.toString());
