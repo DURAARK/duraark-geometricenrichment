@@ -25,7 +25,7 @@ function prepareSession(e57master) {
 
   session.basename = path.basename(e57master, '.e57');
   session.workingDir = path.join(e57master, '..', '..', 'tools', 'rise');
-  session.basedir  = path.basename(path.join(e57master, '..', '..'));
+  session.basedir = path.basename(path.join(e57master, '..', '..'));
 
   session.e57file = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_e57metadata.json");
   session.wallfile = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_wall.json");
@@ -126,16 +126,16 @@ function startElecdetect(session) {
 }
 
 function prepareWiregen(session) {
-    // collect elecdetect results
-    var files = fs.readdirSync(session.elecdetecResults);
-    session.elecDetecResultImages = [];
-    for (var key in files) {
-      var fileResult = {
-        file: files[key],
-        link: 'session/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
-      };
-      session.elecDetecResultImages.push(fileResult);
-    }
+  // collect elecdetect results
+  var files = fs.readdirSync(session.elecdetecResults);
+  session.elecDetecResultImages = [];
+  for (var key in files) {
+    var fileResult = {
+      file: files[key],
+      link: 'session/' + session.sessionId + '/' + session.elecDir + '/' + session.elecResultsDir + '/' + files[key]
+    };
+    session.elecDetecResultImages.push(fileResult);
+  }
 
 }
 
@@ -389,25 +389,27 @@ module.exports = {
   },
 
   roomInfo: function(req, res, next) {
-    // var sessionId = req.param('sessionId'),
-    // roomId = req.param('roomId');
-    //var sessionId = 3,
-    //    roomId = 'room11';
-    //Rise.findOne(sessionId).then(function(session) {
-    //  console.log('session: ' + JSON.stringify(session, null, 4));
-    var rise2x3d = new Rise2X3D();
-    // TODO: find svgs for room
-    var session = prepareSession(req.body.e57master);
-    //console.log(JSON.stringify(session, null, 4));
+    var rise2x3d = new Rise2X3D(),
+      file = req.query.file,
+      roomId = req.query.roomId;
 
-    // read wall JSON
+    console.log('[roomInfo] GET /roomInfo file: ' + file + ' | roomId: ' + roomId);
+
+    if (!file || !roomId) {
+      console.error('[roomInfo] Error: Please provide a "file" and a "roomId" parameter!')
+      return res.badRequest('Please provide a "file" and a "roomId" parameter!');
+    }
+
+    // TODO: find svgs for room
+    var session = prepareSession(file);
+    // console.log(JSON.stringify(session, null, 4));
+
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
     var ROOMS = rise2x3d.parseRooms(walljson);
 
-    var Room = ROOMS[req.body.roomid];
+    var Room = ROOMS[roomId];
     if (Room) {
 
-      // initialize roomdata
       roomdata = {
         "roomid": Room.label,
         "rise": {
@@ -422,35 +424,54 @@ module.exports = {
             "walls": []
           }
         }
-      };
+      }
 
       for (i = 0; i < Room.walls.length; ++i) {
         var wallid = Room.walls[i].attributes.id;
         roomdata.rise.wallids.push(wallid);
-        var httpbase = "/rise/";
-        roomdata.rise.orthophoto.walls.push(httpbase + "orthoresult/" + session.basename + "_" + wallid + ".jpg");
-        roomdata.rise.grammar.walls.push(httpbase + "wiregen/output/svg_grammar/" + wallid + ".svg");
-        roomdata.rise.hypothesis.walls.push(httpbase + "wiregen/output/svg_hypothesis/" + wallid + ".svg");
+
+        // FIXXME: replace!
+        var httpbase = file.replace('/duraark-storage', '').split('/');
+        httpbase.pop();
+        httpbase.pop();
+        httpbase = httpbase.join('/');
+
+        // console.log('httpbase: ' + httpbase);
+
+        roomdata.rise.orthophoto.walls.push(httpbase + "/tools/rise/orthoresult/" + session.basename + "_" + wallid + ".jpg");
+        roomdata.rise.grammar.walls.push(httpbase + "/tools/rise/wiregen/output/svg_grammar/" + wallid + ".svg");
+        roomdata.rise.hypothesis.walls.push(httpbase + "/tools/rise/wiregen/output/svg_hypothesis/" + wallid + ".svg");
       }
 
       console.log(JSON.stringify(roomdata, null, 4));
 
-      res.send(200, roomdata);
+      res.send(roomdata).status(200);
     } else {
       // Room id not found
-      res.send(404, "room id not found.");
+      console.error('[roomInfo] Error: Cannot find roomId: ' + roomId)
+      return res.badRequest('Cannot find roomId: ' + roomId);
     }
 
   },
 
   x3d: function(req, res, next) {
 
-    var rise2x3d = new Rise2X3D();
-    var session = prepareSession(req.body.e57master);
+    var rise2x3d = new Rise2X3D(),
+      file = req.query.file,
+      roomId = req.query.roomId;
+
+    console.log('[roomInfo] GET /roomInfo file: ' + file + ' | roomId: ' + roomId);
+
+    if (!file || !roomId) {
+      console.error('[roomInfo] Error: Please provide a "file" and a "roomId" parameter!')
+      return res.badRequest('Please provide a "file" and a "roomId" parameter!');
+    }
+
+    var session = prepareSession(file);
 
     // parse wall json
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-    var rooms = rise2x3d.parseRooms(walljson, req.param('roomid'));
+    var rooms = rise2x3d.parseRooms(walljson, roomId);
 
     if (Object.keys(rooms).length == 0) {
       res.send(404, "room id " + req.param('roomid') + " not found");
@@ -463,14 +484,22 @@ module.exports = {
     prepareWiregen(session);
     var wiregen = new Wiregen();
     wiregen.importDetections(session).then(function() {
-      var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise', 
+      var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise',
         'orthoresult', 'lowres', session.basename + "_");
 
+      texture_path = 'http://localhost/api/v0.7/geometricenrichment' + texture_path;
+      
       console.log('texture path:' + texture_path)
-      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, 
+      var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
         texture_path, session);
-      //console.log(x3d);
-      res.send(200, x3d);
+      console.log(x3d);
+
+      fs.writeFile('/duraark-storage/sessions/tmp/1234.x3d', x3d, function(err) {
+        if (err) reject(err);
+        res.send({
+          url: '/duraark-storage/sessions/tmp/1234.x3d'.replace('/duraark-storage', '')
+        }).status(200);
+      });
     });
   }
 
