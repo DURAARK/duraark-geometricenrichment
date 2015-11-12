@@ -15,23 +15,30 @@ Rise2X3D.prototype.test = function(bla) {
 
 //----------------------------------------------------------------------------
 
-Rise2X3D.prototype.parseRooms = function(walljson) {
+Rise2X3D.prototype.parseRooms = function(walljson, filterid) {
   var ROOMS = {};
   var room2wall = {};
   
+  if (filterid) {
+    console.log('filtering for room ' + filterid)
+  }
+
   // build room wall cycles
   for (var i in walljson.Walls)
   {
     var wall = walljson.Walls[i];
-    // build room->walls index
-    if (!room2wall[wall.attributes.roomid]) 
-      room2wall[wall.attributes.roomid]=[];
-      
-    room2wall[wall.attributes.roomid].push(wall);
+
+	    // build room->walls index
+	    if (!room2wall[wall.attributes.roomid]) 
+	      room2wall[wall.attributes.roomid]=[];
+	      
+	    room2wall[wall.attributes.roomid].push(wall);
   }
 
   for (var roomid in room2wall)
   {
+    if (filterid==undefined || roomid==filterid)
+    {
       // create new room
       room = {
         "label" : roomid,
@@ -65,6 +72,7 @@ Rise2X3D.prototype.parseRooms = function(walljson) {
       }
       room.walls = ordered;
       ROOMS[room.label] = room;
+	}
   }
   return ROOMS;
 }
@@ -168,7 +176,8 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	var SKT = new IndexedSet();		// sockets
 	var SWI = new IndexedSet();		// switches
 	
-	// -------------------------------- WALLS
+	console.log('creating walls');
+	//-------------------------------- WALLS
     WALLS = {};
 	{
 		var floornormal = new Vec3(0,0,1);
@@ -198,7 +207,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 				newwall.texture = { "url": texturepath + wall.attributes.id + ".jpg" };
 				newwall.attributes.texCoordIndex = " 3 2 1 0 -1";
 				newwall.texCoord = "0.0 0.0  1.0 0.0  1.0 1.0  0.0 1.0";
-			    console.log(newwall.texture);
+			    //console.log(newwall.texture);
 				newwall.material = {
 					"diffuseColor" : "0.3 0.3 0.3",
 					"ambientIntensity" : "0.8",
@@ -238,28 +247,35 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	for (var i=0; i<openings.length; ++i) {
 		var S = openings[i];
 		var G = null;
-		var wall = WALLS[S.attributes.wallid];
-		switch(S.label) {
-			case "DOOR" :   G = DG; break;
-			case "WINDOW" : G = WIG; break;
-			default:
-				console.log('unknown opening symbol: ' + JSON.stringify(S));
+		if (S.attributes.wallid in WALLS) {
+			var wall = WALLS[S.attributes.wallid];
+			switch(S.label) {
+				case "DOOR" :   G = DG; break;
+				case "WINDOW" : G = WIG; break;
+				default:
+					console.log('unknown opening symbol: ' + JSON.stringify(S));
+			}
+			G.addSymbol(wall, S);
 		}
-		G.addSymbol(wall, S);
 	}
-
+	console.log("creating detections");
 	// detections: sockets and switches
 	for (var i=0;i<session.Sockets.length; ++i) {
 		var socket = session.Sockets[i];
-		var wall = WALLS[socket.attributes.wallid];
-		SKT.addSymbol(wall, socket, true);
+		if (S.attributes.wallid in WALLS) {
+			var wall = WALLS[socket.attributes.wallid];
+			SKT.addSymbol(wall, socket, true);
+		}
 	}
 	for (var i=0;i<session.Switches.length; ++i) {
 		var swt= session.Switches[i];
-		var wall = WALLS[swt.attributes.wallid];
-		SWI.addSymbol(wall, swt, true);
+		if (S.attributes.wallid in WALLS) {
+			var wall = WALLS[swt.attributes.wallid];
+			SWI.addSymbol(wall, swt, true);
+		}
 	}
 
+	console.log('write X3D');
 	// write WALLS
 	WG.forEach(function(wg) { wg.writeX3D(xw, "IndexedFaceSet"); });
 	
@@ -302,6 +318,8 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 		xw.endElement();
 	xw.endElement();		
 	{
+		console.log('writing power lines');
+
 		var V = "";
 		var I = "";
 		var index = 0;
@@ -318,14 +336,16 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	    	var edge = powerlines.E[e];
 	    	var v0 = powerlines.N[edge.v0];
 	    	var v1 = powerlines.N[edge.v1];
-	    	var wall = WALLS[v0.wallid]; 	// assert == v1.wallid
-	     	// transform to 3D world coordinates
-	    	var p0 = transform3D(wall, v0);
-	    	var p1 = transform3D(wall, v1);
-	    	// add line
-	    	addVertex(p0);
-	    	addVertex(p1);
-	    	I = I + " -1";
+	    	if (v0.wallid in WALLS) {
+		    	var wall = WALLS[v0.wallid]; 	// assert == v1.wallid
+		     	// transform to 3D world coordinates
+		    	var p0 = transform3D(wall, v0);
+		    	var p1 = transform3D(wall, v1);
+		    	// add line
+		    	addVertex(p0);
+		    	addVertex(p1);
+		    	I = I + " -1";
+	    	}
 	    }
 
 	 	xw.startElement('IndexedLineSet');

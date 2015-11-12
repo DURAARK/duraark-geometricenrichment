@@ -25,6 +25,7 @@ function prepareSession(e57master) {
 
   session.basename = path.basename(e57master, '.e57');
   session.workingDir = path.join(e57master, '..', '..', 'tools', 'rise');
+  session.basedir  = path.basename(path.join(e57master, '..', '..'));
 
   session.e57file = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_e57metadata.json");
   session.wallfile = path.join(session.workingDir, "..", "..", "tmp", session.basename + "_wall.json");
@@ -338,7 +339,7 @@ module.exports = {
   //   });
   // },
   startOrthogen: function(req, res, next) {
-    var session = req.body;
+    var session = prepareSession(req.body.e57master);
 
     startOrthogen(session).then(function(argument) {
       res.send(200, argument);
@@ -348,7 +349,7 @@ module.exports = {
     });
   },
   startElecdetect: function(req, res, next) {
-    var session = req.body;
+    var session = prepareSession(req.body.e57master);
     req.connection.setTimeout(0);
 
     startElecdetect(session).then(function(argument) {
@@ -449,7 +450,12 @@ module.exports = {
 
     // parse wall json
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-    var rooms = rise2x3d.parseRooms(walljson);
+    var rooms = rise2x3d.parseRooms(walljson, req.param('roomid'));
+
+    if (Object.keys(rooms).length == 0) {
+      res.send(404, "room id " + req.param('roomid') + " not found");
+    }
+
     // parse hypothesis power line graph
     var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
 
@@ -457,8 +463,12 @@ module.exports = {
     prepareWiregen(session);
     var wiregen = new Wiregen();
     wiregen.importDetections(session).then(function() {
+      var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise', 
+        'orthoresult', 'lowres', session.basename + "_");
+
+      console.log('texture path:' + texture_path)
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson, 
-        "/sessions/nygade-1001/tools/rise/orthoresult/lowres/" + session.basename + "_", session);
+        texture_path, session);
       //console.log(x3d);
       res.send(200, x3d);
     });

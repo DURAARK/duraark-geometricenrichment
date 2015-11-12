@@ -21,19 +21,6 @@ Orthogen.prototype.createOrthoImages = function(session) {
 
     console.log('[Orthogen::createOrthoImages] configuration: ' + session.basename);
 
-    //var config = session.poseInformation;
-    // var args = ['--im', session.panoImage,
-    //   '--ig', objFile,
-    //   '--rot', config.poseInformation.rotationW, config.poseInformation.rotationX, config.poseInformation.rotationY, config.poseInformation.rotationZ,
-    //   '--trans', config.poseInformation.translationX, config.poseInformation.translationY, config.poseInformation.translationZ,
-    //   '--res', config.poseInformation.res, // default: 1mm/pixel
-    //   '--elevation', config.poseInformation.elevationX, config.poseInformation.elevationY,
-    //   '--scale', config.poseInformation.scale, // default: 'm'
-    //   //'--exgeom', config.poseInformation.exgeom,
-    //   //'--exsphere', config.poseInformation.exsphere,
-    //   //'--exquad', config.poseInformation.exquad,
-    //   '--output', path.basename(objFile,'.obj')
-
     var args = [
       '--e57metadata', session.e57file,
       '--walljson', session.wallfile,
@@ -75,18 +62,6 @@ Orthogen.prototype.createOrthoImages = function(session) {
         }
 
         console.log('[Orthogen-finished]'); //'Read directory and return result ' + JSON.stringify(files));
-        // session.resultImages = [];
-
-        // for (key in files) {
-        //   if (files[key].substr(-4)==".jpg") {
-        //     var fileResult = {
-        //       file: files[key],
-        //       //TODO: don't like this style alternatives?
-        //       link: sails.getBaseurl() + '/public/' + session.sessionId + '/' + files[key]
-        //     };
-        //     session.resultImages.push(fileResult);
-        //   }
-        // }
         resolve(session);
       });
     });
