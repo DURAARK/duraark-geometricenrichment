@@ -262,16 +262,20 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	// detections: sockets and switches
 	for (var i=0;i<session.Sockets.length; ++i) {
 		var socket = session.Sockets[i];
-		if (S.attributes.wallid in WALLS) {
+		if (socket.attributes.wallid in WALLS) {
 			var wall = WALLS[socket.attributes.wallid];
 			SKT.addSymbol(wall, socket, true);
+		} else {
+			console.log('wall ' + socket.attributes.wallid + ' not in filtered wall set of socket ' + JSON.stringify(socket) );
 		}
 	}
 	for (var i=0;i<session.Switches.length; ++i) {
 		var swt= session.Switches[i];
-		if (S.attributes.wallid in WALLS) {
+		if (swt.attributes.wallid in WALLS) {
 			var wall = WALLS[swt.attributes.wallid];
 			SWI.addSymbol(wall, swt, true);
+		} else {
+			console.log('wall ' + swt.attributes.wallid + ' not in filtered wall set of switch ' + JSON.stringify(swt) );
 		}
 	}
 
@@ -336,7 +340,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	    	var edge = powerlines.E[e];
 	    	var v0 = powerlines.N[edge.v0];
 	    	var v1 = powerlines.N[edge.v1];
-	    	if (v0.wallid in WALLS) {
+	    	if (v0.wallid in WALLS && v1.wallid in WALLS) {
 		    	var wall = WALLS[v0.wallid]; 	// assert == v1.wallid
 		     	// transform to 3D world coordinates
 		    	var p0 = transform3D(wall, v0);
