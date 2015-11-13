@@ -63,8 +63,8 @@ module.exports.http = {
   customMiddleware: function (app) {
     var express = require('sails/node_modules/express');
       app.use('/session', express.static('/tmp'));
-      app.use('/sessions', express.static('/duraark-storage/sessions'));
-      //app.use('/sessions', express.static('I:/tmp'));
+      //app.use('/sessions', express.static('/duraark-storage/sessions'));
+      app.use('/sessions', express.static('I:/tmp'));
       console.log('exported /sessions');
     }
 
