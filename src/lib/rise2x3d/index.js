@@ -340,7 +340,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	    	var edge = powerlines.E[e];
 	    	var v0 = powerlines.N[edge.v0];
 	    	var v1 = powerlines.N[edge.v1];
-	    	if (v0.wallid in WALLS) {
+	    	if (v0.wallid in WALLS && v1.wallid in WALLS) {
 		    	var wall = WALLS[v0.wallid]; 	// assert == v1.wallid
 		     	// transform to 3D world coordinates
 		    	var p0 = transform3D(wall, v0);
