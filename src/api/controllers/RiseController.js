@@ -487,17 +487,22 @@ module.exports = {
       var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise',
         'orthoresult', 'lowres', session.basename + "_");
 
-      texture_path = 'http://localhost/api/v0.7/geometricenrichment' + texture_path;
+      texture_path = 'http://juliet.cgv.tugraz.at/api/v0.7/geometricenrichment' + texture_path;
 
       console.log('texture path:' + texture_path)
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
         texture_path, session);
 
+      console.log('x3d: ' + x3d);
       // FIXXME: create /tmp folder if it does not exist!
       var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
 
       fs.writeFile(file, x3d, function(err) {
-        if (err) res.badRequest(err);
+        if (err) {
+          console.log('error writing x3d file: file');
+          return res.badRequest(err);
+        }
+
         console.log('[x3d] created file at: ' + file);
         res.send({
           url: file.replace('/duraark-storage', '')
