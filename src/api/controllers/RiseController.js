@@ -488,16 +488,18 @@ module.exports = {
         'orthoresult', 'lowres', session.basename + "_");
 
       texture_path = 'http://localhost/api/v0.7/geometricenrichment' + texture_path;
-      
+
       console.log('texture path:' + texture_path)
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
         texture_path, session);
-      console.log(x3d);
 
-      fs.writeFile('/duraark-storage/sessions/tmp/1234.x3d', x3d, function(err) {
+      var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
+
+      fs.writeFile(file, x3d, function(err) {
         if (err) reject(err);
+        console.log('[x3d] created file at: ' + file);
         res.send({
-          url: '/duraark-storage/sessions/tmp/1234.x3d'.replace('/duraark-storage', '')
+          url: file.replace('/duraark-storage', '')
         }).status(200);
       });
     });
