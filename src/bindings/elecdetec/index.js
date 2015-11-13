@@ -111,7 +111,7 @@ Elecdetec.prototype.createElecImages = function(session, config) {
               '-i', path.join(session.workingDir, 'config.ini')
             ];
 
-            var executable = spawn('Elecdetec', args);
+            var executable = spawn('ElecDetec', args);
 
             executable.stdout.on('data', function(data) {
               console.log(data.toString());

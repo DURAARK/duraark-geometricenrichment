@@ -17,6 +17,8 @@ RUN cmake -DEIGEN3_INCLUDE_DIR=/usr/include/eigen3 ../ && make -j2
 RUN cp /opt/orthogen/build/orthogen /usr/local/bin
 
 ## Install OpenCV
+RUN apt-get install wget -y && add-apt-repository "deb http://archive.ubuntu.com/ubuntu $(lsb_release -sc) multiverse"
+RUN apt-get update -y
 RUN (cd /opt/duraark-geometricenrichment/scripts/Install-OpenCV/Ubuntu && ./opencv_latest.sh)
 
 RUN mkdir -p /opt/elecdetect/build
@@ -24,7 +26,7 @@ COPY ./elecdetect /opt/elecdetect
 
 WORKDIR /opt/elecdetect/build
 RUN cmake ../ && make -j6
-RUN cp /opt/orthogen/build/bin/Elecdetec /usr/local/bin
+RUN cp /opt/elecdetect/build/bin/ElecDetec /usr/local/bin
 
 ##
 ## Install microservice:
