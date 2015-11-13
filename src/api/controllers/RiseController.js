@@ -493,10 +493,11 @@ module.exports = {
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
         texture_path, session);
 
+      // FIXXME: create /tmp folder if it does not exist!
       var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
 
       fs.writeFile(file, x3d, function(err) {
-        if (err) reject(err);
+        if (err) res.badRequest(err);
         console.log('[x3d] created file at: ' + file);
         res.send({
           url: file.replace('/duraark-storage', '')
