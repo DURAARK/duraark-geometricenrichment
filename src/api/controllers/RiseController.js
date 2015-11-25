@@ -486,6 +486,9 @@ module.exports = {
     prepareWiregen(session);
     var wiregen = new Wiregen();
     wiregen.importDetections(session).then(function() {
+
+      console.log(JSON.stringify(session, null, 2));
+
       var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise',
         'orthoresult', 'lowres', session.basename + "_");
 
@@ -495,7 +498,7 @@ module.exports = {
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
         texture_path, session);
 
-      console.log('x3d: ' + x3d);
+      //console.log('x3d: ' + x3d);
       // FIXXME: create /tmp folder if it does not exist!
       var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
 
