@@ -27,7 +27,8 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--panopath', session.panopath,
       '--align', 'panoalign',
       '--output', session.basename,
-      '--exgeom', '1'
+      '--exgeom', '1',
+      '--ccw', '0'
     ];
 
     // TODO: change to session directory here?
