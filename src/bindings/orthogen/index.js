@@ -21,6 +21,15 @@ Orthogen.prototype.createOrthoImages = function(session) {
 
     console.log('[Orthogen::createOrthoImages] configuration: ' + session.basename);
 
+    if (!folderExists(session.panopath)) {
+      console.log('[Orthogen] ERROR: no pano folder exists');
+
+      return reject({
+        type: 'error',
+        text: 'No panorama folder exists. Please upload panorama images first!'
+      });
+    };
+
     var args = [
       '--e57metadata', session.e57file,
       '--walljson', session.wallfile,
@@ -67,3 +76,15 @@ Orthogen.prototype.createOrthoImages = function(session) {
     });
   });
 };
+
+function folderExists(folderPath)
+{
+    try
+    {
+        return fs.statSync(folderPath).isFolder();
+    }
+    catch (err)
+    {
+        return false;
+    }
+}

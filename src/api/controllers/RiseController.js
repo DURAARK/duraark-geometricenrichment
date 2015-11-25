@@ -86,6 +86,8 @@ function startOrthogen(session) {
         orthogen.createOrthoImages(session).then(function(orthogen_result) {
           createOrthoLowRes(session);
           resolve(session);
+        }).catch(function(err) {
+          reject(err);
         });
       } else {
         console.log('Error creating orthogen result directory. Aborting!');
@@ -298,10 +300,10 @@ module.exports = {
       // .then(reOrderResult)
       .then(function(argument) {
         console.log('returning from everything');
-        res.send(200, argument);
+        res.send(argument).status(200);
       }).catch(function(err) {
-        console.log('Error: ' + err);
-        res.send(500, err);
+        console.log('Error: ' + JSON.stringify(err));
+        res.send(err).status(500);
       });
   },
 
@@ -497,9 +499,12 @@ module.exports = {
       // FIXXME: create /tmp folder if it does not exist!
       var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
 
+      console.log('writing to file: ' + file);
+
       fs.writeFile(file, x3d, function(err) {
         if (err) {
-          console.log('error writing x3d file: file');
+          console.log('error writing x3d file: ' + file);
+          console.log('ERROR: ' + JSON.stringify(err, null, 4));
           return res.badRequest(err);
         }
 
