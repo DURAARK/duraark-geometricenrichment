@@ -22,7 +22,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
     console.log('[Orthogen::createOrthoImages] configuration: ' + session.basename);
 
     if (!folderExists(session.panopath)) {
-      console.log('[Orthogen] ERROR: no pano folder exists');
+      console.log('[Orthogen] ERROR: no pano folder exists at ' + session.panopath);
 
       return reject({
         type: 'error',
@@ -82,7 +82,7 @@ function folderExists(folderPath)
 {
     try
     {
-        return fs.statSync(folderPath).isFolder();
+        return fs.statSync(folderPath).isDirectory();
     }
     catch (err)
     {
