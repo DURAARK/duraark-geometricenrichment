@@ -81,7 +81,7 @@ function folderExists(folderPath)
 {
     try
     {
-        return fs.statSync(folderPath).isFolder();
+        return fs.statSync(folderPath).isDirectory();
     }
     catch (err)
     {

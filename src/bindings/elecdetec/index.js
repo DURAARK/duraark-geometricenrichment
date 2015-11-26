@@ -111,6 +111,8 @@ Elecdetec.prototype.createElecImages = function(session, config) {
               '-i', path.join(session.workingDir, 'config.ini')
             ];
 
+            console.log('[Elecdetec-binding] about to run: ElecDetec' + args.join(' '));
+            
             var executable = spawn('ElecDetec', args);
 
             executable.stdout.on('data', function(data) {
