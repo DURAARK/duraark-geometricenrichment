@@ -6,4 +6,4 @@
 	url = https://github.com/DURAARK/orthogen.git
 [submodule "elecdetect"]
 	path = elecdetect
-	url = git@github.com:DURAARK/elecdetect.git
+	url = https://github.com/DURAARK/elecdetect.git

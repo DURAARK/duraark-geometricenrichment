@@ -86,6 +86,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
     console.log('[Wiregen::createWiregenImages]');
     session.wiregenExecutable = path.join(__dirname, '../../../app/wiregen/src'); //Config.xml, config.ini & elecdetect.exe
     session.wiregenGrammar = path.join(__dirname, '../../../app/wiregen/src/grammar/grammar-nygade.json');
+    //session.wiregenGrammar = path.join(__dirname, '../../../app/wiregen/src/grammar/grammar-nygade_cfonly.json');
 
     var cwd = process.cwd();
 

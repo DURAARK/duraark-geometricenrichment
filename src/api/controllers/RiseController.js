@@ -362,7 +362,7 @@ module.exports = {
     });
   },
   startWiregen: function(req, res, next) {
-    var session = req.body;
+    var session = prepareSession(req.query.file);
     //console.log(session);
     startWiregen(session).then(function(argument) {
       res.send(200, argument);
@@ -464,7 +464,8 @@ module.exports = {
 
     console.log('[roomInfo] GET /roomInfo file: ' + file + ' | roomId: ' + roomId);
 
-    if (!file || !roomId) {
+    if (!file )//|| !roomId) 
+    {
       console.error('[roomInfo] Error: Please provide a "file" and a "roomId" parameter!')
       return res.badRequest('Please provide a "file" and a "roomId" parameter!');
     }
