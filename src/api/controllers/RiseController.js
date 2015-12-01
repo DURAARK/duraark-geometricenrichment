@@ -19,10 +19,6 @@ var Orthogen = require('../../bindings/orthogen/index'),
 function prepareSession(e57master) {
   var session = {};
 
-  session.config = {
-    elecdetect: {}
-  };
-
   if (!e57master) {
     console.log('ERROR: e57master ' + e57master);
     return null;
@@ -57,9 +53,14 @@ function prepareSession(e57master) {
   } else {
     session.config = {
         "orthogen":   { },
-        "elecdetect": { },
+        "elecdetect": { 
+          "ini" : new Elecdetec().defaultConfig()
+        },
         "wiregen":    { }
     };
+    // write initial config to file
+    console.log("writing initial config.");
+    fs.writeFileSync(session.configFile, JSON.stringify(session.config, null, 4), "utf8");
   }
   console.log(session.config);
 
@@ -108,8 +109,10 @@ function startOrthogen(session) {
     mkdirp(session.orthoresult, function(err) {
       if (!err) {
         var orthogen = new Orthogen();
+        console.time('Orthogen');
         orthogen.createOrthoImages(session).then(function(orthogen_result) {
           createOrthoLowRes(session);
+          console.timeEnd('Orthogen');
           resolve(session);
         }).catch(function(err) {
           reject(err);
@@ -128,24 +131,9 @@ function startElecdetect(session) {
     console.log('[SessionController::starting Elecdetect]');
 
     var elecdetect = new Elecdetec();
-    // var elecdetectConfig = elecdetect.defaultConfig();
-    // // parse elecdetect params
-    // if (session.config) {
-    //   if (session.config.elecdetect) {
-    //     console.log("reading elecdetect config:");
-    //     for (var category in param.config.elecdetect) {
-    //       for (var key in param.config.elecdetect[category]) {
-    //         console.log(key + " : " + elecdetectConfig[category][key] + " -> " + param.config.elecdetect[category][key]);
-    //         elecdetectConfig[category][key] = param.config.elecdetect[category][key];
-    //       }
-    //     }
-    //   }
-    //   //elecdetectConfig.detection.detection_default_threshold = "0.4";
-    //   //elecdetectConfig.detection.detection_label_thresholds = "0.2, 0.55";
-    // }
-    // console.log(elecdetect.config2ini(elecdetectConfig));
-
-    elecdetect.createElecImages(session, session.config.elecdetect).then(function() {
+    console.time('Elecdetect');
+    elecdetect.createElecImages(session, session.config.elecdetect.ini).then(function() {
+      console.timeEnd('Elecdetect');
       console.log("[SessionController::finished]");
       resolve(session);
     });

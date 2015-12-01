@@ -1,0 +1,261 @@
+{
+  "WALL" : [
+    { "rhs" : 
+      [
+        { "label" : "vzone", "attributes" : { "pos": "left+150", "wallid":  "id" } } ,
+        { "label" : "vzone", "attributes" : { "pos": "left+width-150", "wallid":  "id" } },
+        { "label" : "hzone", "attributes" : { "pos": "top+150", "wallid":  "id" } },
+        { "label" : "wall",  "attributes" : { "zone_width" : "200" } }
+      ] 
+    }
+  ],
+
+  "DOOR" : [
+    { "rhs" : 
+      [
+        { "label" : "vzone", "attributes" : { "pos": "left-150" } },
+        { "label" : "vzone", "attributes" : { "pos": "left+width+150" } },
+        { "label" : "door" }
+      ]
+    }
+  ],
+
+  "WINDOW" : [
+    { "rhs" :
+      [
+        { "label" : "vzone", "attributes" : { "pos":"left-150" } },
+        { "label" : "vzone", "attributes" : { "pos":"left+width+150" } },
+        { "label" : "window" }
+      ]
+    }
+  ],
+
+  "SOCKET" : [
+    { "rhs" :
+      [ 
+        { "label" : "socket" , "attributes" : { "endpoint":"true" } } 
+      ]
+    }
+  ],
+
+  "SWITCH" : [
+    { "rhs" :
+      [
+        { "label" : "switch" , "attributes" : { "endpoint":"true" } }
+      ]
+    }
+  ],
+
+  "ROOT" : [
+    { "rhs" :
+      [ 
+        { "label" : "root" , "attributes" : { "endpoint" : "true", "root":"true" } }
+      ]
+    }
+  ],
+  
+  "VGROUP" : [
+    {
+      "condition" : "height > 350",
+      "rhs" : [ 
+        {
+          "label" : "vzone", 
+          "attributes" : { "pos": "left+width/2" }
+        },
+        {
+          "label" : "vgroup"
+        }
+      ]
+    },
+    {
+      "rhs" : [ 
+        {
+          "label" : "vgroup"
+        }
+      ]
+    }
+  ],
+  
+  
+  "SWITCH:SWITCH" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "switch",
+          "attributes" : {
+            "left" : "A.left", 
+            "top" : "A.top", 
+            "width" : "A.width",
+            "height" : "A.height", 
+            "wallid" : "A.wallid",
+            "endpoint" : "true"
+          }
+        },
+        {
+          "label" : "switch",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ],
+  
+  "SOCKET:SOCKET" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "A.left", 
+            "top" : "A.top", 
+            "width" : "A.width",
+            "height" : "A.height", 
+            "wallid" : "A.wallid",
+            "endpoint" : "true"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ],
+  
+  "VGROUP:SWITCH" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "switch",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ], 
+  
+ "VGROUP:SOCKET" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ], 
+   
+  "VGROUP:VGROUP" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        }
+      ]
+    }
+  ]
+  
+}
