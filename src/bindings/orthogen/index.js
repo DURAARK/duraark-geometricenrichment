@@ -39,6 +39,12 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--exgeom', '1',
       '--ccw', '0'
     ];
+    if (session.config.orthogen.args) {
+      for (var oarg in session.config.orthogen.args) {
+        args.push(oarg);
+        args.push(session.config.orthogen.args[oarg]);
+      }
+    }
 
     // TODO: change to session directory here?
     var cwd = process.cwd();

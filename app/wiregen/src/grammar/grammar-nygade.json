@@ -123,6 +123,51 @@
     }
   ],
   
+  "SOCKET:SOCKET" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "A.left", 
+            "top" : "A.top", 
+            "width" : "A.width",
+            "height" : "A.height", 
+            "wallid" : "A.wallid",
+            "endpoint" : "true"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ],
+  
   "VGROUP:SWITCH" : [
     { 
       "vars" : { 
@@ -157,6 +202,40 @@
     }
   ], 
   
+ "VGROUP:SOCKET" : [
+    { 
+      "vars" : { 
+        "BBA"   : "BB(A)",
+        "BBB"   : "BB(B)",
+        "group" : "BB(A).insertBB(BBB)" 
+      },
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "rhs" : [
+        {
+          "label" : "VGROUP",
+          "attributes" : {
+            "left": "group.left()",
+            "top": "group.top()",
+            "width": "group.width()",
+            "height": "group.height()",
+            "wallid": "A.wallid"
+          }
+        },
+        {
+          "label" : "socket",
+          "attributes" : {
+            "left" : "B.left", 
+            "top" : "B.top", 
+            "width" : "B.width",
+            "height" : "B.height", 
+            "wallid" : "B.wallid",
+            "endpoint" : "true"
+          }
+        }
+      ]
+    }
+  ], 
+   
   "VGROUP:VGROUP" : [
     { 
       "vars" : { 

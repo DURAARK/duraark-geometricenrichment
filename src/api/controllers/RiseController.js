@@ -23,6 +23,11 @@ function prepareSession(e57master) {
     elecdetect: {}
   };
 
+  if (!e57master) {
+    console.log('ERROR: e57master ' + e57master);
+    return null;
+  }
+
   session.basename = path.basename(e57master, '.e57');
   session.workingDir = path.join(e57master, '..', '..', 'tools', 'rise');
   session.basedir = path.basename(path.join(e57master, '..', '..'));
@@ -38,6 +43,26 @@ function prepareSession(e57master) {
   session.elecdetecResults = path.join(session.elecdetecPath, session.elecResultsDir);
 
   session.wiregenHypothesisGraph = path.join(session.workingDir, "wiregen", "output", "hypothesis-graph.json");
+  session.configFile = path.join(session.workingDir, "rise_config.json");
+
+  // read config
+  console.log("loading config " + session.configFile);
+  var hasConfig=false;
+  try 
+  {
+    hasConfig = fs.lstatSync(svgfilename).isFile();
+  } catch (err) { }
+  if (hasConfig) {
+    session.config = JSON.parse(fs.readFileSync(session.configFile, "utf8"));
+  } else {
+    session.config = {
+        "orthogen":   { },
+        "elecdetect": { },
+        "wiregen":    { }
+    };
+  }
+  console.log(session.config);
+
   //console.log(JSON.stringify(session));
   return session;
 }
@@ -171,7 +196,7 @@ function createInputSymbolList(session) {
         console.log("imported " + walljson[ia].length + " " + ia + " symbols.");
       }
       // add sockets and switches
-      ['Sockets', 'Switches'].forEach(function(category) {
+      ['Sockets', 'Switches', 'Roots'].forEach(function(category) {
         session[category].forEach(function(symbol) {
           session.wiregenInput.push(symbol);
         });
@@ -303,6 +328,7 @@ module.exports = {
         res.send(argument).status(200);
       }).catch(function(err) {
         console.log('Error: ' + JSON.stringify(err));
+
         res.send(err).status(500);
       });
   },
@@ -362,12 +388,14 @@ module.exports = {
     });
   },
   startWiregen: function(req, res, next) {
-    var session = prepareSession(req.query.file);
+    var session = prepareSession(req.body.e57master);
+    session.useGroundtruth = req.body.useGroundtruth;    
     //console.log(session);
     startWiregen(session).then(function(argument) {
       res.send(200, argument);
     }).catch(function(err) {
       console.log('Error: ' + err);
+      console.log(err.stack);
       res.send(500, err);
     });
 

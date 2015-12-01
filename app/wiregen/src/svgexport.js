@@ -7,7 +7,7 @@ var util = require('util');
 var vec = require('./vec');
 
 // returns an object with one svg string per wall
-function ExportTerminalsToSVG(symbols)
+function ExportTerminalsToSVG(symbols, imgprefix, flip)
 {
     var s = 0.1;    // scale
     
@@ -39,8 +39,21 @@ function ExportTerminalsToSVG(symbols)
     // initialize wall svgs
     WALLS.forEach(function (symbol) {
         var att = symbol.attributes;
-        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', resultbb[att.id].width() * s, resultbb[att.id].height() * s);
-        result[att.id] += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', resultbb[att.id].width() * s, resultbb[att.id].height() * s);
+        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', att.width * s, att.height * s);
+        
+        if (imgprefix) {
+            result[att.id] += util.format('<image xlink:href="%s_%s.jpg" y="0" width="%d" height="%d"', imgprefix, att.id, att.width * s, att.height * s);
+            if (flip) {
+                result[att.id] += util.format(' transform="scale(-1,1)" x="%d" ', -resultbb[att.id].width() * s);
+            } else {
+                result[att.id] += ' x="0" ';
+            }
+            
+            result[att.id] += ' />\n';
+        } else {
+            result[att.id] += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', resultbb[att.id].width() * s, resultbb[att.id].height() * s);
+        }
+        //result[att.id] += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', resultbb[att.id].width() * s, resultbb[att.id].height() * s);
     });
 
     //var result = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', bb.width()*s, bb.height()*s);
@@ -87,7 +100,7 @@ function ExportTerminalsToSVG(symbols)
 }
 
 
-function ExportGraphToSVG(G, wallid, bb) 
+function ExportGraphToSVG(G, wallid, bb, imgprefix, flip) 
 {
 
     var s = 0.1;    // scale
@@ -102,8 +115,23 @@ function ExportGraphToSVG(G, wallid, bb)
             }
         }
     }
-    var result = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', bb.width()*s, bb.height()*s);
-    result += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', bb.width() * s, bb.height() * s);
+    
+    var result = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n', bb.width() * s, bb.height() * s);
+    
+    if (imgprefix) {
+        result += util.format('<image xlink:href="%s_%s.jpg" y="0" width="%d" height="%d"', imgprefix, wallid, bb.width() * s, bb.height() * s);
+        if (flip) {
+            result += util.format(' transform="scale(-1,1)" x="%d" ', -bb.width() * s);
+        } else {
+            result += ' x="0" ';
+        }
+
+        result += ' />\n';
+    } else {
+        result += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', bb.width() * s, bb.height() * s);
+    }
+    // link to ortho image
+
     // draw vertices
     for (var n in G.N) {
         var v = G.N[n];
@@ -135,6 +163,8 @@ function ExportGraphToSVG(G, wallid, bb)
             result += util.format('<line x1="%d" y1="%d" x2="%d" y2="%d" stroke-dasharray="10,10" style="stroke:rgb(255,0,0);stroke-width:2;" />\n', v0.x * s, v0.y * s, v1.x * s, v1.y * s);
         }
     }
+    // draw wall label
+    result += '<text x="10" y="20" fill="black">' + wallid + '</text>'
     result += '</svg>\n';
     return result;
 }

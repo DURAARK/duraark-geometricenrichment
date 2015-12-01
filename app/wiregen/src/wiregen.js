@@ -57,6 +57,8 @@ program
     .option('-i, --input [json]', 'Set Input Symbols', 'input.json')
     .option('-g, --grammar [json]', 'Set Installation Zone Grammar', 'grammar.json')
     .option('-o, --output [dir]', 'Set Output Directory', './')
+    .option('-p, --prefix [string]', 'Orthophoto prefix string', '')
+    .option('-f, --flip [boolean]', 'Orthophoto prefix string', false)
     .parse(process.argv);
 
 // read installation zone grammar
@@ -128,25 +130,6 @@ var WALLORDER = [];
 //console.log("WALL ORDER:");
 //console.log(WALLORDER);
 
-var SVG_HTML = "<html><body>\n";
-WALLORDER.forEach(function (cycle) {
-    cycle.forEach(function (id) {
-        SVG_HTML += '<img src="' + id + '.svg">\n';
-    });
-    SVG_HTML += '<br>\n\n'
-});
-SVG_HTML += "</body></html>\n";
-
-
-// write SVG with terminal symbols (objects + installation zones)
-mkdirSync(program.output);
-mkdirSync(program.output + "/svg_grammar");
-var wallsvg = svgexport.ExportTerminalsToSVG(TerminalSymbols);
-for (var w in wallsvg) {
-    var wall = wallsvg[w];
-    fs.writeFileSync(util.format("%s/svg_grammar/%s.svg", program.output, w), wall);
-}
-fs.writeFileSync(util.format("%s/svg_grammar/index.html", program.output), SVG_HTML);
 // -------------------------------------------------------------------------------
 // build installation zone graph
 
@@ -287,6 +270,13 @@ for (var ts in TerminalSymbols) {
         }
     }
 }
+
+// sort endpoints by Y
+EndPoints.sort(function (a, b){
+    return a.pos.y - b.pos.y;
+}
+);
+
 
 if (!ROOT) {
     console.log("WARNING: no root found, using an endpoint.");
@@ -471,11 +461,42 @@ fs.writeFileSync(util.format("%s/hypothesis-graph.dot", program.output), WireTre
 
 
 // --------------------------------------------------------------------------------------------------------------------
-mkdirSync(program.output + "/svg_hypothesis");
-for (var wallid in WALLS) {
-    fs.writeFileSync(util.format("%s/svg_hypothesis/%s.svg", program.output, wallid), svgexport.ExportGraphToSVG(WireTree, wallid, WALLS[wallid].bb));
+
+// param: array of svg sourcecode
+function createHTMLOutput(wallorder, svg)  
+{
+    var SVG_HTML = "<html><body>\n";
+    WALLORDER.forEach(function (cycle) {
+        cycle.forEach(function (id) {
+            SVG_HTML += svg[id] + "\n";
+        });
+        SVG_HTML += '<br>\n\n'
+    });
+    SVG_HTML += "</body></html>\n";
+    return SVG_HTML;
 }
-fs.writeFileSync(util.format("%s/svg_hypothesis/index.html", program.output), SVG_HTML);
+
+
+
+
+// write SVG with terminal symbols (objects + installation zones)
+mkdirSync(program.output);
+mkdirSync(program.output + "/svg_grammar");
+var grammarSVG = svgexport.ExportTerminalsToSVG(TerminalSymbols, program.prefix, program.flip);
+for (var w in grammarSVG) {
+    var wall = grammarSVG[w];
+    fs.writeFileSync(util.format("%s/svg_grammar/%s.svg", program.output, w), wall);
+}
+fs.writeFileSync(util.format("%s/svg_grammar/index.html", program.output), createHTMLOutput(WALLORDER, grammarSVG));
+
+
+mkdirSync(program.output + "/svg_hypothesis");
+var hypothesisSVG = {};
+for (var wallid in WALLS) {
+    hypothesisSVG[wallid] = svgexport.ExportGraphToSVG(WireTree, wallid, WALLS[wallid].bb, program.prefix, program.flip);
+    fs.writeFileSync(util.format("%s/svg_hypothesis/%s.svg", program.output, wallid), hypothesisSVG[wallid]);
+}
+fs.writeFileSync(util.format("%s/svg_hypothesis/index.html", program.output), createHTMLOutput(WALLORDER, hypothesisSVG));
 
 //fs.writeFileSync("wire-graph.svg", svgexport.ExportGraphToSVG(WireTree));
 console.log("=== WireGen Finished ===");
