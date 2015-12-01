@@ -58,7 +58,7 @@ program
     .option('-g, --grammar [json]', 'Set Installation Zone Grammar', 'grammar.json')
     .option('-o, --output [dir]', 'Set Output Directory', './')
     .option('-p, --prefix [string]', 'Orthophoto prefix string', '')
-    .option('-f, --flip [boolean]', 'Orthophoto prefix string', false)
+    .option('-c, --ccw [boolean]', 'Orientation', false)
     .parse(process.argv);
 
 // read installation zone grammar
@@ -71,17 +71,30 @@ console.log('* reading semantic entities from %s', program.input);
 Symbols = readJSON(program.input);
 console.log('parsed %d entities', Symbols.length);
 
+console.log('Orientation is ' + program.ccw);
 // adapt input
+
+var WALLINPUT= {}
 Symbols.forEach(function (s) {
-  if (s.label=="WALL")
-  {
-    var a = s.attributes;
-    if (s.hasOwnProperty('left')) { a['connleft'] = s.left; }
-    if (s.hasOwnProperty('right')) { a['connright'] = s.right; }
-    if (s.hasOwnProperty('crosslink')) { a['conncrosslink'] = s.crosslink; }
-  }
+    if (s.label == "WALL") {
+        WALLINPUT[s.attributes.id] = s;
+        var a = s.attributes;
+        if (s.hasOwnProperty('left'))      { a['connleft'] = (program.ccw == "true" || program.ccw == true) ? s.left : s.right; }
+        if (s.hasOwnProperty('right'))     { a['connright'] = (program.ccw == "true" || program.ccw == true) ? s.right : s.left; }
+        if (s.hasOwnProperty('crosslink')) { a['conncrosslink'] = s.crosslink; }
+    }
 });
 
+Symbols.forEach(function (s) {
+    // flip coordinates of wrongly oriented symbols
+    if (!(program.ccw == "true" || program.ccw == true)) {
+        if (s.attributes.wallid) {
+            if (s.label == "DOOR" || s.label == "WINDOW") {
+                s.attributes.left = WALLINPUT[s.attributes.wallid].attributes.width - (s.attributes.left + s.attributes.width);
+            }
+        }
+    }
+});
 
 // -------------------------------------------------------------------------------
 console.log("evaluating grammar...");
@@ -97,16 +110,45 @@ console.log("evaluation took " + steps + " steps.");
 var numSockets = 0;
 var numSwitches = 0;
 var numWalls = 0;
+var WALLS = {};
+
 TerminalSymbols.forEach(function (t) {
     if (t.label == "wall") {
-        t.bb = new vec.AABB();
         WALLS[t.attributes.id] = t;
+        t.bb = new vec.AABB();
         numWalls = numWalls + 1;
     }
     if (t.label == "socket") numSockets = numSockets + 1;
     if (t.label == "switch") numSwitches = numSwitches + 1;
     //if (t.label == "vgroup") console.log("vgroup height:" + t.attributes.height);
 });
+
+for (var w in WALLS) {
+    if (w == "wall0") {
+        var wall = WALLS[w];
+        console.log("######### WALL:" + w);
+        TerminalSymbols.forEach(function (s) {
+            if (s.attributes.wallid == w) {
+                console.log(JSON.stringify({ 'label': s.label, 'left': s.attributes.left }));
+            }
+        });
+    }
+}
+
+
+
+//for (var w in WALLS) {
+//    if (w == "wall0") {
+//        var wall = WALLS[w];
+//        console.log("######### WALL:" + w);
+//        TerminalSymbols.forEach(function (s) {
+//            if (s.attributes.wallid == w) {
+//                console.log(JSON.stringify({ 'label': s.label, 'left': s.attributes.left }));
+//            }
+//        });
+//    }
+//}
+
 console.log("found " + numWalls + " walls, " + numSwitches + " switches and " + numSockets + " sockets.");
 
 // get wall arrangements
@@ -114,7 +156,9 @@ var WALLORDER = [];
 {
     // build left index
     var LEFT = {}
-    for (var w in WALLS) { LEFT[WALLS[w].attributes.connleft] = WALLS[w]; }
+    for (var w in WALLS) {
+        LEFT[WALLS[w].attributes.connleft] = WALLS[w];
+    }
     
     while (Object.keys(LEFT).length > 0) {
         var current = LEFT[Object.keys(LEFT)[0]];
@@ -127,8 +171,8 @@ var WALLORDER = [];
         WALLORDER.push(corder);
     }
 }
-//console.log("WALL ORDER:");
-//console.log(WALLORDER);
+console.log("WALL ORDER:");
+console.log(WALLORDER);
 
 // -------------------------------------------------------------------------------
 // build installation zone graph
@@ -452,6 +496,10 @@ console.log("Extracting wire hypothesis...");
 var WireTree = findWireTree(G, ROOT, EndPoints);
 
 console.log("writing output...");
+
+try {
+    fs.mkdirSync(program.output);
+} catch (err) { }
 
 fs.writeFileSync(util.format("%s/iz-graph.json",program.output), JSON.stringify(G));
 fs.writeFileSync(util.format("%s/iz-graph.dot", program.output), G.exportToGraphViz());

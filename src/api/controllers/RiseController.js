@@ -41,7 +41,7 @@ function prepareSession(e57master) {
   session.wiregenHypothesisGraph = path.join(session.workingDir, "wiregen", "output", "hypothesis-graph.json");
   session.configFile = path.join(session.workingDir, "rise_config.json");
 
-  // read config
+  // read config and set default values if necessary
   console.log("loading config " + session.configFile);
   var hasConfig=false;
   try 
@@ -50,21 +50,17 @@ function prepareSession(e57master) {
   } catch (err) { }
   if (hasConfig) {
     session.config = JSON.parse(fs.readFileSync(session.configFile, "utf8"));
-  } else {
-    session.config = {
-        "orthogen":   { },
-        "elecdetect": { 
-          "ini" : new Elecdetec().defaultConfig()
-        },
-        "wiregen":    { }
-    };
-    // write initial config to file
-    console.log("writing initial config.");
-    fs.writeFileSync(session.configFile, JSON.stringify(session.config, null, 4), "utf8");
+  } 
+  if (!session.config) { session.config = {}; }
+  if (!session.config.orthogen)   { session.config["orthogen"]   = {}; }
+  if (!session.config.elecdetect) { session.config["elecdetect"] = {}; }
+  if (!session.config.elecdetect.ini) {
+    session.config.elecdetect["ini"] = new Elecdetec().defaultConfig();
   }
-  console.log(session.config);
+  if (!session.config.wiregen) { session.config["wiregen"] = {}; }
 
-  //console.log(JSON.stringify(session));
+  fs.writeFileSync(session.configFile, JSON.stringify(session.config, null, 4), "utf8");
+  console.log(session.config);
   return session;
 }
 
@@ -134,7 +130,7 @@ function startElecdetect(session) {
     console.time('Elecdetect');
     elecdetect.createElecImages(session, session.config.elecdetect.ini).then(function() {
       console.timeEnd('Elecdetect');
-      console.log("[SessionController::finished]");
+      console.log("[Elecdetect::finished]");
       resolve(session);
     });
   });
@@ -159,11 +155,14 @@ function startWiregen(session) {
     console.log('[SessionController::start Wiregen]');
     prepareWiregen(session);
     var wiregen = new Wiregen();
-    resolve(wiregen.importDetections(session)
+    wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
       .then(wireGenResultSvg_grammar)
-      .then(wireGenResultSvg_hypothesis));
+      .then(wireGenResultSvg_hypothesis).then(function() {
+        console.log("[startWiregen::finished]");
+        resolve(session);
+    });
   });
 }
 
@@ -185,10 +184,13 @@ function createInputSymbolList(session) {
       }
       // add sockets and switches
       ['Sockets', 'Switches', 'Roots'].forEach(function(category) {
-        session[category].forEach(function(symbol) {
-          session.wiregenInput.push(symbol);
-        });
+        if (category.length > 0) {
+          session[category].forEach(function(symbol) {
+            session.wiregenInput.push(symbol);
+          });
+        }
         console.log("imported " + session[category].length + " " + category + " symbols.");
+        console.log(JSON.stringify(session[category]));
       });
 
       session.wiregenPath = path.join(session.workingDir, 'wiregen');
@@ -341,7 +343,6 @@ module.exports = {
       console.log('Error: ' + err);
       res.send(500, err);
     });
-
   },
 
   // createObjectFiles: function(req, res, next) {
@@ -354,6 +355,7 @@ module.exports = {
   //     res.send(500, err);
   //   });
   // },
+
   startOrthogen: function(req, res, next) {
     var session = prepareSession(req.body.e57master);
 
@@ -364,6 +366,7 @@ module.exports = {
       res.send(500, err);
     });
   },
+
   startElecdetect: function(req, res, next) {
     var session = prepareSession(req.body.e57master);
     req.connection.setTimeout(0);
@@ -375,11 +378,14 @@ module.exports = {
       res.send(500, err);
     });
   },
+
   startWiregen: function(req, res, next) {
     var session = prepareSession(req.body.e57master);
     session.useGroundtruth = req.body.useGroundtruth;    
     //console.log(session);
+    console.time('Wiregen');
     startWiregen(session).then(function(argument) {
+      console.timeEnd('Wiregen');
       res.send(200, argument);
     }).catch(function(err) {
       console.log('Error: ' + err);

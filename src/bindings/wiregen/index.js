@@ -12,7 +12,13 @@ Wiregen.prototype.importDetections = function(session) {
   session.wiregenInput = [];
   session.Sockets = [];
   session.Switches = [];
-  session.Roots = [ session.config.wiregen.root ];
+
+  if (session.config.wiregen.roots) {
+    session.Roots = session.config.wiregen.roots;
+  } else {
+    session.Roots = [];
+  }
+
   var promises = [];
 
   if (session.useGroundtruth)
@@ -174,7 +180,8 @@ Wiregen.prototype.createWiregenImages = function(session) {
     var args = ['-i', session.wireGenFile, 
                 '-o', session.wireGenOutput,
                 '-g', session.wiregenGrammar,
-                '-p', session.basename];
+                '-p', session.basename,
+                '-c', 'false'];
 
     console.log('wiregen.bat ' + args);
     var executable = spawn(path.join(session.wiregenExecutable, 'wiregen.bat'), args);
@@ -189,11 +196,18 @@ Wiregen.prototype.createWiregenImages = function(session) {
 
     executable.on('close', function(code) {
       console.log('[Wiregen-binding] child process exited with code ' + code);
-
-
       session.status = 'finished-Wiregen';
 
       if (code === 0) {
+        // copy lowres ortho images
+          var files = fs.readdirSync(path.join(session.orthoresult, 'lowres'));
+          files.forEach(function(fname) {
+            var sourceFile = path.join(session.orthoresult, 'lowres', fname);
+            var targetFile = path.join(session.workingDir, "wiregen", "output", "svg_grammar", fname);
+            fs.writeFileSync(targetFile, fs.readFileSync(sourceFile));
+            targetFile = path.join(session.workingDir, "wiregen", "output", "svg_hypothesis", fname);
+            fs.writeFileSync(targetFile, fs.readFileSync(sourceFile));
+          });
         resolve(session);
       }
       else{
