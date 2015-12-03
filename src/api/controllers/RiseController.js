@@ -194,7 +194,7 @@ function createInputSymbolList(session) {
           });
         }
         console.log("imported " + session[category].length + " " + category + " symbols.");
-        console.log(JSON.stringify(session[category]));
+        //console.log(JSON.stringify(session[category]));
       });
 
       session.wiregenPath = path.join(session.workingDir, 'wiregen');
@@ -544,8 +544,16 @@ module.exports = {
         }).status(200);
       });
     });
+  },
+
+  evaluateElecdetect: function(req, res, next)
+  {    
+    var session = prepareSession(req.body.e57master);
+
+    var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+
+    prepareWiregen(session);
+
   }
-
-
 
 };
