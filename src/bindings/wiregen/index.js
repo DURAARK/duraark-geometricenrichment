@@ -198,7 +198,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
       console.log('[Wiregen-binding] child process exited with code ' + code);
       session.status = 'finished-Wiregen';
 
-      if (code === 0) {
+      if (code == 0) {
         // copy lowres ortho images
           var files = fs.readdirSync(path.join(session.orthoresult, 'lowres'));
           files.forEach(function(fname) {
@@ -208,6 +208,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
             targetFile = path.join(session.workingDir, "wiregen", "output", "svg_hypothesis", fname);
             fs.writeFileSync(targetFile, fs.readFileSync(sourceFile));
           });
+        console.log('# ending wiregen');
         resolve(session);
       }
       else{

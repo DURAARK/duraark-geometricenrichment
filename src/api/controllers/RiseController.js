@@ -151,6 +151,7 @@ function prepareWiregen(session) {
 }
 
 function startWiregen(session) {
+
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::start Wiregen]');
     prepareWiregen(session);
@@ -158,11 +159,14 @@ function startWiregen(session) {
     wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
-      .then(wireGenResultSvg_grammar)
-      .then(wireGenResultSvg_hypothesis).then(function() {
+      //.then(wireGenResultSvg_grammar)
+      //.then(wireGenResultSvg_hypothesis)
+      .then(function() {
         console.log("[startWiregen::finished]");
         resolve(session);
-    });
+    }).catch(function(err) {
+        console.log('blablubb:' + err);
+      });
   });
 }
 
