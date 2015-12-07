@@ -4,10 +4,6 @@ var spawn = require('child_process').spawn,
   fs = require('fs'),
   xml2js = require('xml2js');
 
-var Wiregen = module.exports = function() {
-  //this.session = session;
-};
-
 function importGroundtruthSymbols(session) 
 {
   var symbols = {
@@ -30,7 +26,9 @@ function importGroundtruthSymbols(session)
       try 
       {
         hasSVG = fs.lstatSync(svgfilename).isFile();
-      } catch (err) { }
+      } catch (err) { 
+        console.log('file ' + svgfilename + ' could not be opened.');
+      }
 
       if (hasSVG)
       {
@@ -54,6 +52,9 @@ function importGroundtruthSymbols(session)
                   var transform = RE.exec(rect.$.transform);
                   var sx = Number(transform[1]);
                   var sy = Number(transform[2]);
+                } else {
+                  sx = 1.0;
+                  sy = 1.0;
                 }
 
                 var item = {
@@ -103,6 +104,7 @@ function importElecdetectSymbols(session)
     if (n.file.substr(-4) === '.xml') 
     {
       var f = path.join(session.elecdetecResults, n.file);
+      console.log('importing from ' + f);
 
       var contents = fs.readFileSync(f, 'utf-8');
       var parser = new xml2js.Parser();
@@ -125,8 +127,6 @@ function importElecdetectSymbols(session)
                 "wallid": wallid
               }
             };
-            //console.log('new item' + object.label);
-
             if (object.label == '1') {
               item.label = 'SOCKET';
               symbols.Sockets.push(item);
@@ -135,6 +135,8 @@ function importElecdetectSymbols(session)
               item.label = 'SWITCH';
               symbols.Switches.push(item);
             }
+            console.log('new item' + JSON.stringify(item) );
+
           }
         }
       });
@@ -143,6 +145,12 @@ function importElecdetectSymbols(session)
 
   return symbols;
 }
+
+var Wiregen = module.exports = function() {
+};
+
+Wiregen.prototype.importElecdetectSymbols = importElecdetectSymbols;
+Wiregen.prototype.importGroundtruthSymbols = importGroundtruthSymbols;
 
 Wiregen.prototype.importDetections = function(session) {
   return new Promise(function(resolve, reject) {
