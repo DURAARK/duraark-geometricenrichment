@@ -622,14 +622,14 @@ module.exports = {
             if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.1 )
             {
               var area = (right-left) * (bottom-top);
-              if ((area / areaA) >= 0.9)
-              {
                 console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
                   + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
                 console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
+              if ((area / areaA) >= 0.9)
+              {
                 console.log((area / areaA) + ' => match!');
                 match_gt[i_gt] = '1';
-                match_d[i_d] = '1';
+                match_d[i_d]   = '1';
               }
             }
           }

@@ -56,13 +56,18 @@ function importGroundtruthSymbols(session)
                   sx = 1.0;
                   sy = 1.0;
                 }
+                // parse width
+                var RE = /stroke-width:([^;]*);/gi;
+                var sw = RE.exec(rect.$.style);
+                var strokewidth = Number(sw[1]);
+                console.log(strokewidth);
 
                 var item = {
                   "attributes": {
-                    "left": sx*Number(rect.$.x),
-                    "top": sy*Number(rect.$.y),
-                    "width": Number(rect.$.width),
-                    "height": Number(rect.$.height),
+                    "left": sx*Number(rect.$.x)-strokewidth,
+                    "top": sy*Number(rect.$.y)-strokewidth,
+                    "width": Number(rect.$.width)+2*strokewidth,
+                    "height": Number(rect.$.height)+2*strokewidth,
                     "wallid": wall.attributes.id
                   }
                 };
