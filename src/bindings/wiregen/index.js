@@ -4,29 +4,19 @@ var spawn = require('child_process').spawn,
   fs = require('fs'),
   xml2js = require('xml2js');
 
-var Wiregen = module.exports = function() {
-  //this.session = session;
-};
+function importGroundtruthSymbols(session) 
+{
+  var symbols = {
+    'Sockets'  : [],
+    'Switches' : [],
+    'Roots'    : []
+  };
 
-Wiregen.prototype.importDetections = function(session) {
-  session.wiregenInput = [];
-  session.Sockets = [];
-  session.Switches = [];
+  console.log('[Wiregen::importGroundtruth]');
 
-  if (session.config.wiregen.roots) {
-    session.Roots = session.config.wiregen.roots;
-  } else {
-    session.Roots = [];
-  }
-
-  var promises = [];
-
-  if (session.useGroundtruth)
+  var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+  for (var i=0; i<walljson.Walls.length; ++i) 
   {
-    console.log('[Wiregen::importGroundtruth]');
-    var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-    for (var i=0; i<walljson.Walls.length; ++i) 
-    {
       var xmlparser = new xml2js.Parser();
       var wall = walljson.Walls[i];
       var svgfilename = path.join(session.workingDir, 'groundtruth', 
@@ -36,16 +26,23 @@ Wiregen.prototype.importDetections = function(session) {
       try 
       {
         hasSVG = fs.lstatSync(svgfilename).isFile();
-      } catch (err) { }
+      } catch (err) { 
+        console.log('file ' + svgfilename + ' could not be opened.');
+      }
 
       if (hasSVG)
       {
         var svgxml = fs.readFileSync(svgfilename);
-        var promise = new Promise(function(resolve, reject) {
-          xmlparser.parseString(svgxml,function(err, svg) {
-            if (err) reject(err);
-            // import symbols from SVG:
-            if (svg.svg.rect) {
+
+        xmlparser.parseString(svgxml,function(err, svg) 
+        {
+          if (err) {
+            console.log('could not parse SVG XML:' + svgfilename);
+          }
+          else 
+          {
+            if (svg.svg.rect) 
+            {
               for (j=0; j<svg.svg.rect.length; ++j)
               {
                 var rect = svg.svg.rect[j];
@@ -55,14 +52,22 @@ Wiregen.prototype.importDetections = function(session) {
                   var transform = RE.exec(rect.$.transform);
                   var sx = Number(transform[1]);
                   var sy = Number(transform[2]);
+                } else {
+                  sx = 1.0;
+                  sy = 1.0;
                 }
+                // parse width
+                var RE = /stroke-width:([^;]*);/gi;
+                var sw = RE.exec(rect.$.style);
+                var strokewidth = Number(sw[1]);
+                console.log(strokewidth);
 
                 var item = {
                   "attributes": {
-                    "left": sx*Number(rect.$.x),
-                    "top": sy*Number(rect.$.y),
-                    "width": Number(rect.$.width),
-                    "height": Number(rect.$.height),
+                    "left": sx*Number(rect.$.x)-strokewidth,
+                    "top": sy*Number(rect.$.y)-strokewidth,
+                    "width": Number(rect.$.width)+2*strokewidth,
+                    "height": Number(rect.$.height)+2*strokewidth,
                     "wallid": wall.attributes.id
                   }
                 };
@@ -72,94 +77,117 @@ Wiregen.prototype.importDetections = function(session) {
                 switch(result[1].toLowerCase()) {
                   case '0000ff' : // SOCKET
                     item.label = 'SOCKET';
-                    session.Sockets.push(item);
+                    symbols.Sockets.push(item);
                   break;
                   case '00ff00' : // SWITCH
                     item.label = 'SWITCH';
-                    session.Switches.push(item);
+                    symbols.Switches.push(item);
                   break;
                 }
-                //console.log(item);
               }
             }
-            resolve();
-          });
+          }
         });
-        promises.push(promise);
       } else {
         console.log('no groundtruth data for ' + svgfilename);
       }
     }
-  } 
-  else 
-  {
+  return symbols;
+} 
+
+function importElecdetectSymbols(session) 
+{
   console.log('[Wiregen::importDetections]');
+  var symbols = {
+    'Sockets'  : [],
+    'Switches' : [],
+    'Roots'    : []
+  };
 
-  //console.log("selecimages " + JSON.stringify(session.elecDetecResultImages, null, 4));
-  _.forEach(session.elecDetecResultImages, function(n) {
-    if (n.file.substr(-4) === '.xml') {
-      var promise = new Promise(function(resolve, reject) {
-        var f = path.join(session.elecdetecResults, n.file);
+  _.forEach(session.elecDetecResultImages, function(n) 
+  {
+    if (n.file.substr(-4) === '.xml') 
+    {
+      var f = path.join(session.elecdetecResults, n.file);
+      console.log('importing from ' + f);
 
-        fs.readFile(f, 'utf-8', function(err, contents) {
+      var contents = fs.readFileSync(f, 'utf-8');
+      var parser = new xml2js.Parser();
+      parser.parseString(contents, function(err, result) {
+        if (err) {
+          console.log('could not parse XML: ' + f);
+        } else {
+          for (var position in result.Image.Object) 
+          {
+            var object = result.Image.Object[position];
+            var attr = object.boundingbox[0].$;
+            var wallid = path.basename(result.Image.$.file, '.jpg').substring(session.basename.length+1);
 
-          var parser = new xml2js.Parser();
-          if (err) reject(err);
-
-          var innerPrommises = [];
-          parser.parseString(contents, function(err, result) {
-            if (err) reject(err);
-            for (var position in result.Image.Object) {
-
-              var object = result.Image.Object[position];
-
-              var attr = object.boundingbox[0].$;
-
-              var wallid = path.basename(result.Image.$.file, '.jpg').substring(session.basename.length+1);
-
-              var item = {
-                "attributes": {
-                  "left": Number(attr.x),
-                  "top": Number(attr.y),
-                  "width": Number(attr.w),
-                  "height": Number(attr.h),
-                  "wallid": wallid
-                }
-              };
-              //console.log('new item' + object.label);
-
-              if (object.label == '1') {
-                item.label = 'SOCKET';
-                session.Sockets.push(item);
-
-              } else if (object.label == '2') {
-                item.label = 'SWITCH';
-                session.Switches.push(item);
+            var item = {
+              "attributes": {
+                "left": Number(attr.x),
+                "top": Number(attr.y),
+                "width": Number(attr.w),
+                "height": Number(attr.h),
+                "wallid": wallid
               }
+            };
+            if (object.label == '1') {
+              item.label = 'SOCKET';
+              symbols.Sockets.push(item);
+
+            } else if (object.label == '2') {
+              item.label = 'SWITCH';
+              symbols.Switches.push(item);
             }
-            resolve();
+            console.log('new item' + JSON.stringify(item) );
 
-          });
-
-        });
+          }
+        }
       });
-      promises.push(promise);
     }
   });
-    
-  }
 
-  return Promise.all(promises).then(function(argument) {
+  return symbols;
+}
+
+var Wiregen = module.exports = function() {
+};
+
+Wiregen.prototype.importElecdetectSymbols = importElecdetectSymbols;
+Wiregen.prototype.importGroundtruthSymbols = importGroundtruthSymbols;
+
+Wiregen.prototype.importDetections = function(session) {
+  return new Promise(function(resolve, reject) {
+    session.wiregenInput = [];
+    session.Sockets = [];
+    session.Switches = [];
+
+    var symbols;
+   
+    if (session.useGroundtruth)
+    {
+      symbols = importGroundtruthSymbols(session);
+    } 
+    else 
+    {
+      symbols = importElecdetectSymbols(session);
+    }
+
+    for (group in symbols)
+    {
+      session[group] = symbols[group];
+    }
+
+    // append any roots from config
+    if (session.config.wiregen.roots) {
+      session.Roots = session.Roots.concat(session.config.wiregen.roots);
+    } 
     console.log(session.Sockets.length + " sockets");
     console.log(session.Switches.length + " switches");
-    return session;
-  }).catch(function(err) {
-    console.log('Error: ' + err);
-    console.log(err.stack);
-    throw new Error(err);
+    console.log(session.Roots.length + " roots");
+    resolve(session);
   });
-
-
 };
 
 Wiregen.prototype.createWiregenImages = function(session) {
@@ -198,7 +226,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
       console.log('[Wiregen-binding] child process exited with code ' + code);
       session.status = 'finished-Wiregen';
 
-      if (code === 0) {
+      if (code == 0) {
         // copy lowres ortho images
           var files = fs.readdirSync(path.join(session.orthoresult, 'lowres'));
           files.forEach(function(fname) {
@@ -208,6 +236,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
             targetFile = path.join(session.workingDir, "wiregen", "output", "svg_hypothesis", fname);
             fs.writeFileSync(targetFile, fs.readFileSync(sourceFile));
           });
+        console.log('# ending wiregen');
         resolve(session);
       }
       else{

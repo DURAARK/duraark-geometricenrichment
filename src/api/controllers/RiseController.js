@@ -151,6 +151,7 @@ function prepareWiregen(session) {
 }
 
 function startWiregen(session) {
+
   return new Promise(function(resolve, reject) {
     console.log('[SessionController::start Wiregen]');
     prepareWiregen(session);
@@ -158,11 +159,14 @@ function startWiregen(session) {
     wiregen.importDetections(session)
       .then(createInputSymbolList)
       .then(wiregen.createWiregenImages)
-      .then(wireGenResultSvg_grammar)
-      .then(wireGenResultSvg_hypothesis).then(function() {
+      //.then(wireGenResultSvg_grammar)
+      //.then(wireGenResultSvg_hypothesis)
+      .then(function() {
         console.log("[startWiregen::finished]");
         resolve(session);
-    });
+    }).catch(function(err) {
+        console.log('blablubb:' + err);
+      });
   });
 }
 
@@ -190,7 +194,7 @@ function createInputSymbolList(session) {
           });
         }
         console.log("imported " + session[category].length + " " + category + " symbols.");
-        console.log(JSON.stringify(session[category]));
+        //console.log(JSON.stringify(session[category]));
       });
 
       session.wiregenPath = path.join(session.workingDir, 'wiregen');
@@ -540,8 +544,123 @@ module.exports = {
         }).status(200);
       });
     });
+  },
+
+  evaluateElecdetect: function(req, res, next)
+  {    
+    var session = prepareSession(req.body.e57master);
+    var wiregen = new Wiregen();
+    prepareWiregen(session);
+    var symbol_elecdetect  = wiregen.importElecdetectSymbols(session);
+    var symbol_groundtruth = wiregen.importGroundtruthSymbols(session);
+
+    console.log('###################### Elecdetect Evaluation ###############');
+    var symbol_statistics = function(m,s) {
+      console.log('***' + m + '***');
+      for (var i in s) {
+        console.log(i + ":" + s[i].length + " symbols.");
+      }
+    };
+    symbol_statistics('Elecdetect', symbol_elecdetect);
+    symbol_statistics('Groundtruth', symbol_groundtruth);
+
+    // compare category GT (groundtruth) vs
+    //         category D (detected) in terms of
+    // comparison per wall
+    // - matches (overlapping symbols)
+    // - false positives (object in D but not in GT)
+    // - false negatives (object in GT but not in D)
+    var compare_category = function(GT, D)
+    {
+      // build wall index
+      var wallIndex = function(symbols)
+      {
+        var wi = {};
+        for (var i = 0, ie = symbols.length; i<ie; ++i)
+        {
+          s = symbols[i];
+          if (!wi[s.attributes.wallid]) {
+            wi[s.attributes.wallid] = [];
+          }
+          wi[s.attributes.wallid].push(s);
+        }
+        return wi;
+      };
+
+      var wall_gt = wallIndex(GT);
+      var wall_d  = wallIndex(D);
+
+
+      var result = {
+        'match' : 0,
+        'false_positive' : 0,
+        'false_negative' : 0
+      };
+
+      Object.keys(wall_d).forEach( function(wallid) {
+        console.log('testing ' + wallid);
+        var match_gt = {};
+        var match_d  = {};
+
+        if (wall_gt[wallid])
+        for (var i_gt = 0, i_gte = wall_gt[wallid].length; i_gt < i_gte; ++i_gt)
+        {
+          g = wall_gt[wallid][i_gt];
+          for (var i_d = 0, i_de = wall_d[wallid].length; i_d < i_de; ++i_d)
+          {
+            d = wall_d[wallid][i_d];
+
+            var A = g.attributes;
+            var B = d.attributes;
+            // detect overlap
+            var left = Math.max(A.left, B.left);
+            var top  = Math.max(A.top, B.top);
+            var right = Math.min(A.left+A.width, B.left+B.width);
+            var bottom = Math.min(A.top+A.height, B.top+B.height);
+            var areaA = A.width*A.height;
+            var areaB = B.width*B.height;
+            if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.1 )
+            {
+              var area = (right-left) * (bottom-top);
+                console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
+                  + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
+                console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
+              if ((area / areaA) >= 0.9)
+              {
+                console.log((area / areaA) + ' => match!');
+                match_gt[i_gt] = '1';
+                match_d[i_d]   = '1';
+              }
+            }
+          }
+        }
+
+        // count matches and fals positives/negatives
+        if (wall_gt[wallid])
+        for (var i_gt = 0, i_gte = wall_gt[wallid].length; i_gt < i_gte; ++i_gt)
+        {
+          if (match_gt[i_gt] == '1')  { result.match += 1; } 
+          else                        { result.false_negative +=1; }  // gt but not detected
+        }
+
+        for (var i_d = 0, i_de = wall_d[wallid].length; i_d < i_de; ++i_d)
+        {
+          if (match_d[i_d] != '1') { result.false_positive += 1; }    // detection not present in gt
+        }
+
+      });
+
+
+      return result;
+    }
+
+    console.log('GT Sockets:' + JSON.stringify(symbol_groundtruth.Sockets));
+    console.log('D  Sockets:' + JSON.stringify(symbol_elecdetect.Sockets));
+    var sockets = compare_category(symbol_groundtruth.Sockets, symbol_elecdetect.Sockets);
+    console.log(JSON.stringify(sockets));
+    var switches = compare_category(symbol_groundtruth.Switches, symbol_elecdetect.Switches);
+    console.log(JSON.stringify(switches));
+
   }
-
-
 
 };
