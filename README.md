@@ -44,8 +44,9 @@ Our recommended stack is to install DURAARK on a Docker-compatible Linux system 
 On the host you want to deploy the service execute the following steps (assuming that Docker and Docker Compose are installed and working):
 
 ```js
-> git clone https://github.com/DURAARK/duraark-geometricenrichment.git
+> git clone --recursive https://github.com/DURAARK/duraark-geometricenrichment.git
 > cd duraark-geometricenrichment
+> sudo mkdir -p /duraark-storage/sessions
 > docker-compose up -d
 ```
 
@@ -58,9 +59,10 @@ The files you want to use have to be put into the folder **/tmp/duraark/files**.
 To setup the environment follow these steps:
 
 ```js
-> git clone https://github.com/DURAARK/duraark-geometricenrichment.git
+> git clone --recursive https://github.com/DURAARK/duraark-geometricenrichment.git
 > cd duraark-geometricenrichment
 > npm install
+> mkdir -p /duraark-storage/sessions
 > docker-compose -f devenv-compose.yml build
 > docker-compose -f devenv-compose.yml up -d
 ```
