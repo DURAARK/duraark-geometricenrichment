@@ -12,6 +12,9 @@ Information on the provided functionalities can be found in the reports
 * [D5.4 Shape grammars for almost invisible structures Software prototype v2](http://duraark.eu/wp-content/uploads/2015/08/DURAARK_D5.5.4.pdf) 
 * [D2.5 Software prototype v2, Section 4.4](http://duraark.eu/wp-content/uploads/2015/08/DURAARK_D2_5_final.pdf) (overview)
 
+### Usage
+
+Usage documentation is available [here](https://github.com/DURAARK/duraark-geometricenrichment/wiki).
 ### Dependencies
 
 The service depends on the following DURAARK components:
