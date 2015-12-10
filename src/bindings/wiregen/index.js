@@ -11,8 +11,13 @@ function importGroundtruthSymbols(session)
     'Switches' : [],
     'Roots'    : []
   };
+  var HFLIP = false;
+  if (session.config.elecdetect.groundtruth)
+  {
+    HFLIP = (session.config.elecdetect.groundtruth.HFLIP == true);
+  }
 
-  console.log('[Wiregen::importGroundtruth]');
+  console.log('[Wiregen::importGroundtruth]       HFLIP:'+HFLIP);
 
   var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
   for (var i=0; i<walljson.Walls.length; ++i) 
@@ -41,6 +46,9 @@ function importGroundtruthSymbols(session)
           }
           else 
           {
+            //console.log(JSON.stringify(svg,null,2));
+            var WIDTH = Number(svg.svg.$.width);
+            var HEIGHT = Number(svg.svg.$.height);
             if (svg.svg.rect) 
             {
               for (j=0; j<svg.svg.rect.length; ++j)
@@ -60,14 +68,20 @@ function importGroundtruthSymbols(session)
                 var RE = /stroke-width:([^;]*);/gi;
                 var sw = RE.exec(rect.$.style);
                 var strokewidth = Number(sw[1]);
-                console.log(strokewidth);
+                //console.log(strokewidth);
+
+                var IW = Number(rect.$.width)+strokewidth;
+                var IH = Number(rect.$.height)+strokewidth;
+
+                var IL = sx*Number(rect.$.x)-(strokewidth/2);
+                var IT = sy*Number(rect.$.y)-(IH-(strokewidth/2));
 
                 var item = {
                   "attributes": {
-                    "left": sx*Number(rect.$.x)-strokewidth,
-                    "top": sy*Number(rect.$.y)-strokewidth,
-                    "width": Number(rect.$.width)+2*strokewidth,
-                    "height": Number(rect.$.height)+2*strokewidth,
+                    "left": HFLIP ? WIDTH - IL - IW : IL,
+                    "top": IT,
+                    "width": IW,
+                    "height": IH,
                     "wallid": wall.attributes.id
                   }
                 };
@@ -140,8 +154,7 @@ function importElecdetectSymbols(session)
               item.label = 'SWITCH';
               symbols.Switches.push(item);
             }
-            console.log('new item' + JSON.stringify(item) );
-
+            //console.log('new item' + JSON.stringify(item) );
           }
         }
       });

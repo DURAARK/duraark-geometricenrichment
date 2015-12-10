@@ -46,7 +46,7 @@ function prepareSession(e57master) {
   var hasConfig=false;
   try 
   {
-    hasConfig = fs.lstatSync(svgfilename).isFile();
+    hasConfig = fs.lstatSync(session.configFile).isFile();
   } catch (err) { }
   if (hasConfig) {
     session.config = JSON.parse(fs.readFileSync(session.configFile, "utf8"));
@@ -60,7 +60,7 @@ function prepareSession(e57master) {
   if (!session.config.wiregen) { session.config["wiregen"] = {}; }
 
   fs.writeFileSync(session.configFile, JSON.stringify(session.config, null, 4), "utf8");
-  console.log(session.config);
+  //console.log(JSON.stringify(session.config, null, 4));
   return session;
 }
 
@@ -564,6 +564,8 @@ module.exports = {
     symbol_statistics('Elecdetect', symbol_elecdetect);
     symbol_statistics('Groundtruth', symbol_groundtruth);
 
+    var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+
     // compare category GT (groundtruth) vs
     //         category D (detected) in terms of
     // comparison per wall
@@ -572,16 +574,19 @@ module.exports = {
     // - false negatives (object in GT but not in D)
     var compare_category = function(GT, D)
     {
+
       // build wall index
       var wallIndex = function(symbols)
       {
-        var wi = {};
+        wi={};
+        for (var i=0; i<walljson.Walls.length; ++i) 
+        {
+          wi[walljson.Walls[i].attributes.id] = [];
+        }
+
         for (var i = 0, ie = symbols.length; i<ie; ++i)
         {
           s = symbols[i];
-          if (!wi[s.attributes.wallid]) {
-            wi[s.attributes.wallid] = [];
-          }
           wi[s.attributes.wallid].push(s);
         }
         return wi;
@@ -590,15 +595,25 @@ module.exports = {
       var wall_gt = wallIndex(GT);
       var wall_d  = wallIndex(D);
 
+      //console.log('wall_gt:' + JSON.stringify(wall_gt,null,2));
+      //console.log('wall_d:' + JSON.stringify(wall_d,null,2));
 
       var result = {
         'match' : 0,
         'false_positive' : 0,
-        'false_negative' : 0
+        'false_negative' : 0,
+        'detail' : { }
       };
 
-      Object.keys(wall_d).forEach( function(wallid) {
-        console.log('testing ' + wallid);
+      var WALLS = [];
+      for (var i=0; i<walljson.Walls.length; ++i) {
+        WALLS.push(walljson.Walls[i].attributes.id);
+      }
+
+      for (var i=0; i<WALLS.length; ++i)
+      {
+        var wallid = WALLS[i];      
+        console.log('###################### testing ' + wallid);
         var match_gt = {};
         var match_d  = {};
 
@@ -619,15 +634,16 @@ module.exports = {
             var bottom = Math.min(A.top+A.height, B.top+B.height);
             var areaA = A.width*A.height;
             var areaB = B.width*B.height;
-            if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.1 )
+            //console.log('test area similarity: ' + Math.abs(areaA/areaB - 1.0));
+            if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.2 )
             {
               var area = (right-left) * (bottom-top);
-                console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
-                  + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
-                console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
+                //console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
+                // + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
+                //console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
               if ((area / areaA) >= 0.9)
               {
-                console.log((area / areaA) + ' => match!');
+                //console.log((area / areaA) + ' => match!');
                 match_gt[i_gt] = '1';
                 match_d[i_d]   = '1';
               }
@@ -635,32 +651,58 @@ module.exports = {
           }
         }
 
+        result.detail[wallid] = {
+          'match' : 0,
+          'false_positive' : 0,
+          'false_negative' : 0
+        };
+
         // count matches and fals positives/negatives
         if (wall_gt[wallid])
         for (var i_gt = 0, i_gte = wall_gt[wallid].length; i_gt < i_gte; ++i_gt)
         {
-          if (match_gt[i_gt] == '1')  { result.match += 1; } 
-          else                        { result.false_negative +=1; }  // gt but not detected
+          if (match_gt[i_gt] == '1')  { result.detail[wallid].match += 1; } 
+          else                        { result.detail[wallid].false_negative +=1; }  // gt but not detected
         }
 
         for (var i_d = 0, i_de = wall_d[wallid].length; i_d < i_de; ++i_d)
         {
-          if (match_d[i_d] != '1') { result.false_positive += 1; }    // detection not present in gt
+          if (match_d[i_d] != '1') { result.detail[wallid].false_positive += 1; }    // detection not present in gt
         }
 
-      });
-
-
+        console.log('##  RESULT FOR ' + wallid + ":");
+        if (wall_gt[wallid])
+          console.log(wall_gt[wallid].length + " groundtruth objects");
+        console.log(wall_d[wallid].length + " detected objects");
+        result.match += result.detail[wallid].match;
+        result.false_positive += result.detail[wallid].false_positive;
+        result.false_negative += result.detail[wallid].false_negative
+      }
       return result;
     }
 
-    console.log('GT Sockets:' + JSON.stringify(symbol_groundtruth.Sockets));
-    console.log('D  Sockets:' + JSON.stringify(symbol_elecdetect.Sockets));
-    var sockets = compare_category(symbol_groundtruth.Sockets, symbol_elecdetect.Sockets);
-    console.log(JSON.stringify(sockets));
-    var switches = compare_category(symbol_groundtruth.Switches, symbol_elecdetect.Switches);
-    console.log(JSON.stringify(switches));
+    //console.log(JSON.stringify(symbol_groundtruth));
+    //console.log(JSON.stringify(symbol_elecdetect));
 
+    console.log('============================= testing SOCKETS');
+    var sockets = compare_category(symbol_groundtruth.Sockets, symbol_elecdetect.Sockets);
+    console.log('sockets:' + JSON.stringify(sockets));
+    console.log('============================= testing SWITCHES');
+    var switches = compare_category(symbol_groundtruth.Switches, symbol_elecdetect.Switches);
+    console.log('switches:' + JSON.stringify(switches));
+
+    console.log('============================= testing COMBINED');
+    var combined = compare_category(
+      symbol_groundtruth.Sockets.concat(symbol_groundtruth.Switches), 
+      symbol_elecdetect.Sockets.concat(symbol_elecdetect.Switches)
+      );
+    console.log('combined:' + JSON.stringify(combined));
+
+    res.send({
+      'Sockets': sockets,
+      'Switches' : switches,
+      'combined' : combined
+    }).status(200);
   }
 
 };
