@@ -213,6 +213,10 @@ Wiregen.prototype.createWiregenImages = function(session) {
       session.wiregenGrammar = path.join(__dirname, '../../../app/wiregen/src/grammar/grammar-nygade.json'
         );
     }
+    var CCW = true;
+    if (session.config.wiregen.ccw) {
+      CCW = session.config.wiregen.ccw;
+    }
     console.log('using grammar ' + session.wiregenGrammar);
     var cwd = process.cwd();
 
@@ -222,7 +226,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
                 '-o', session.wireGenOutput,
                 '-g', session.wiregenGrammar,
                 '-p', session.basename,
-                '-c', 'false'];
+                '-c', CCW];
 
     console.log('wiregen.bat ' + args);
     var executable = spawn(path.join(session.wiregenExecutable, 'wiregen.bat'), args);
