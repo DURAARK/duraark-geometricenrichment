@@ -19,11 +19,12 @@ PC2BIM.prototype.extract = function(jobConfig) {
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
     //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc
-    var errorText = '';
+    var errorText = '',
+      args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', '"' + jobConfig.inputFile + '"', , '--output', '"' + jobConfig.bimFilePath + '"', '--outputjson', '"' + jobConfig.wallsFilePath + '"'];
 
-    console.log('[PC2BIM::convert] about to run:\n ' + 'docker run --rm -v ' + that.storagePath + ':/duraark-storage ochi/duraark_pc2bim pc2bim --input ' + jobConfig.inputFile + ' --output ' + jobConfig.bimFilePath + ' --outputjson ' + jobConfig.wallsFilePath);
+    console.log('[PC2BIM::convert] about to run:\n ' + 'docker ' + args.join(' '));
 
-    var executable = spawn('docker', ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', jobConfig.inputFile, , '--output', jobConfig.bimFilePath, '--outputjson', jobConfig.wallsFilePath]);
+    var executable = spawn('docker', args);
 
     executable.stdout.on('data', function(data) {
       console.log(data.toString());
