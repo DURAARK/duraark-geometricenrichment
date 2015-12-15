@@ -28,18 +28,27 @@ function filterNT(NT, label)
     return filtered;
 }
 
+// evaluate a statement in the local rule scope, which has a set of limited
+// available functions (right now BB and DIFF), and the attributes from the lhs
 function evaluateStatement(match, statement)
 {
     // set available functions
     var names  = ['BB','DIFF'];
     var values = [ BB , DIFF ];
-    // set current state
+    // set local rule scope state
     for (var v in match.state) {
         names.push(v);
         values.push(match.state[v]);
     }
     names.push("return (" + statement + ")");
-    var result = Function.apply(null, names).apply(null, values);
+    var result;
+    try {
+        result = Function.apply(null, names).apply(null, values);
+    } catch (err) {
+        console.log('## error evaluating statement: ' + statement);
+        console.log('error:' + err);
+        console.log('namespace:' + names);
+    }
     return result;
 }
 

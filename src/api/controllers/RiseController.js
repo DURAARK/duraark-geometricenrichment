@@ -703,6 +703,32 @@ module.exports = {
       'Switches' : switches,
       'combined' : combined
     }).status(200);
+  },
+
+  getWireLength: function(req, res, next)
+  {
+    var session = prepareSession(req.body.e57master);
+    var G = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
+    var total_length = 0;
+    for (var eid in G.E) {
+      var e = G.E[eid];
+      var v0 = G.N[e.v0];
+      var v1 = G.N[e.v1];
+      if (v0.wallid == v1.wallid) {
+        var dx = v1.x-v0.x;
+        var dy = v1.y-v0.y;
+        total_length += Math.sqrt(dx*dx+dy*dy);
+      } else {
+        //console.log('invalid edge: v0:' + JSON.stringify(v0) + ' v1:' +  JSON.stringify(v1));
+      }
+    }
+
+    res.send(
+    {
+      'total_length': (total_length/1000.0)
+    }
+    ).status(200);
+  
   }
 
 };

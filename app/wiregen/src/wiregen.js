@@ -543,6 +543,8 @@ var hypothesisSVG = {};
 for (var wallid in WALLS) {
     hypothesisSVG[wallid] = svgexport.ExportGraphToSVG(WireTree, wallid, WALLS[wallid].bb, program.prefix, program.flip);
     fs.writeFileSync(util.format("%s/svg_hypothesis/%s.svg", program.output, wallid), hypothesisSVG[wallid]);
+    var fullgraphsvg = svgexport.ExportGraphToSVG(G, wallid, WALLS[wallid].bb, program.prefix, program.flip);
+    fs.writeFileSync(util.format("%s/svg_hypothesis/%s_fullgraph.svg", program.output, wallid), fullgraphsvg);
 }
 fs.writeFileSync(util.format("%s/svg_hypothesis/index.html", program.output), createHTMLOutput(WALLORDER, hypothesisSVG));
 
