@@ -57,7 +57,10 @@ function prepareSession(e57master) {
   if (!session.config.elecdetect.ini) {
     session.config.elecdetect["ini"] = new Elecdetec().defaultConfig();
   }
-  if (!session.config.wiregen) { session.config["wiregen"] = {}; }
+  if (!session.config.wiregen) { session.config["wiregen"] = { 
+    "ccw": true,
+    "wiregenGrammar": "grammar-nygade.json"
+  }; }
 
   fs.writeFileSync(session.configFile, JSON.stringify(session.config, null, 4), "utf8");
   //console.log(JSON.stringify(session.config, null, 4));
@@ -171,7 +174,8 @@ function startWiregen(session) {
 }
 
 function createInputSymbolList(session) {
-  return new Promise(function(resolve, reject) {
+
+  return new Promise(function(resolve, reject) {    
     try {
 
       console.log('[SessionController::create Flat List]');
@@ -480,6 +484,31 @@ module.exports = {
       return res.badRequest('Cannot find roomId: ' + roomId);
     }
 
+  },
+
+  x3dsrc: function(req, res, next) {
+    var rise2x3d = new Rise2X3D();
+
+    var session = prepareSession(req.body.e57master);
+    var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+    var rooms = rise2x3d.parseRooms(walljson);
+    // parse hypothesis power line graph
+    var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
+
+    // parse elecdetect results
+    prepareWiregen(session);
+    var wiregen = new Wiregen();
+    wiregen.importDetections(session).then(function() {
+      console.log('creating X3D');
+      // textures are assumed to be in the same directory
+      var texture_path = session.basename + "_";
+      // get X3D
+      var x3dcontent = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
+        texture_path, session);      
+
+      console.log('sending result');
+      res.send(x3dcontent).status(200);
+    });
   },
 
   x3d: function(req, res, next) {

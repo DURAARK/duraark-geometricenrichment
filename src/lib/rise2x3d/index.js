@@ -7,6 +7,22 @@ var Rise2X3D = module.exports = function() {
 };
 
 
+
+  function inRectangle(rect, x, y)
+  {
+    return (x >= rect.left) && (x <= (rect.left+rect.width)) &&
+           (y >= rect.top) && (y <= (rect.top+rect.height));
+  }
+
+  function rectOverlap(A, B)
+  {
+    return  inRectangle(A, B.left, B.top) ||
+            inRectangle(A, B.left+B.width, B.top) ||
+            inRectangle(A, B.left+B.width, B.top+B.height) ||
+            inRectangle(A, B.left, B.top+B.height);
+  }
+
+
 //----------------------------------------------------------------------------
 
 Rise2X3D.prototype.test = function(bla) {
@@ -97,11 +113,13 @@ IndexedSet.prototype.endFace = function() {
 	this.I = this.I + " -1";
 }
 
-IndexedSet.prototype.addSymbol = function(wall, symbol, closed)
+IndexedSet.prototype.addSymbol = function(wall, symbol, closed, ccw)
 {
 	//console.log("[addSymbol] : wall: " + JSON.stringify(wall) + " symbol:" + JSON.stringify(symbol));
-	var TL = wall.O.add(wall.X.scale(symbol.attributes.left)).add(wall.Y.scale(symbol.attributes.top));
-	var W  = wall.X.scale(symbol.attributes.width);
+	var O = (ccw && closed) ? wall.O.add(wall.X.scale(-wall.W)) : wall.O;
+	var X = (ccw && closed) ? wall.X : wall.X.scale(-1);
+	var TL = O.add(X.scale(symbol.attributes.left)).add(wall.Y.scale(symbol.attributes.top));
+	var W  = X.scale(symbol.attributes.width);
 	var H  = wall.Y.scale(symbol.attributes.height);
 	//console.log(" TL:" + TL + " W:" + W + " H:" + H);
 
@@ -175,11 +193,15 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	var WIG = new IndexedSet();		// window geometry
 	var SKT = new IndexedSet();		// sockets
 	var SWI = new IndexedSet();		// switches
-	
-	console.log('creating walls');
+	var CCW = session.config.wiregen.ccw;
+
+	console.log('creating walls CCW:' + CCW);
+
 	//-------------------------------- WALLS
     WALLS = {};
 	{
+		var O, vx, vy, n;
+		var v0,v1,v2,v3;
 		var floornormal = new Vec3(0,0,1);
 
 		for (roomid in rooms) {
@@ -188,15 +210,26 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 			for (wallid in room.walls) {
 				var wall = room.walls[wallid];
 
-				var O = new Vec3(wall.attributes.origin);
-				var vx = new Vec3(wall.attributes.x).scale(wall.attributes.width);
-				var vy = new Vec3(wall.attributes.y).scale(wall.attributes.height);
-				var n  = new Vec3(wall.attributes.x).cross(new Vec3(wall.attributes.y));
-
-				var v0 = O.add(n.scale(2));
-				var v1 = O.add(vx).add(n.scale(2));
-				var v2 = O.add(vx).add(vy).add(n.scale(2));
-				var v3 = O.add(vy).add(n.scale(2));
+				if (CCW) 
+				{
+					vx = new Vec3(wall.attributes.x).scale(-wall.attributes.width);
+					vy = new Vec3(wall.attributes.y).scale(wall.attributes.height);
+					O = new Vec3(wall.attributes.origin);
+					n  = new Vec3(wall.attributes.x).cross(new Vec3(wall.attributes.y));
+					v0 = O.add(vx.scale(-1)).add(n.scale(2));
+					v1 = O.add(n.scale(2));
+					v2 = O.add(vy).add(n.scale(2));
+					v3 = O.add(vx.scale(-1)).add(vy).add(n.scale(2));
+				} else {
+					O = new Vec3(wall.attributes.origin);
+					vx = new Vec3(wall.attributes.x).scale(wall.attributes.width);
+					vy = new Vec3(wall.attributes.y).scale(wall.attributes.height);
+					n  = new Vec3(wall.attributes.x).cross(new Vec3(wall.attributes.y));
+					v0 = O.add(n.scale(2));
+					v1 = O.add(vx).add(n.scale(2));
+					v2 = O.add(vx).add(vy).add(n.scale(2));
+					v3 = O.add(vy).add(n.scale(2));
+				}
 
 				var newwall = new IndexedSet();
 				newwall.addVertex(v0, n);
@@ -218,10 +251,13 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 
 				WALLS[wall.attributes.id] = {
 					"O" : O,
-					"X" : new Vec3(wall.attributes.x),
+					"X" : (CCW ? new Vec3(wall.attributes.x).scale(-1.0) : Vec3(wall.attributes.x)),
 					"Y" : new Vec3(wall.attributes.y),
-					"N"  : n
+					"N" : n,
+					"W" : wall.attributes.width,
+					"H" : wall.attributes.height
 				};
+				console.log(wall.attributes.id +  " : " + WALLS[wall.attributes.id]);
 			}
 
 			// create floor face: triangulate
@@ -255,16 +291,17 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 				default:
 					console.log('unknown opening symbol: ' + JSON.stringify(S));
 			}
-			G.addSymbol(wall, S);
+			G.addSymbol(wall, S, false, CCW);
 		}
 	}
 	console.log("creating detections");
+
 	// detections: sockets and switches
 	for (var i=0;i<session.Sockets.length; ++i) {
 		var socket = session.Sockets[i];
 		if (socket.attributes.wallid in WALLS) {
 			var wall = WALLS[socket.attributes.wallid];
-			SKT.addSymbol(wall, socket, true);
+			SKT.addSymbol(wall, socket, true, CCW);
 		} else {
 			console.log('wall ' + socket.attributes.wallid + ' not in filtered wall set of socket ' + JSON.stringify(socket) );
 		}
@@ -273,7 +310,7 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 		var swt= session.Switches[i];
 		if (swt.attributes.wallid in WALLS) {
 			var wall = WALLS[swt.attributes.wallid];
-			SWI.addSymbol(wall, swt, true);
+			SWI.addSymbol(wall, swt, true, CCW);
 		} else {
 			console.log('wall ' + swt.attributes.wallid + ' not in filtered wall set of switch ' + JSON.stringify(swt) );
 		}
@@ -333,7 +370,12 @@ Rise2X3D.prototype.rooms2x3d = function(rooms, powerlines, walljson, texturepath
 	    	index = index + 1;
 	    };
 	    var transform3D = function(wall, vertex) {
-	    	return wall.O.add( wall.X.scale(vertex.x) ).add( wall.Y.scale(vertex.y) ).add( wall.N.scale(-10.0) );
+	    	var O = wall.O;
+	    	if (CCW) {
+	    		O = O.add(wall.X.scale(-wall.W));
+	    	}
+	    	var result = O.add( wall.X.scale(vertex.x) ).add( wall.Y.scale(vertex.y) ).add( wall.N.scale(-10.0) );
+	    	return result;
 	    }
 
 	    for (e in powerlines.E) {
