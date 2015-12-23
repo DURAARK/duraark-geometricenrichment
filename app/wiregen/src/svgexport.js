@@ -86,6 +86,9 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
                 case "vgroup":
                     result[att.wallid] += util.format('<rect x="%d" y="%d" width="%d" height="%d" style="fill:none;stroke-width:3;stroke:rgb(200,200,0)" />\n', att.left * s, att.top * s, att.width * s, att.height * s);
                     break;
+                case "hgroup":
+                    result[att.wallid] += util.format('<rect x="%d" y="%d" width="%d" height="%d" style="fill:none;stroke-width:3;stroke:rgb(200,0,200)" />\n', att.left * s, att.top * s, att.width * s, att.height * s);
+                    break;
             }
         }
     });

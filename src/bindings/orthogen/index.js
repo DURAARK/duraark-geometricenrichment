@@ -37,6 +37,7 @@ Orthogen.prototype.createOrthoImages = function(session) {
       '--align', 'panoalign',
       '--output', session.basename,
       '--exgeom', '1',
+      '--exsphere', '1',
       '--ccw', '0'
     ];
     if (session.config.orthogen.args) {

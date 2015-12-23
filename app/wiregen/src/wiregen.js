@@ -111,6 +111,7 @@ var numSockets = 0;
 var numSwitches = 0;
 var numWalls = 0;
 var WALLS = {};
+var TSYMBS = {};
 
 TerminalSymbols.forEach(function (t) {
     if (t.label == "wall") {
@@ -121,21 +122,14 @@ TerminalSymbols.forEach(function (t) {
     if (t.label == "socket") numSockets = numSockets + 1;
     if (t.label == "switch") numSwitches = numSwitches + 1;
     //if (t.label == "vgroup") console.log("vgroup height:" + t.attributes.height);
+    // count symbols
+    if (!TSYMBS[t.label]) TSYMBS[t.label] = [];
+    TSYMBS[t.label].push(t);
 });
 
-for (var w in WALLS) {
-    if (w == "wall0") {
-        var wall = WALLS[w];
-        console.log("######### WALL:" + w);
-        TerminalSymbols.forEach(function (s) {
-            if (s.attributes.wallid == w) {
-                console.log(JSON.stringify({ 'label': s.label, 'left': s.attributes.left }));
-            }
-        });
-    }
+for (var label in TSYMBS) {
+    console.log(label + " : " + TSYMBS[label].length + " symbols.");
 }
-
-
 
 //for (var w in WALLS) {
 //    if (w == "wall0") {
@@ -148,8 +142,7 @@ for (var w in WALLS) {
 //        });
 //    }
 //}
-
-console.log("found " + numWalls + " walls, " + numSwitches + " switches and " + numSockets + " sockets.");
+//console.log("found " + numWalls + " walls, " + numSwitches + " switches and " + numSockets + " sockets.");
 
 // get wall arrangements
 var WALLORDER = [];
