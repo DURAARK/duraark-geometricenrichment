@@ -9,6 +9,7 @@ var Orthogen = require('../../bindings/orthogen/index'),
   Elecdetec = require('../../bindings/elecdetec/index'),
   Wiregen = require('../../bindings/wiregen/index'),
   Rise2X3D = require('../../lib/rise2x3d/index'),
+  Rise2SVG = require('../../lib/rise2svg/index'),
   Graph = require('../../../app/wiregen/src/graph'),
   uuid = require('node-uuid'),
   fs = require('fs'),
@@ -758,6 +759,20 @@ module.exports = {
     }
     ).status(200);
   
+  },
+
+  // with GET
+  getFloorplandata: function(req, res, next)
+  {
+    var rise2x3d = new Rise2X3D(),
+        rise2svg = new Rise2SVG();
+    var session = prepareSession(req.query.e57master);
+    var roomId = req.body.roomId;
+    var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
+    var rooms = rise2x3d.parseRooms(walljson, roomId);
+    
+    var floorplandata = rise2svg.getFloorplan(rooms);
+    res.send(floorplandata).status(200);
   }
 
-};
+}
