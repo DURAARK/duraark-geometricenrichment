@@ -767,7 +767,7 @@ module.exports = {
     var rise2x3d = new Rise2X3D(),
         rise2svg = new Rise2SVG();
     var session = prepareSession(req.query.e57master);
-    var roomId = req.body.roomId;
+    var roomId = req.query.roomId;
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
     var rooms = rise2x3d.parseRooms(walljson, roomId);
     

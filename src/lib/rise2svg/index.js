@@ -8,7 +8,9 @@ var Rise2SVG = module.exports = function() {
 Rise2SVG.prototype.getFloorplan = function(rooms, params)
 {
   // perform a 2D projection of the floorplan
-  var ROOMS = {};
+  var ROOMS = {
+    ROOMS : []
+  };
   var totalbb = new geo2d.AABB();
   
   // extract vertices for ordered wall cycle
@@ -29,33 +31,30 @@ Rise2SVG.prototype.getFloorplan = function(rooms, params)
       totalbb.insert(v.x, v.y);
       room.points.push(v);
     }
-    
+    ROOMS.ROOMS.push(room);
+  }
+  
+  // scale points
+  var aspect = totalbb.width() / totalbb.height();
+  ROOMS.width = 500;
+  ROOMS.height = ROOMS.width / aspect;
+  var scale = function(v) {
+    v.x = (v.x - totalbb.bbmin.x) * ROOMS.width / totalbb.width();
+    v.y = ROOMS.height - ((v.y - totalbb.bbmin.y) * ROOMS.height / totalbb.height());
+  }    
+  
+  ROOMS.ROOMS.forEach(function (room)
+  {
+    for (var p in room.points) {
+      scale(room.points[p]);
+    }
     // calculate center
     var roombb = new geo2d.AABB();
     room.points.forEach(function(p) {
       roombb.insert(p.x, p.y);
     });
     room.center = roombb.center();
-    ROOMS[roomid] = room;
-  }
-  
-  // scale points
-  var aspect = totalbb.width() / totalbb.height();
-  var TARGET_WIDTH = 500;
-  var TARGET_HEIGHT = TARGET_WIDTH / aspect;
-  var scale = function(v) {
-    v.x = (v.x - totalbb.bbmin.x) * TARGET_WIDTH / totalbb.width();
-    v.y = TARGET_HEIGHT - ((v.y - totalbb.bbmin.y) * TARGET_HEIGHT / totalbb.height());
-  }    
-  
-  for(roomid in ROOMS) 
-  {
-    var room = ROOMS[roomid];
-    for (var p in room.points) {
-      scale(room.points[p]);
-    }
-    scale(room.center);
-  }
+  });
   
   return ROOMS;
 };
