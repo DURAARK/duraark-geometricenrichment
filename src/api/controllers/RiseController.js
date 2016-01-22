@@ -640,9 +640,11 @@ module.exports = {
         WALLS.push(walljson.Walls[i].attributes.id);
       }
 
-      for (var i=0; i<WALLS.length; ++i)
+      //for (var i=0; i<WALLS.length; ++i)
+
       {
-        var wallid = WALLS[i];      
+        //var wallid = WALLS[i];      
+        wallid = "wall12";
         console.log('###################### testing ' + wallid);
         var match_gt = {};
         var match_d  = {};
@@ -657,6 +659,8 @@ module.exports = {
 
             var A = g.attributes;
             var B = d.attributes;
+            console.log('A:' + JSON.stringify(A));
+            console.log('B:' + JSON.stringify(B));
             // detect overlap
             var left = Math.max(A.left, B.left);
             var top  = Math.max(A.top, B.top);
@@ -664,16 +668,18 @@ module.exports = {
             var bottom = Math.min(A.top+A.height, B.top+B.height);
             var areaA = A.width*A.height;
             var areaB = B.width*B.height;
-            //console.log('test area similarity: ' + Math.abs(areaA/areaB - 1.0));
+            console.log('test area similarity: ' + Math.abs(areaA/areaB - 1.0));
             if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.2 )
             {
               var area = (right-left) * (bottom-top);
-                //console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
-                // + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
-                //console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
+                console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
+                 + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
+                console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
+                console.log('overlap: ' + (area / areaA))
+
               if ((area / areaA) >= 0.9)
               {
-                //console.log((area / areaA) + ' => match!');
+                console.log((area / areaA) + ' => match!');
                 match_gt[i_gt] = '1';
                 match_d[i_d]   = '1';
               }
@@ -726,13 +732,18 @@ module.exports = {
       symbol_groundtruth.Sockets.concat(symbol_groundtruth.Switches), 
       symbol_elecdetect.Sockets.concat(symbol_elecdetect.Switches)
       );
-    console.log('combined:' + JSON.stringify(combined));
-
-    res.send({
+    //console.log('combined:' + JSON.stringify(combined));
+    var result = {
       'Sockets': sockets,
       'Switches' : switches,
       'combined' : combined
-    }).status(200);
+    };
+    for (var category in result)
+    {
+      var e=result[category];
+      console.log( category + " :  M:" + e.match + " FP: " + e.false_positive + " FN:" + e.false_negative);
+    }
+    res.send(result).status(200);
   },
 
   getWireLength: function(req, res, next)

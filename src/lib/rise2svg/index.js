@@ -4,7 +4,6 @@ var geo2d = require('./geo2d');
 var Rise2SVG = module.exports = function() {
 };
 
-// params: { width: x, height: y, 
 Rise2SVG.prototype.getFloorplan = function(rooms, params)
 {
   // perform a 2D projection of the floorplan
@@ -12,7 +11,7 @@ Rise2SVG.prototype.getFloorplan = function(rooms, params)
     ROOMS : []
   };
   var totalbb = new geo2d.AABB();
-  
+  params = params ? params : { };
   // extract vertices for ordered wall cycle
   for (var roomid in rooms)
   {
@@ -36,7 +35,7 @@ Rise2SVG.prototype.getFloorplan = function(rooms, params)
   
   // scale points
   var aspect = totalbb.width() / totalbb.height();
-  ROOMS.width = 500;
+  ROOMS.width = params.width ? params.width : 500;
   ROOMS.height = ROOMS.width / aspect;
   var scale = function(v) {
     v.x = (v.x - totalbb.bbmin.x) * ROOMS.width / totalbb.width();
