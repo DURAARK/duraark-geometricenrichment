@@ -491,8 +491,9 @@ module.exports = {
     var rise2x3d = new Rise2X3D();
 
     var session = prepareSession(req.body.e57master);
+    var roomid  = req.body.roomid;
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-    var rooms = rise2x3d.parseRooms(walljson);
+    var rooms = rise2x3d.parseRooms(walljson, roomid);
     // parse hypothesis power line graph
     var powerlines = new Graph.Graph(JSON.parse(fs.readFileSync(session.wiregenHypothesisGraph, "utf8")));
 
