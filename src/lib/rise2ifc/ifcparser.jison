@@ -1,132 +1,173 @@
 
-/* simple step parser */
+/* simple jison parser for ISO 10303-21 
+   http://www.steptools.com/library/standard/p21e3_dis_paris.html
+*/
 
 /* lexical grammar */
 %lex
 
-DecimalDigit [0-9]
-DecimalDigits [0-9]+
-NonZeroDigit [1-9]
-OctalDigit [0-7]
-HexDigit [0-9a-fA-F]
-IdentifierStart [$_a-zA-Z]|("\\"[u]{HexDigit}{4})
-IdentifierPart {UnicodeIdentifierPart}|[0-9]
-Identifier {IdentifierStart}{IdentifierPart}*
-ExponentIndicator [eE]
-SignedInteger [+-]?[0-9]+
-DecimalIntegerLiteral [0]|({NonZeroDigit}{DecimalDigits}*)
-ExponentPart {ExponentIndicator}{SignedInteger}
-OctalIntegerLiteral [0]{OctalDigit}+
-HexIntegerLiteral [0][xX]{HexDigit}+
-DecimalLiteral ({DecimalIntegerLiteral}\.{DecimalDigits}*{ExponentPart}?)|(\.{DecimalDigits}{ExponentPart}?)|({DecimalIntegerLiteral}{ExponentPart}?)
-LineContinuation \\(\r\n|\r|\n)
-OctalEscapeSequence (?:[1-7][0-7]{0,2}|[0-7]{2,3})
-HexEscapeSequence [x]{HexDigit}{2}
-UnicodeEscapeSequence [u]{HexDigit}{4}
-SingleEscapeCharacter [\'\"\\bfnrtv]
-NonEscapeCharacter [^\'\"\\bfnrtv0-9xu]
-CharacterEscapeSequence {SingleEscapeCharacter}|{NonEscapeCharacter}
-EscapeSequence {CharacterEscapeSequence}|{OctalEscapeSequence}|{HexEscapeSequence}|{UnicodeEscapeSequence}
-DoubleStringCharacter ([^\"\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
-SingleStringCharacter ([^\'\\\n\r]+)|(\\{EscapeSequence})|{LineContinuation}
-StringLiteral (\"{DoubleStringCharacter}*\")|(\'{SingleStringCharacter}*\')
+/* token matches */
 
+Space " "
+Digit [0-9]
+Lower [a-z]
+Upper [A-Z_]
+UpperOrDigit {Upper}|{Digit}
+UpperOrLower {Upper}|{Lower}
+UpperOrLowerOrDigit {Upper}|{Lower}|{Digit}
+Special [\!\"\*\$\%\&\.\#\+\,\-\(\)\=\/\:\;\<\=\>\@\[\]\{\|\}\^\]\`\~]
+
+Keyword {UserDefinedKeyword}|{StandardKeyword}
+KeywordPart {Upper}|{Digit}
+UserDefinedKeyword \!{Upper}{KeywordPart}*
+StandardKeyword {Upper}{KeywordPart}*
+Sign [+-]
+Real [+-]?[0-9]+"."[0-9]*{Exponent}?
+Integer {Sign}?{Digit}+
+Exponent "E"[+-]?[0-9]+
+
+StringCharacter {Digit}|{Space}|{Lower}|{Upper}|{Special}|\\\\|\'\'
+/* String \'{StringCharacter}*\' */
+String \'[^\']*\'
+EntityName "#"[0-9]+
+ValueName "@"[0-9]+
+InstanceName {EntityName}|{ValueName}
+
+
+ObjectIdentifier "{"{UpperOrLowerOrDigit}*"}"
+ExpressConstant {Upper}{UpperOrDigit}*{ObjectIdentifier}*"."{Upper}{UpperOrDigit}*
+AnchorName "TODO"
+Resource "TODO"
+TagName UpperOrLower{UpperOrLowerOrDigit}*
+Enumeration "."{Upper}{UpperOrDigit}*"."
+HexDigit [0-9A-F]
+Binary  \"[0-3]{HexDigit}\"
 
 %%
 /* token types */
 
 \s+                    /* skip whitespace */
 
-/* comment */
-"//".*($|\r\n|\r|\n)  %{
-                          if (yytext.match(/\r|\n/)) {
-                              parser.newLine = true;
-                          }
-                      %}
+"ISO-10303-21;"        return "BEGIN_TOKEN";
+"END-ISO-10303-21;"    return "END_TOKEN";
+"ENDSEC;"              return "END_SECTION";
+"HEADER;"              return "BEGIN_HEADER";
+"ANCHOR;"              return "BEGIN_ANCHOR";
+"REFERENCE;"           return "BEGIN_REFERENCE";
+"DATA"                 return "BEGIN_DATA";
 
-/* header entities */
-"FILE_DESCRIPTION"     return "FILE_DESCRIPTION";
-"FILE_NAME"            return "FILE_NAME";
-"FILE_SCHEMA"          return "FILE_SCHEMA";
+{Keyword}              return "KEYWORD";
+{EntityName}           return "ENTITY_NAME";
+{Real}                 return "REAL";
+{Integer}              return "INTEGER";
+{Enumeration}          return "ENUMERATION";
+{String}               return "STRING";
+{Binary}               return "BINARY";
 
-"FILE_POPULATION"      return "FILE_POPULATION";
-"SECTION_LANGUAGE"     return "SECTION_LANGUAGE";
-"SECTION_CONTEXT"      return "SECTION_CONTEXT";
-
-{StringLiteral}        return "STRING_LITERAL";
-"ISO-10303-21"         return 'STEPID';
-"HEADER"               return 'HEADERMARK';
-"DATA"                 return 'DATAMARK';
-"ENDSEC"               return 'ENDSEC';
-";"                    return 'ENDSTATEMENT';
-"\n"                   return 'ENDLINE';
-{DecimalLiteral}       return "NUMERIC_LITERAL";
-{HexIntegerLiteral}    return "NUMERIC_LITERAL";
-{OctalIntegerLiteral}  return "NUMERIC_LITERAL";
-<<EOF>>                return 'EOF'
-"#"                    return 'HASH';
-"="                    return 'EQUAL';
 "("                    return "(";
 ")"                    return ")";
 ","                    return ",";
-"$"                    return "DOLLAR";
-"."                    return "DOT";
-"*"                    return "STAR";
-{Identifier}           return "IDENTIFIER";
+";"                    return ";";
+"*"                    return "*";
+"="                    return "=";
+"$"                    return "$";
 
 /lex
 
 /* operator associations and precedence */
 
-%start ifcstart
+%start exchange_file
 
 %% /* language grammar */
 
-ifcstart :
-  STEPID ENDSTATEMENT ifcheader ifcdata EOF;
+exchange_file : 
+    BEGIN_TOKEN
+    header_section 
+    anchor_section 
+    reference_section 
+    data_section
+    END_TOKEN;
 
-ifcheader :
-  HEADERMARK ENDSTATEMENT headerlines ENDSEC ENDSTATEMENT;
 
-ifcdata : 
-  DATAMARK ENDSTATEMENT datalines ENDSEC ENDSTATEMENT;
+/* --------------------------------------------------- PARAMETERS */
 
-parameter :
-  STRING_LITERAL 
-  | "(" STRING_LITERAL ")" 
-  | "(" ")" 
-  | NUMERIC_LITERAL 
-  | DOLLAR 
-  | STAR
-  | HASH NUMERIC_LITERAL
-  | DOT IDENTIFIER DOT
-  | IDENTIFIER parameters
-  | parameters
-  ;
+parameter_list: /* parameter_list can be empty */
+          | parameter_list2;
+parameter_list2 : parameter | parameter_list2 "," parameter;
 
-parameterlist :
-  parameter | parameterlist "," parameter;
+parameter : typed_parameter 
+          | untyped_parameter 
+          | omitted_parameter;
 
-parameters : 
-  "(" parameterlist ")" ;
+typed_parameter: KEYWORD "(" parameter ")";
 
-headerlines :
-/* header structure is fixed */
-  FILE_DESCRIPTION parameters ENDSTATEMENT
-  FILE_NAME parameters ENDSTATEMENT
-  FILE_SCHEMA parameters ENDSTATEMENT
-  |
-  FILE_DESCRIPTION parameters ENDSTATEMENT
-  FILE_NAME parameters ENDSTATEMENT
-  FILE_SCHEMA parameters ENDSTATEMENT
-  FILE_POPULATION parameters ENDSTATEMENT
-  SECTION_LANGUAGE parameters ENDSTATEMENT
-  SECTION_CONTEXT parameters ENDSTATEMENT;
+untyped_parameter: "$" 
+                 | INTEGER
+                 | REAL
+                 | STRING
+                 | ENTITY_NAME
+                 | ENUMERATION
+                 | BINARY
+                 | "(" parameter_list ")";
+                 
+omitted_parameter: "*";
 
-dataline :
-  HASH NUMERIC_LITERAL EQUAL IDENTIFIER parameters ENDSTATEMENT;
+/* --------------------------------------------------- HEADER SECTION */
+
+header_section : /* header section can be optional */
+  header | ;
+
+header : BEGIN_HEADER 
+         header_entity header_entity header_entity
+         header_entity_list
+         END_SECTION;
+
+header_entity_list : /* can be empty */
+        | header_entity_list1;
+        
+header_entity_list1:
+        header_entity |
+        header_entity_list1 header_entity;
+
+header_entity : 
+        KEYWORD "(" parameter_list ")" ";";
+
+/* --------------------------------------------------- DATA SECTION */
+
+data_section : 
+    BEGIN_DATA  
+    parameter_list ";"
+    entity_instance_list
+    END_SECTION;
+
+entity_instance_list: /* can be empty */
+  | entity_instance_list1;
+
+entity_instance_list1 : 
+    entity_instance 
+  | entity_instance_list1 entity_instance;
+
+entity_instance: 
+    simple_entity_instance 
+  | complex_entity_instance;
+
+simple_entity_instance : 
+    ENTITY_NAME "=" simple_record ";";
+
+complex_entity_instance :
+    ENTITY_NAME "=" subsuper_record ";";
+
+simple_record :
+    KEYWORD "(" parameter_list ")";
+
+subsuper_record :
+    "(" simple_record_list ")";
+    
+simple_record_list :
+    simple_record
+  | simple_record_list simple_record;
   
-datalines :
-  dataline |
-  datalines dataline;
+/* --------------------------------------------------- NOT IMPLEMENTED YET */
 
+anchor_section : ;
+reference_section : ;
