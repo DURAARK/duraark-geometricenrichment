@@ -1,6 +1,8 @@
 
 /* simple jison parser for ISO 10303-21 
    http://www.steptools.com/library/standard/p21e3_dis_paris.html
+   
+   2016-02 : initial version ulrich.krispel@fraunhofer.at
 */
 
 /* lexical grammar */
@@ -86,7 +88,16 @@ exchange_file :
     anchor_section 
     reference_section 
     data_section
-    END_TOKEN;
+    END_TOKEN 
+    {
+      var result = {};
+      result.HEADER = $2;
+      result.ANCHOR = $3;
+      result.REFERENCE = $4;
+      result.DATA = $5;
+      $$=result; 
+    }
+    ;
 
 
 /* --------------------------------------------------- PARAMETERS */
@@ -143,14 +154,20 @@ data_section :
     BEGIN_DATA  
     parameter_list ";"
     entity_instance_list
-    END_SECTION;
+    END_SECTION { return $4; } ;
 
 entity_instance_list: /* can be empty */
   | entity_instance_list1;
 
 entity_instance_list1 : 
-    entity_instance 
-  | entity_instance_list1 entity_instance;
+    entity_instance                       { var result={};
+                                            result[$1[0]] = $1[1];
+                                            $$=result;
+                                          }
+  | entity_instance_list1 entity_instance { var obj = $1;
+                                            obj[$2[0]] = $2[1];
+                                            $$=obj;
+                                          };
 
 entity_instance: 
     simple_entity_instance 
@@ -158,9 +175,8 @@ entity_instance:
 
 simple_entity_instance : 
     ENTITY_NAME "=" simple_record ";" 
-    { console.log("entity:" + $1 + " value:" + JSON.stringify($3)); 
-      DATA[$1] = $3;
-    } ;
+    { $$ = [ $1, $3 ]; }
+    ;
 
 complex_entity_instance :
     ENTITY_NAME "=" subsuper_record ";";
