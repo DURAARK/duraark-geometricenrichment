@@ -45,20 +45,20 @@ function prepareSession(e57master) {
   // read config and set default values if necessary
   console.log("loading config " + session.configFile);
   var hasConfig=false;
-  try 
+  try
   {
     hasConfig = fs.lstatSync(session.configFile).isFile();
   } catch (err) { }
   if (hasConfig) {
     session.config = JSON.parse(fs.readFileSync(session.configFile, "utf8"));
-  } 
+  }
   if (!session.config) { session.config = {}; }
   if (!session.config.orthogen)   { session.config["orthogen"]   = {}; }
   if (!session.config.elecdetect) { session.config["elecdetect"] = {}; }
   if (!session.config.elecdetect.ini) {
     session.config.elecdetect["ini"] = new Elecdetec().defaultConfig();
   }
-  if (!session.config.wiregen) { session.config["wiregen"] = { 
+  if (!session.config.wiregen) { session.config["wiregen"] = {
     "ccw": true,
     "wiregenGrammar": "grammar-nygade.json"
   }; }
@@ -87,11 +87,11 @@ function createOrthoLowRes(session) {
   files.forEach(function(oldFile) {
     if (path.extname(oldFile) == '.jpg') {
       var destFile = path.join('lowres', path.basename(oldFile));
-      console.log(JSON.stringify({
-        src: oldFile,
-        dst: destFile,
-        width: 500
-      }));
+      // console.log(JSON.stringify({
+      //   src: oldFile,
+      //   dst: destFile,
+      //   width: 500
+      // }));
       promises.push(easyimage.resize({
         src: oldFile,
         dst: destFile,
@@ -176,7 +176,7 @@ function startWiregen(session) {
 
 function createInputSymbolList(session) {
 
-  return new Promise(function(resolve, reject) {    
+  return new Promise(function(resolve, reject) {
     try {
 
       console.log('[SessionController::create Flat List]');
@@ -390,7 +390,7 @@ module.exports = {
 
   startWiregen: function(req, res, next) {
     var session = prepareSession(req.body.e57master);
-    session.useGroundtruth = req.body.useGroundtruth;    
+    session.useGroundtruth = req.body.useGroundtruth;
     //console.log(session);
     console.time('Wiregen');
     startWiregen(session).then(function(argument) {
@@ -476,7 +476,7 @@ module.exports = {
         roomdata.rise.hypothesis.walls.push(httpbase + "/tools/rise/wiregen/output/svg_hypothesis/" + wallid + ".svg");
       }
 
-      console.log(JSON.stringify(roomdata, null, 4));
+      // console.log(JSON.stringify(roomdata, null, 4));
 
       res.send(roomdata).status(200);
     } else {
@@ -506,7 +506,7 @@ module.exports = {
       var texture_path = session.basename + "_";
       // get X3D
       var x3dcontent = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
-        texture_path, session);      
+        texture_path, session);
 
       console.log('sending result');
       res.send(x3dcontent).status(200);
@@ -521,7 +521,7 @@ module.exports = {
 
     console.log('[roomInfo] GET /roomInfo file: ' + file + ' | roomId: ' + roomId);
 
-    if (!file )//|| !roomId) 
+    if (!file )//|| !roomId)
     {
       console.error('[roomInfo] Error: Please provide a "file" and a "roomId" parameter!')
       return res.badRequest('Please provide a "file" and a "roomId" parameter!');
@@ -545,7 +545,7 @@ module.exports = {
     var wiregen = new Wiregen();
     wiregen.importDetections(session).then(function() {
 
-      console.log(JSON.stringify(session, null, 2));
+      // console.log(JSON.stringify(session, null, 2));
 
       var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise',
         'orthoresult', 'lowres', session.basename + "_");
@@ -558,7 +558,7 @@ module.exports = {
 
       //console.log('x3d: ' + x3d);
       // FIXXME: create /tmp folder if it does not exist!
-      var file = '/duraark-storage/sessions/tmp/' + uuid.v4() + '.x3d';
+      var file = '/duraark-storage/tmp/' + uuid.v4() + '.x3d';
 
       console.log('writing to file: ' + file);
 
@@ -578,7 +578,7 @@ module.exports = {
   },
 
   evaluateElecdetect: function(req, res, next)
-  {    
+  {
     var session = prepareSession(req.body.e57master);
     var wiregen = new Wiregen();
     prepareWiregen(session);
@@ -610,7 +610,7 @@ module.exports = {
       var wallIndex = function(symbols)
       {
         wi={};
-        for (var i=0; i<walljson.Walls.length; ++i) 
+        for (var i=0; i<walljson.Walls.length; ++i)
         {
           wi[walljson.Walls[i].attributes.id] = [];
         }
@@ -644,7 +644,7 @@ module.exports = {
       //for (var i=0; i<WALLS.length; ++i)
 
       {
-        //var wallid = WALLS[i];      
+        //var wallid = WALLS[i];
         wallid = "wall12";
         console.log('###################### testing ' + wallid);
         var match_gt = {};
@@ -673,7 +673,7 @@ module.exports = {
             if ( (left < right) && (top < bottom) && Math.abs(areaA/areaB - 1.0)<0.2 )
             {
               var area = (right-left) * (bottom-top);
-                console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height 
+                console.log('overlap detected: AL:' + A.left + ' AW:' + A.width + ' AT:' + A.top + ' AH' + A.height
                  + ' BL:' + B.left + ' BW:' + B.width + ' BT:' + B.top + ' BH' + B.height);
                 console.log('area a: ' + areaA + ' area b:' + areaB + ' relsize:' + Math.abs(areaA/areaB - 1.0) + ' area overlap:' + area);
                 console.log('overlap: ' + (area / areaA))
@@ -698,7 +698,7 @@ module.exports = {
         if (wall_gt[wallid])
         for (var i_gt = 0, i_gte = wall_gt[wallid].length; i_gt < i_gte; ++i_gt)
         {
-          if (match_gt[i_gt] == '1')  { result.detail[wallid].match += 1; } 
+          if (match_gt[i_gt] == '1')  { result.detail[wallid].match += 1; }
           else                        { result.detail[wallid].false_negative +=1; }  // gt but not detected
         }
 
@@ -730,7 +730,7 @@ module.exports = {
 
     console.log('============================= testing COMBINED');
     var combined = compare_category(
-      symbol_groundtruth.Sockets.concat(symbol_groundtruth.Switches), 
+      symbol_groundtruth.Sockets.concat(symbol_groundtruth.Switches),
       symbol_elecdetect.Sockets.concat(symbol_elecdetect.Switches)
       );
     //console.log('combined:' + JSON.stringify(combined));
@@ -770,7 +770,7 @@ module.exports = {
       'total_length': (total_length/1000.0)
     }
     ).status(200);
-  
+
   },
 
   // with GET
@@ -782,7 +782,7 @@ module.exports = {
     var roomId = req.query.roomId;
     var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
     var rooms = rise2x3d.parseRooms(walljson, roomId);
-    
+
     var floorplandata = rise2svg.getFloorplan(rooms);
     res.send(floorplandata).status(200);
   }

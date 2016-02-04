@@ -4,7 +4,7 @@ var spawn = require('child_process').spawn,
   fs = require('fs'),
   xml2js = require('xml2js');
 
-function importGroundtruthSymbols(session) 
+function importGroundtruthSymbols(session)
 {
   var symbols = {
     'Sockets'  : [],
@@ -20,18 +20,18 @@ function importGroundtruthSymbols(session)
   console.log('[Wiregen::importGroundtruth]       HFLIP:'+HFLIP);
 
   var walljson = JSON.parse(fs.readFileSync(session.wallfile, "utf8"));
-  for (var i=0; i<walljson.Walls.length; ++i) 
+  for (var i=0; i<walljson.Walls.length; ++i)
   {
       var xmlparser = new xml2js.Parser();
       var wall = walljson.Walls[i];
-      var svgfilename = path.join(session.workingDir, 'groundtruth', 
+      var svgfilename = path.join(session.workingDir, 'groundtruth',
         session.basename + "_" + wall.attributes.id + ".svg");
       var hasSVG = false;
-      
-      try 
+
+      try
       {
         hasSVG = fs.lstatSync(svgfilename).isFile();
-      } catch (err) { 
+      } catch (err) {
         console.log('file ' + svgfilename + ' could not be opened.');
       }
 
@@ -39,17 +39,17 @@ function importGroundtruthSymbols(session)
       {
         var svgxml = fs.readFileSync(svgfilename);
 
-        xmlparser.parseString(svgxml,function(err, svg) 
+        xmlparser.parseString(svgxml,function(err, svg)
         {
           if (err) {
             console.log('could not parse SVG XML:' + svgfilename);
           }
-          else 
+          else
           {
             //console.log(JSON.stringify(svg,null,2));
             var WIDTH = Number(svg.svg.$.width);
             var HEIGHT = Number(svg.svg.$.height);
-            if (svg.svg.rect) 
+            if (svg.svg.rect)
             {
               for (j=0; j<svg.svg.rect.length; ++j)
               {
@@ -107,9 +107,9 @@ function importGroundtruthSymbols(session)
       }
     }
   return symbols;
-} 
+}
 
-function importElecdetectSymbols(session) 
+function importElecdetectSymbols(session)
 {
   console.log('[Wiregen::importDetections]');
   var symbols = {
@@ -118,9 +118,9 @@ function importElecdetectSymbols(session)
     'Roots'    : []
   };
 
-  _.forEach(session.elecDetecResultImages, function(n) 
+  _.forEach(session.elecDetecResultImages, function(n)
   {
-    if (n.file.substr(-4) === '.xml') 
+    if (n.file.substr(-4) === '.xml')
     {
       var f = path.join(session.elecdetecResults, n.file);
       console.log('importing from ' + f);
@@ -131,11 +131,12 @@ function importElecdetectSymbols(session)
         if (err) {
           console.log('could not parse XML: ' + f);
         } else {
-          for (var position in result.Image.Object) 
+          for (var position in result.Image.Object)
           {
             var object = result.Image.Object[position];
             var attr = object.boundingbox[0].$;
-            var wallid = path.basename(result.Image.$.file, '.jpg').substring(session.basename.length+1);
+            // FIXXME: this is very fragile and will lead to errors when the file structure changes!
+            var wallid = result.Image.$.file.split(session.basename + '_').pop().replace('.jpg', '');
 
             var item = {
               "attributes": {
@@ -177,12 +178,12 @@ Wiregen.prototype.importDetections = function(session) {
     session.Switches = [];
 
     var symbols;
-   
+
     if (session.useGroundtruth)
     {
       symbols = importGroundtruthSymbols(session);
-    } 
-    else 
+    }
+    else
     {
       symbols = importElecdetectSymbols(session);
     }
@@ -195,7 +196,7 @@ Wiregen.prototype.importDetections = function(session) {
     // append any roots from config
     if (session.config.wiregen.roots) {
       session.Roots = session.Roots.concat(session.config.wiregen.roots);
-    } 
+    }
     console.log(session.Sockets.length + " sockets");
     console.log(session.Switches.length + " switches");
     console.log(session.Roots.length + " roots");
@@ -222,7 +223,7 @@ Wiregen.prototype.createWiregenImages = function(session) {
 
     process.chdir(session.wiregenExecutable);
 
-    var args = ['-i', session.wireGenFile, 
+    var args = ['-i', session.wireGenFile,
                 '-o', session.wireGenOutput,
                 '-g', session.wiregenGrammar,
                 '-p', session.basename,
