@@ -93,7 +93,12 @@ exchange_file :
 
 parameter_list: /* parameter_list can be empty */
           | parameter_list2;
-parameter_list2 : parameter | parameter_list2 "," parameter;
+parameter_list2 : 
+    parameter 
+    { $$ = []; $$.push($1); }
+  | parameter_list2 "," parameter 
+    { $$.push($3); }
+  ;
 
 parameter : typed_parameter 
           | untyped_parameter 
@@ -108,7 +113,7 @@ untyped_parameter: "$"
                  | ENTITY_NAME
                  | ENUMERATION
                  | BINARY
-                 | "(" parameter_list ")";
+                 | "(" parameter_list ")" { $$ = $2; };
                  
 omitted_parameter: "*";
 
@@ -152,13 +157,19 @@ entity_instance:
   | complex_entity_instance;
 
 simple_entity_instance : 
-    ENTITY_NAME "=" simple_record ";";
+    ENTITY_NAME "=" simple_record ";" 
+    { console.log("entity:" + $1 + " value:" + JSON.stringify($3)); 
+      DATA[$1] = $3;
+    } ;
 
 complex_entity_instance :
     ENTITY_NAME "=" subsuper_record ";";
 
 simple_record :
-    KEYWORD "(" parameter_list ")";
+    KEYWORD "(" parameter_list ")" 
+    { $$={};
+      $$[$1] = $3;
+    };
 
 subsuper_record :
     "(" simple_record_list ")";

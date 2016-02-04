@@ -39,7 +39,7 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
     // initialize wall svgs
     WALLS.forEach(function (symbol) {
         var att = symbol.attributes;
-        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', att.width * s, att.height * s);
+        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink">\n', att.width * s, att.height * s);
         
         if (imgprefix) {
             result[att.id] += util.format('<image xlink:href="%s_%s.jpg" y="0" width="%d" height="%d"', imgprefix, att.id, att.width * s, att.height * s);

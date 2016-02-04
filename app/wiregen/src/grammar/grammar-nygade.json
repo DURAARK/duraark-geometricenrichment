@@ -50,7 +50,7 @@
   "ROOT" : [
     { "rhs" :
       [ 
-        { "label" : "root" , "attributes" : { "root":"true" } }
+        { "label" : "root" , "attributes" : { "endpoint" : "true", "root":"true" } }
       ]
     }
   ],
