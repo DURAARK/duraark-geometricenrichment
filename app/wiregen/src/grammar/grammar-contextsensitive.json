@@ -89,7 +89,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.width(),BBA.width())<15) && (DIFF(group.width(),BBB.width())<15) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "VGROUP",
@@ -131,7 +131,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.height(),BBA.height())<15) && (DIFF(group.height(),BBB.height())<15) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.height(),BBA.height())<5) && (DIFF(group.height(),BBB.height())<5) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "HGROUP",
@@ -176,7 +176,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.width(),BBA.width())<15) && (DIFF(group.width(),BBB.width())<15) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "VGROUP",
@@ -218,7 +218,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.height(),BBA.height())<15) && (DIFF(group.height(),BBB.height())<15) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.height(),BBA.height())<5) && (DIFF(group.height(),BBB.height())<5) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "HGROUP",
@@ -263,7 +263,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.width(),BBA.width())<15) && (DIFF(group.width(),BBB.width())<15) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "VGROUP",
@@ -296,7 +296,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.height(),BBA.height())<15) && (DIFF(group.height(),BBB.height())<15) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.height(),BBA.height())<5) && (DIFF(group.height(),BBB.height())<5) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "HGROUP",
@@ -330,7 +330,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.width(),BBA.width())<15) && (DIFF(group.width(),BBB.width())<15) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "VGROUP",
@@ -364,7 +364,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.height(),BBA.height())<15) && (DIFF(group.height(),BBB.height())<15) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.height(),BBA.height())<5) && (DIFF(group.height(),BBB.height())<5) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "HGROUP",
@@ -398,7 +398,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.width(),BBA.width())<15) && (DIFF(group.width(),BBB.width())<15) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.width(),BBA.width())<5) && (DIFF(group.width(),BBB.width())<5) && ( group.height() < (BBA.height()+BBB.height()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "VGROUP",
@@ -421,7 +421,7 @@
         "BBB"   : "BB(B)",
         "group" : "BB(A).insertBB(BBB)" 
       },
-      "condition" : "(DIFF(group.height(),BBA.height())<15) && (DIFF(group.height(),BBB.height())<15) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
+      "condition" : "(DIFF(group.height(),BBA.height())<5) && (DIFF(group.height(),BBB.height())<5) && ( group.width() < (BBA.width()+BBB.width()+50)) && (A.wallid==B.wallid)",
       "rhs" : [
         {
           "label" : "HGROUP",
