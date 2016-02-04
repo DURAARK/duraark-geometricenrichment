@@ -10,7 +10,7 @@ var vec = require('./vec');
 function ExportTerminalsToSVG(symbols, imgprefix, flip)
 {
     var s = 0.1;    // scale
-    
+
     var result = {};
     var resultbb = {};
     var WALLS = [];
@@ -24,7 +24,7 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
                 resultbb[att.wallid] = new vec.AABB();
             }
             resultbb[att.wallid].insert(att.left, att.top);
-            resultbb[att.wallid].insert(att.left + att.width, att.top + att.height);            
+            resultbb[att.wallid].insert(att.left + att.width, att.top + att.height);
         }
         if (symbol.label == "wall") {
             WALLS.push(symbol);
@@ -35,12 +35,12 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
             resultbb[att.id].insert(att.left + att.width, att.top + att.height);
         }
     });
-    
+
     // initialize wall svgs
     WALLS.forEach(function (symbol) {
         var att = symbol.attributes;
-        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg">\n', att.width * s, att.height * s);
-        
+        result[att.id] = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n', att.width * s, att.height * s);
+
         if (imgprefix) {
             result[att.id] += util.format('<image xlink:href="%s_%s.jpg" y="0" width="%d" height="%d"', imgprefix, att.id, att.width * s, att.height * s);
             if (flip==true || flip=="true") {
@@ -48,7 +48,7 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
             } else {
                 result[att.id] += ' x="0" ';
             }
-            
+
             result[att.id] += ' />\n';
         } else {
             result[att.id] += util.format('<rect width="%d" height="%d" style="fill:rgb(240,240,240);stroke-width:3;stroke:rgb(0,0,0)" />\n', resultbb[att.id].width() * s, resultbb[att.id].height() * s);
@@ -92,18 +92,18 @@ function ExportTerminalsToSVG(symbols, imgprefix, flip)
             }
         }
     });
-    
+
     WALLS.forEach(function (symbol) {
         var att = symbol.attributes;
         result[att.id] += '<text x="10" y="20" fill="black">' + att.id + '</text>'
-        result[att.id] += '</svg>\n'; 
+        result[att.id] += '</svg>\n';
     });
 
     return result;
 }
 
 
-function ExportGraphToSVG(G, wallid, bb, imgprefix, flip) 
+function ExportGraphToSVG(G, wallid, bb, imgprefix, flip)
 {
 
     var s = 0.1;    // scale
@@ -118,9 +118,9 @@ function ExportGraphToSVG(G, wallid, bb, imgprefix, flip)
             }
         }
     }
-    
+
     var result = util.format('<svg width="%s" height="%s" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n', bb.width() * s, bb.height() * s);
-    
+
     if (imgprefix) {
         result += util.format('<image xlink:href="%s_%s.jpg" y="0" width="%d" height="%d"', imgprefix, wallid, bb.width() * s, bb.height() * s);
         if (flip == true || flip == "true") {
