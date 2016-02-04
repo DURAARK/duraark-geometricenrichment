@@ -458,9 +458,15 @@ module.exports = {
           }
         }
       }
+      var CCW = true;
+      if (session.config.wiregen.ccw) {
+        CCW = session.config.wiregen.ccw;
+      }
+      var orderedwalls = Room.walls.slice();
+      if (CCW) orderedwalls.reverse();
 
-      for (i = 0; i < Room.walls.length; ++i) {
-        var wallid = Room.walls[i].attributes.id;
+      for (i = 0; i < orderedwalls.length; ++i) {
+        var wallid = orderedwalls[i].attributes.id;
         roomdata.rise.wallids.push(wallid);
 
         // FIXXME: replace!
@@ -475,6 +481,7 @@ module.exports = {
         roomdata.rise.grammar.walls.push(httpbase + "/tools/rise/wiregen/output/svg_grammar/" + wallid + ".svg");
         roomdata.rise.hypothesis.walls.push(httpbase + "/tools/rise/wiregen/output/svg_hypothesis/" + wallid + ".svg");
       }
+
 
       // console.log(JSON.stringify(roomdata, null, 4));
 
