@@ -557,7 +557,7 @@ module.exports = {
       var texture_path = path.join('/sessions/', session.basedir, 'tools', 'rise',
         'orthoresult', 'lowres', session.basename + "_");
 
-      texture_path = 'http://juliet.cgv.tugraz.at/api/v0.7/geometricenrichment' + texture_path;
+      texture_path = '/api/v0.7/geometricenrichment' + texture_path;
 
       console.log('texture path:' + texture_path)
       var x3d = rise2x3d.rooms2x3d(rooms, powerlines, walljson,
