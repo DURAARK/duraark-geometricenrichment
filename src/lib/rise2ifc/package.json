@@ -1,0 +1,19 @@
+{
+  "name": "rise2ifc",
+  "version": "1.0.0",
+  "description": "DURAARK rise2ifc",
+  "main": "ifcspf.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ulrich Krispel",
+  "license": "ISC",
+  "preferGlobal": true,
+  "bin": {
+    "ifcspf": "ifcspf.js"
+  },
+  "dependencies": {
+    "jison": "^0.4.16",
+    "node-step": "^0.0.2"
+  }
+}
