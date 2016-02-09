@@ -22,10 +22,10 @@ Preprocess.prototype.run = function(fileId) {
       // docker run --rm -v /home/user/work:/work paulhilbert/e57-processor --input /work/a.e57 --output /work/a.e57n -l 0.02
       var logText = '',
         resolution = 0.02,
-        outputFileName = path.join(dirname, '../tmp', basename.substring(0, basename.length - fileType.length)) + '.e57n';
-      args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/e57-processor', '--input', inputFileId, '--output', outputFileName, '-l', resolution];
+        outputFileName = path.join(dirname, '../tmp', basename.substring(0, basename.length - fileType.length)) + '.e57n',
+        args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/e57-processor', '--input', inputFileId, '--output', outputFileName, '-l', resolution];
 
-      console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
+      // console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
 
       var executable = spawn('docker', args);
 
@@ -43,10 +43,13 @@ Preprocess.prototype.run = function(fileId) {
         // console.log('[Preprocess-binding] child process exited with code ' + code);
 
         if (code === 0) {
-          console.log('[Preprocess::preprocess] successfully finished');
+          // console.log('[Preprocess::preprocess] successfully finished');
 
           resolve({
-            inputFileId: inputFileId
+            fileId: fileId,
+            type: 'e57',
+            processed: outputFileName,
+            resolution: resolution
           });
         } else {
           console.log('[Preprocess::convert] ERROR:\n' + logText);
@@ -58,10 +61,10 @@ Preprocess.prototype.run = function(fileId) {
       var logText = '',
         resolution = 0.02,
         objOutputPath = path.join(dirname, '../tmp/obj'),
-        ifcmeshFileName = path.join(dirname, '../tmp', basename) + '.ifcmesh'
+        ifcmeshFileName = path.join(dirname, '../tmp', basename.substring(0, basename.length - fileType.length)) + '.ifcmesh'
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/ifc-mesh-extract', '--input', inputFileId, '--output', objOutputPath, '--json', ifcmeshFileName, '-s'];
 
-      console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
+      // console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
 
       var executable = spawn('docker', args);
 
@@ -79,13 +82,16 @@ Preprocess.prototype.run = function(fileId) {
         // console.log('[Preprocess-binding] child process exited with code ' + code);
 
         if (code === 0) {
-          console.log('[Preprocess::preprocess] successfully finished');
+          // console.log('[Preprocess::preprocess] successfully finished');
 
           resolve({
-            inputFileId: inputFileId
+            fileId: fileId,
+            type: 'ifc',
+            processed: ifcmeshFileName,
+            objPath: objOutputPath
           });
         } else {
-          console.log('[Preprocess::convert] ERROR:\n' + logText);
+          console.log('[Preprocess::preprocess] ERROR:\n' + logText);
           reject(logText);
         }
       });
