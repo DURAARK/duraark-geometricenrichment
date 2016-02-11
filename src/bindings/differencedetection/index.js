@@ -15,10 +15,8 @@ var DifferenceDetectionCLI = module.exports = function(storagePath) {
 };
 
 DifferenceDetectionCLI.prototype.compare = function(config) {
-  console.log('[DifferenceDetectionCLI] fileIdA: ' + config.fileIdA);
+  console.log('[DifferenceDetectionLib] fileIdA: ' + config.fileIdA);
   console.log('                         fileIdB: ' + config.fileIdB);
-
-  // TODO: implement caching!
 
   var filesToPreprocess = [],
     that = this;

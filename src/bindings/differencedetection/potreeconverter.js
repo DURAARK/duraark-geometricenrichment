@@ -37,8 +37,12 @@ PotreeConverter.prototype.run = function(config) {
       // console.log('[PotreeConverter-binding] child process exited with code ' + code);
 
       if (code === 0) {
-        // console.log('[PotreeConverter] successfully finished');
         config.viewerUrl = path.join(config.potreeOutdir, 'examples', config.pageName) + '.html';
+
+        console.log('[PotreeConverter] successfully finished');
+        console.log('potreeOutdir: ' + config.potreeOutdir);
+        console.log('config.viewerUrl: ' + config.viewerUrl);
+
         resolve(config);
       } else {
         console.log('[PotreeConverter] ERROR:\n' + logText);

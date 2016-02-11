@@ -8,9 +8,15 @@
 module.exports = {
 
   attributes: {
-    fileIdA: 'string',
-    fileIdB: 'string',
+    fileAPath: 'string',
+    fileBPath: 'string',
+
     viewerUrl: 'string',
-    status: 'string'
+    status: 'string',
+
+    registrationRDF: 'string',
+    associationRDF: 'string',
+    differenceE57: 'string',
+    viewerUrl: 'string'
   }
 };

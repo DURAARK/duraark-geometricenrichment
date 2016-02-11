@@ -6,40 +6,142 @@
  */
 
 var DifferenceDetectionLib = require('../../bindings/differencedetection/index'),
-  duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage';
+  duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage',
+  Promise = require('bluebird');
 
 module.exports = {
   create: function(req, res, next) {
-    var options = req.body;
+    var fileIdA = req.body.fileIdA,
+      fileIdB = req.body.fileIdB,
+      restart = req.body.restart;
+
+    // restart = true;
 
     console.log('[duraark-geometricenrichment] Requesting difference detection:');
-    console.log('             fileIdA: ' + options.fileIdA);
-    console.log('             fileIdB: ' + options.fileIdB);
+    console.log('    fileIdA: ' + fileIdA);
+    console.log('    fileIdB: ' + fileIdB);
 
-    // TODO: search in cache first!
-    options.status = 'pending';
+    DifferenceDetection.findOne({
+        fileAPath: fileIdA,
+        fileBPath: fileIdB
+      })
+      .exec(function(err, diffDetectRecord) {
+        if (diffDetectRecord) {
+          if (restart) {
+            console.log('[duraark-geometricenrichment] Deleting cached entry and restarting task');
+            DifferenceDetection.destroy({
+              id: diffDetectRecord.id
+            }).then(function() {
+              startDifferenceDetection(fileIdA, fileIdB).then(function(diffDetectRecord) {
+                return res.send(diffDetectRecord).status(200);
+              }).catch(function(diffDetectRecord) {
+                // NOTE: though we are having an error here a 200 response is sent, so that the client
+                //       can display the error.
+                return res.send(diffDetectRecord).status(200);
+              });
+            });
+          } else {
+            console.log('[duraark-geometricenrichment] Returning cached entry');
+            return res.send(diffDetectRecord).status(200);
+          }
+        } else {
+          console.log('[duraark-geometricenrichment] Starting new comparison task')
 
-    DifferenceDetection.create(options).then(function(diffDetection) {
-      // TODO: schedule difference detection job!
-      console.log('[duraark-geometricenrichment] scheduled difference detection job')
-
-      var cli = new DifferenceDetectionLib(duraarkStoragePath);
-      cli.compare(diffDetection).then(function(result) {
-        diffDetection.status = 'finished';
-        diffDetection.viewerUrl = result.potreeOutdir.replace('/duraark-storage', '');
-        diffDetection.save().then(function(diffDetection) {
-          console.log('Finished difference detection (ID: %s)', diffDetection.id);
-        }).catch(function(err) {
-          console.log('Failed to save to database:\n' + err);
-        });
-      }).catch(function(err) {
-        console.log('[duraark-geometricenrichment] difference detection error:\n' + err);
-        diffDetection.status = 'error';
-        diffDetection.errorMessage = err;
-        diffDetection.save();
+          startDifferenceDetection(fileIdA, fileIdB).then(function(diffDetectRecord) {
+            return res.send(diffDetectRecord).status(200);
+          }).catch(function(diffDetectRecord) {
+            // NOTE: though we are having an error here a 200 response is sent, so that the client
+            //       can display the error.
+            return res.send(diffDetectRecord).status(200);
+          });
+        }
       });
-
-      res.send(diffDetection).status(200);
-    });
   }
-};
+}
+
+function startDifferenceDetection(fileIdA, fileIdB) {
+  return new Promise(function(resolve, reject) {
+    DifferenceDetection.create({
+      fileAPath: fileIdA,
+      fileBPath: fileIdB,
+    }).exec(function(err, diffDetectRecord) {
+      if (err) {
+        throw new Error('ERROR creating difference detection instance');
+      }
+
+      var preprocessingTasks = [];
+      preprocessingTasks.push(preprocessFile(fileIdA));
+      preprocessingTasks.push(preprocessFile(fileIdB));
+
+      Promise.all(preprocessingTasks).then(function(files) {
+        var fileA = files[0];
+        var fileB = files[1];
+        scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord).then(function(diffDetectRecord) {
+          resolve(diffDetectRecord);
+        }).catch(function(err) {
+          reject(err);
+        });
+      });
+    });
+  });
+}
+
+function preprocessFile(fileId) {
+  return new Promise(function(resolve, reject) {
+    File.findOne({
+      path: fileId
+    }).exec(function(err, file) {
+      if (err) {
+        throw new Error('ERROR finding file: %s', fileId);
+      }
+
+      if (file) {
+        console.log('File "%s" is cached', file.path);
+        resolve(file);
+      } else {
+        File.create({
+          path: fileId
+        }).exec(function(err, file) {
+          if (err) {
+            throw new Error('ERROR creating fileA record for: %s', fileId);
+          }
+
+          // TODO: schedule preprocessing of file!
+
+          file.preprocessed = '/path/asdf.ifcmesh';
+          file.save().then(function(file) {
+            resolve(file);
+          });
+        });
+      }
+    });
+  });
+}
+
+function scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord) {
+  return new Promise(function(resolve, reject) {
+    console.log('[duraark-geometricenrichment] scheduling difference detection task')
+
+    var DDLib = new DifferenceDetectionLib(duraarkStoragePath);
+    return DDLib.compare({
+      fileIdA: fileA.path,
+      fileIdB: fileB.path
+    }).then(function(result) {
+      diffDetectRecord.status = 'finished';
+      diffDetectRecord.viewerUrl = result.viewerUrl.replace('/duraark-storage', '');
+      diffDetectRecord.save().then(function() {
+        console.log('Finished difference detection (ID: %s)', diffDetectRecord.id);
+        resolve(diffDetectRecord);
+      }).catch(function(err) {
+        console.log('Failed to save to database:\n' + err);
+      });
+    }).catch(function(err) {
+      console.log('[duraark-geometricenrichment] difference detection error:\n' + err);
+      diffDetectRecord.status = 'error';
+      diffDetectRecord.errorText = err;
+      diffDetectRecord.viewerUrl = null;
+      diffDetectRecord.save();
+      reject(diffDetectRecord);
+    });
+  });
+}

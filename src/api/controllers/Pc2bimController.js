@@ -70,6 +70,13 @@ module.exports = {
    *      }
    */
   create: function(req, res, next) {
+    // return res.send({
+    //   status: 'pending',
+    //   errorText: 'an error',
+    //   viewerUrl: 'http://orf.at',
+    //   id: 42
+    // });
+
     var inputFile = req.param('inputFile'),
       restart = req.param('restart'),
       duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage',
@@ -81,17 +88,17 @@ module.exports = {
     // console.log('inputFile: ' + inputFile);
     // console.log('restart: ' + restart);
 
-    // console.log('POST /pc2bim: Scheduled conversion from ' + inputFile);
+    console.log('POST /pc2bim: Scheduled conversion of ' + inputFile);
 
     res.setTimeout(0);
 
     // Check if reconstructed IFC file is already present:
     isAlreadyReconstructed = isThere(bimFilePath) && isThere(wallsFilePath);
 
-    console.log('bim: ' + bimFilePath);
-    console.log('wall: ' + wallsFilePath);
-    console.log('bim there: ' + isThere(bimFilePath));
-    console.log('wall there: ' + isThere(wallsFilePath));
+    // console.log('bim: ' + bimFilePath);
+    // console.log('wall: ' + wallsFilePath);
+    // console.log('bim there: ' + isThere(bimFilePath));
+    // console.log('wall there: ' + isThere(wallsFilePath));
 
     console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
 
