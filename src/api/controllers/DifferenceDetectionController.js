@@ -64,6 +64,7 @@ function startDifferenceDetection(fileIdA, fileIdB) {
     DifferenceDetection.create({
       fileAPath: fileIdA,
       fileBPath: fileIdB,
+      status: 'pending'
     }).exec(function(err, diffDetectRecord) {
       if (err) {
         throw new Error('ERROR creating difference detection instance');
@@ -76,12 +77,10 @@ function startDifferenceDetection(fileIdA, fileIdB) {
       Promise.all(preprocessingTasks).then(function(files) {
         var fileA = files[0];
         var fileB = files[1];
-        scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord).then(function(diffDetectRecord) {
-          resolve(diffDetectRecord);
-        }).catch(function(err) {
-          reject(err);
-        });
+        scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord);
       });
+
+      resolve(diffDetectRecord);
     });
   });
 }
@@ -129,6 +128,7 @@ function scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord) {
     }).then(function(result) {
       diffDetectRecord.status = 'finished';
       diffDetectRecord.viewerUrl = result.viewerUrl.replace('/duraark-storage', '');
+      console.log('diffDetectRecord.viewerUrl: ' + diffDetectRecord.viewerUrl);
       diffDetectRecord.save().then(function() {
         console.log('Finished difference detection (ID: %s)', diffDetectRecord.id);
         resolve(diffDetectRecord);
