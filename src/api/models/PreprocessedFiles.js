@@ -8,7 +8,9 @@
 module.exports = {
 
   attributes: {
-    path: 'string',
-    preprocessed: 'string'
+    inputFile: 'string',
+    outputFile: 'string',
+    fileType: 'string',
+    status: 'string'
   }
 };

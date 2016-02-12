@@ -65,7 +65,6 @@ module.exports.http = {
       app.use('/session', express.static('/tmp'));
       app.use('/sessions', express.static('/duraark-storage/sessions'));
       app.use('/tmp', express.static('/duraark-storage/tmp'));
-      console.log('exported /sessions');
     }
 
 

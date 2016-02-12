@@ -6,7 +6,6 @@ var spawn = require('child_process').spawn,
 
 var DiffDetect = module.exports = function(storagePath) {
   this.storagePath = storagePath;
-  console.log('[DiffDetect] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
 DiffDetect.prototype.run = function(files) {
@@ -14,15 +13,23 @@ DiffDetect.prototype.run = function(files) {
 
   return new Promise(function(resolve, reject) {
     // docker run --rm -v /home/user/work:/work paulhilbert/duraark_diffdetect --input /work/a.e57n --assoc /work/association.rdf --output /work/differences.e57n
-    var reprA = files[0].processed,
-      reprB = files[1].processed,
-      associationFile = files[0].association,
-      dirname = path.dirname(files[0].fileId),
+    var reprA, reprB;
+
+    if (files[0].outputFile.split('.').pop().toLowerCase() === 'ifcmesh') {
+      reprA = files[1].outputFile;
+      reprB = files[0].outputFile;
+    } else {
+      reprA = files[0].outputFile;
+      reprB = files[1].outputFile;
+    }
+
+    var associationFile = files[0].association,
+      dirname = path.dirname(files[0].outputFile),
       outputFile = path.join(dirname, '../tmp/') + 'diffdetect_' + path.basename(reprA.replace(' ', '_')) + '-' + path.basename(reprB.replace(' ', '_')) + '.e57n',
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/duraark_diffdetect', '--input', reprA, '--assoc', associationFile, '--output', outputFile],
       logText = '';
 
-    // console.log('[DiffDetect] about to run:\n ' + 'docker ' + args.join(' '));
+    console.log('[DiffDetect] about to run:\n ' + 'docker ' + args.join(' '));
 
     var executable = spawn('docker', args);
 

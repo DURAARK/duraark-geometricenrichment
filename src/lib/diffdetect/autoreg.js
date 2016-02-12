@@ -6,7 +6,6 @@ var spawn = require('child_process').spawn,
 
 var Registration = module.exports = function(storagePath) {
   this.storagePath = storagePath;
-  console.log('[Registration] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
 Registration.prototype.run = function(files) {
@@ -19,9 +18,9 @@ Registration.prototype.run = function(files) {
 
     // docker run --rm -v /home/user/work:/work ochi/duraark_autoreg --repra /work/a.e57n --reprb /work/b.ifcmesh --output /work/registration.rdf
 
-    var reprA = files[0].processed,
-      reprB = files[1].processed,
-      dirname = path.dirname(files[0].fileId),
+    var reprA = files[0].outputFile,
+      reprB = files[1].outputFile,
+      dirname = path.dirname(files[0].outputFile),
       outputRDF = path.join(dirname, '../tmp/') + 'registration__' + path.basename(reprA.replace(' ', '_')) + '-' + path.basename(reprB.replace(' ', '_')) + '.rdf',
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_autoreg', '--repra', reprA, '--reprb', reprB, '--output', outputRDF],
       logText = '';

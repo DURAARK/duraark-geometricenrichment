@@ -6,7 +6,6 @@ var spawn = require('child_process').spawn,
 
 var PotreeConverter = module.exports = function(storagePath) {
   this.storagePath = storagePath;
-  console.log('[PotreeConverter] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
 PotreeConverter.prototype.run = function(config) {

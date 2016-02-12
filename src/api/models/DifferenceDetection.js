@@ -8,8 +8,8 @@
 module.exports = {
 
   attributes: {
-    fileAPath: 'string',
-    fileBPath: 'string',
+    inputFileA: 'string',
+    inputFileB: 'string',
 
     viewerUrl: 'string',
     status: 'string',
@@ -17,6 +17,9 @@ module.exports = {
     registrationRDF: 'string',
     associationRDF: 'string',
     differenceE57: 'string',
-    viewerUrl: 'string'
+    viewerUrl: 'string',
+
+    resolution: 'number',
+    objPath: 'string'
   }
 };

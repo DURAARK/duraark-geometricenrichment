@@ -5,7 +5,6 @@ var spawn = require('child_process').spawn,
 
 var Preprocess = module.exports = function(storagePath) {
   this.storagePath = storagePath;
-  console.log('[Preprocess] mounting ' + this.storagePath + ' as "/duraark-storage"');
 };
 
 Preprocess.prototype.run = function(fileId) {
@@ -25,7 +24,7 @@ Preprocess.prototype.run = function(fileId) {
         outputFileName = path.join(dirname, '../tmp', basename.substring(0, basename.length - fileType.length)) + '.e57n',
         args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/e57-processor', '--input', inputFileId, '--output', outputFileName, '-l', resolution];
 
-      // console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
+      //console.log('[Preprocess::preprocess] about to run:\n ' + 'docker ' + args.join(' '));
 
       var executable = spawn('docker', args);
 
@@ -46,10 +45,10 @@ Preprocess.prototype.run = function(fileId) {
           // console.log('[Preprocess::preprocess] successfully finished');
 
           resolve({
-            fileId: fileId,
+            inputFile: fileId,
+            outputFile: outputFileName,
+            resolution: resolution,
             type: 'e57',
-            processed: outputFileName,
-            resolution: resolution
           });
         } else {
           console.log('[Preprocess::convert] ERROR:\n' + logText);
@@ -85,9 +84,9 @@ Preprocess.prototype.run = function(fileId) {
           // console.log('[Preprocess::preprocess] successfully finished');
 
           resolve({
-            fileId: fileId,
-            type: 'ifc',
-            processed: ifcmeshFileName,
+            inputFile: fileId,
+            outputFile: ifcmeshFileName,
+            fileType: 'ifc',
             objPath: objOutputPath
           });
         } else {
