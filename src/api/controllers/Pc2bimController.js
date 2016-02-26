@@ -3,7 +3,8 @@
  */
 
 var PC2BIM = require('../../bindings/pc2bim'),
-  isThere = require('is-there');
+  isThere = require('is-there'),
+  path = require('path');
 
 var _SIMULATE_SUCCESS = false;
 
@@ -78,15 +79,16 @@ module.exports = {
     // });
 
     var inputFile = req.param('inputFile'),
+      ext = path.extname(inputFile),
       restart = req.param('restart'),
       duraarkStoragePath = process.env.DURAARK_STORAGE_PATH || '/duraark-storage',
-      bimFilePath = inputFile.replace('.e57', '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
-      wallsFilePath = inputFile.replace('.e57', '_wall.json').replace('master', 'tmp'),
+      bimFilePath = inputFile.replace(ext, '_RECONSTRUCTED.ifc').replace('master', 'derivative_copy'),
+      wallsFilePath = inputFile.replace(ext, '_wall.json').replace('master', 'tmp'),
       isAlreadyReconstructed = false;
 
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
     // console.log('inputFile: ' + inputFile);
-    // console.log('restart: ' + restart);
+    console.log('restart: ' + restart);
 
     console.log('POST /pc2bim: Scheduled conversion of ' + inputFile);
 
@@ -95,10 +97,10 @@ module.exports = {
     // Check if reconstructed IFC file is already present:
     isAlreadyReconstructed = isThere(bimFilePath) && isThere(wallsFilePath);
 
-    // console.log('bim: ' + bimFilePath);
-    // console.log('wall: ' + wallsFilePath);
-    // console.log('bim there: ' + isThere(bimFilePath));
-    // console.log('wall there: ' + isThere(wallsFilePath));
+    console.log('bim: ' + bimFilePath);
+    console.log('wall: ' + wallsFilePath);
+    console.log('bim there: ' + isThere(bimFilePath));
+    console.log('wall there: ' + isThere(wallsFilePath));
 
     console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
 
@@ -113,7 +115,7 @@ module.exports = {
 
       if (_SIMULATE_SUCCESS) {
         derivativeState.status = "finished";
-        var url = derivativeState.inputFile.replace('.e57', '.ifc');
+        var url = derivativeState.inputFile.replace(ext, '.ifc');
         url = url.replace('/duraark-storage', '');
         derivativeState.bimDownloadUrl = url;
         return res.send(derivativeState).status(200);
@@ -211,7 +213,11 @@ module.exports = {
               duraarkStoragePath: duraarkStoragePath
             });
           }
-          return res.send(derivativeState).status(200);
+          derivativeState.status = 'pending';
+          derivativeState.error = 'no error';
+          derivativeState.save().then(function() {
+            return res.send(derivativeState).status(200);
+          });
         }
       }
     }).catch(function(err) {
