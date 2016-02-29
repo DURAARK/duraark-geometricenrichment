@@ -1,6 +1,7 @@
 var DiffDetectLib = require('../diffdetect'),
   Promise = require('bluebird'),
   util = require('util'),
+  path = require('path'),
   fs = require('fs');
 
 function fileExists(filePath) {
@@ -44,7 +45,7 @@ Preprocess.prototype._startPreprocessingFiles = function(config) {
 
   _.forEach(filePaths, function(filePath) {
     fileProcessPromises.push(that._findCacheRecord(filePath).then(function(preprocessedFiles) {
-      // console.log('[debug] _startPreprocessingFiles: ' + JSON.stringify(preprocessedFiles, null, 4));
+      console.log('[debug] _startPreprocessingFiles: ' + JSON.stringify(preprocessedFiles, null, 4));
       if (preprocessedFiles && preprocessedFiles.status === 'finished') {
         console.log('[sails-duraark-diffdetect] found cache entry');
         if (deleteCache) {
@@ -59,9 +60,9 @@ Preprocess.prototype._startPreprocessingFiles = function(config) {
           return preprocessedFiles;
         }
       } else if (preprocessedFiles && preprocessedFiles.status === 'pending') {
-        // TODO!
+        return preprocessedFiles;
       } else if (preprocessedFiles && preprocessedFiles.status === 'error') {
-        // TODO!
+        return preprocessedFiles;
       } else {
         console.log('[sails-duraark-diffdetect] creating new cache entry');
         return that._createCacheRecord(filePath).then(function(preprocessedFilesRecord) {
@@ -150,20 +151,20 @@ Preprocess.prototype._createCacheRecord = function(inputFile) {
       if (!that.createCacheFromExistingFiles) {
         resolve(preprocessedFilesRecord);
       } else {
-        var fileType = inputFile.split('.').pop(),
+        var fileType = path.extname(inputFile),
           potentialPreprocessedFilePath = null;
 
         console.log('[debug] checking if preprocessed file already exists for: ' + inputFile);
 
-        if (fileType.toLowerCase() === 'ifc') {
+        if (fileType.toLowerCase() === '.ifc') {
           potentialPreprocessedFilePath = inputFile.replace('master', 'tmp').replace(fileType, 'ifcmesh');
-        } else if (fileType.toLowerCase() === 'e57') {
+        } else if (fileType.toLowerCase() === '.e57') {
           potentialPreprocessedFilePath = inputFile.replace('master', 'tmp').replace(fileType, 'e57n');
         } else if (fileType.toLowerCase() === '.e57n') {
           potentialPreprocessedFilePath = inputFile;
         } else {
           console.log('[ERROR] file type is not supported: ' + inputFile);
-          reject('[ERROR] file type is not supported: ' + inputFile);
+          return reject('[ERROR] file type is not supported: ' + inputFile);
         }
 
         console.log('[debug] searching for: ' + potentialPreprocessedFilePath);

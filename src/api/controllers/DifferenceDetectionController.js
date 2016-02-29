@@ -13,7 +13,7 @@ module.exports = {
       fileIdB = req.body.fileIdB,
       restart = req.body.restart;
 
-    restart = false;
+    // restart = false;
 
     console.log('[duraark-geometricenrichment] Requesting difference detection:');
     console.log('    fileIdA: ' + fileIdA);
@@ -26,10 +26,10 @@ module.exports = {
 
     DifferenceDetection.findOne(config).exec(function(err, diffDetectRecord) {
       // console.log('[debug] diffDetectRecord: ' + JSON.stringify(diffDetectRecord, null, 4));
-      if (diffDetectRecord && diffDetectRecord.status === 'finished') {
+      if (diffDetectRecord) {
         if (restart) {
           console.log('[duraark-geometricenrichment] Deleting cached entry and restarting task');
-          DifferenceDetection.destroy({
+          return DifferenceDetection.destroy({
             id: diffDetectRecord.id
           }).then(function() {
             startBackgroundTasks(fileIdA, fileIdB, diffDetectRecord).then(function(diffDetectRecord) {
@@ -42,6 +42,11 @@ module.exports = {
           console.log('[duraark-geometricenrichment] Returning cached entry');
           return res.send(diffDetectRecord).status(200);
         }
+      }
+
+      if (diffDetectRecord && diffDetectRecord.status === 'finished') {
+        console.log('[duraark-geometricenrichment] Returning cached entry');
+        return res.send(diffDetectRecord).status(200);
       } else if (diffDetectRecord && diffDetectRecord.status === 'error') {
         console.log('[duraark-geometricenrichment] Requested difference detection was not successfull');
         return res.send(diffDetectRecord).status(200);
@@ -82,11 +87,11 @@ module.exports = {
 
 function startBackgroundTasks(fileIdA, fileIdB, diffDetectRecord, deleteCache) {
   var config = {
-    filePathA: fileIdA,
-    filePathB: fileIdB,
-    deleteCache: deleteCache
-  },
-  that = this;
+      filePathA: fileIdA,
+      filePathB: fileIdB,
+      deleteCache: deleteCache
+    },
+    that = this;
 
   return this.DuraarkDiffDetect.preprocessFiles(config).then(function(preprocessedFilesRecords) {
     console.log('preprocessedFilesRecords: ' + JSON.stringify(preprocessedFilesRecords, null, 4));
@@ -160,6 +165,10 @@ function scheduleDifferenceDetectionTask(fileA, fileB, diffDetectRecord) {
       fileIdA: fileA.path,
       fileIdB: fileB.path
     }).then(function(result) {
+      if (result.status && result.status === 'pending') {
+        resolve(result);
+      }
+
       diffDetectRecord.status = 'finished';
       diffDetectRecord.viewerUrl = result.viewerUrl.replace('/duraark-storage', '');
       console.log('diffDetectRecord.viewerUrl: ' + diffDetectRecord.viewerUrl);

@@ -64,6 +64,7 @@ module.exports.http = {
     var express = require('sails/node_modules/express');
       app.use('/session', express.static('/tmp'));
       app.use('/sessions', express.static('/duraark-storage/sessions'));
+      app.use('/sessions/fixed', express.static('/duraark-storage/sessions/fixed'));
       app.use('/tmp', express.static('/duraark-storage/tmp'));
     }
 

@@ -25,6 +25,9 @@ DiffDetectionLib.prototype.compare = function(config) {
   filesToPreprocess.push(this.preprocessFile(config.fileIdB));
 
   return Promise.all(filesToPreprocess).then(function(files) {
+    if (files[0].status === 'pending') {
+      return files;
+    }
     console.log('[DiffDetectionLib] finished preprocessing files:\n\n%s\n\n', JSON.stringify(files, null, 4));
     return that.registerFiles(files).then(function(files) {
       console.log('[DiffDetectionLib] finished registration of files:\n\n%s\n\n', JSON.stringify(files, null, 4));
