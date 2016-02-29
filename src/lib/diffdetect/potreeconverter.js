@@ -31,7 +31,7 @@ PotreeConverter.prototype.run = function(config) {
 
     // Check if file is already created and use it in case:
     // FIXXME: make this behaviour configurable!
-    var fileAlreadyExist = isThere(config.potreeOutdir);
+    var fileAlreadyExist = isThere(path.join(config.potreeOutdir, 'examples'));
     if (fileAlreadyExist) {
       console.log('[PotreeConverter] Output already exists, skipping processing.')
       config.viewerUrl = path.join(config.potreeOutdir, 'examples', config.pageName) + '.html';
