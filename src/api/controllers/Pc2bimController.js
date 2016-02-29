@@ -88,12 +88,9 @@ module.exports = {
       wallsFilePath = inputFile.replace(ext, '_wall.json').replace('master', 'tmp'),
       isAlreadyReconstructed = false;
 
-    // FIXXME: remove after testing!
-    restart = true;
-
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
     // console.log('inputFile: ' + inputFile);
-    console.log('restart: ' + restart);
+    // console.log('restart: ' + restart);
 
     console.log('POST /pc2bim: Scheduled conversion of ' + inputFile);
 
