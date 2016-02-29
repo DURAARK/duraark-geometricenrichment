@@ -159,6 +159,8 @@ Preprocess.prototype._createCacheRecord = function(inputFile) {
           potentialPreprocessedFilePath = inputFile.replace('master', 'tmp').replace(fileType, 'ifcmesh');
         } else if (fileType.toLowerCase() === 'e57') {
           potentialPreprocessedFilePath = inputFile.replace('master', 'tmp').replace(fileType, 'e57n');
+        } else if (fileType.toLowerCase() === '.e57n') {
+          potentialPreprocessedFilePath = inputFile;
         } else {
           console.log('[ERROR] file type is not supported: ' + inputFile);
           reject('[ERROR] file type is not supported: ' + inputFile);
