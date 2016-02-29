@@ -18,8 +18,7 @@ var PC2BIM = module.exports = function(storagePath) {
 };
 
 PC2BIM.prototype.extract = function(jobConfig) {
-  var that = this,
-    consoleLog = '';
+  var that = this;
 
   return new Promise(function(resolve, reject) {
     console.log('[PC2BIM::convert] input file: ' + jobConfig.inputFile);
@@ -27,10 +26,12 @@ PC2BIM.prototype.extract = function(jobConfig) {
     // docker run --rm -v /duraark-storage:/duraark-storage ubo/pc2bim pc2bim
     //    --input /duraark-storage/files/Nygade_Scan1001.e57
     //    --output /duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc
-    var args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', 'pc2bim', '--input', '"' + jobConfig.inputFile + '"', , '--output', '"' + jobConfig.bimFilePath + '"', '--outputjson', '"' + jobConfig.wallsFilePath + '"'];
+    var args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'ochi/duraark_pc2bim', '--input', jobConfig.inputFile, , '--output', jobConfig.bimFilePath, '--outputjson', jobConfig.wallsFilePath];
 
     console.log('[PC2BIM::convert] about to run:\n ' + 'docker ' + args.join(' '));
-    // outputLog += '[PC2BIM::convert] about to run:\n ' + 'docker ' + args.join(' ');
+
+    var consoleLog = '[PC2BIM::convert] about to run:\n ' + 'docker ' + args.join(' ');
+    consoleLog += '\n';
 
     var executable = spawn('docker', args);
 
@@ -38,12 +39,12 @@ PC2BIM.prototype.extract = function(jobConfig) {
     executable.stderr.setEncoding('utf8');
 
     executable.stdout.on('data', function(data) {
-      // console.log(data);
+      console.log(data);
       consoleLog += Strings.orEmpty(data);
     });
 
     executable.stderr.on('data', function(data) {
-      // console.log(data);
+      console.log(data);
       consoleLog += Strings.orEmpty(data);
     });
 
@@ -52,7 +53,7 @@ PC2BIM.prototype.extract = function(jobConfig) {
 
       // console.log('consoleLog: ' + consoleLog);
 
-      var logFilePath = '/duraark-storage/logs/pc2bim/' + new Date().toISOString();
+      var logFilePath = '/duraark-storage/logs/pc2bim/run-' + new Date().toISOString();
       fs.writeFile(logFilePath, consoleLog, 'utf8').then(function(err) {
         if (err) {
           console.log('[PC2BIM-binding] ERROR writing log file: ' + logFilePath);
