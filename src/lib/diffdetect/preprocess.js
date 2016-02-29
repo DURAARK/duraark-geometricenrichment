@@ -94,6 +94,13 @@ Preprocess.prototype.run = function(fileId) {
           reject(logText);
         }
       });
+    } else if (fileType === '.e57n') {
+      resolve({
+        inputFile: fileId,
+        outputFile: fileId,
+        resolution: 1,
+        type: 'e57',
+      });
     } else {
       reject('[Preprocess::convert] Filetype "' + fileType + '" not supported, aborting preprocessing!');
     }
