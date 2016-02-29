@@ -2,6 +2,7 @@ var spawn = require('child_process').spawn,
   exec = require('child_process').exec,
   path = require('path'),
   Promise = require('bluebird'),
+  isThere = require('is-there'),
   _ = require('underscore');
 
 var Association = module.exports = function(storagePath) {
@@ -25,6 +26,17 @@ Association.prototype.run = function(files) {
       outputRDF = path.join(dirname, '../tmp/') + 'association__' + path.basename(reprA.replace(' ', '_')) + '-' + path.basename(reprB.replace(' ', '_')) + '.rdf',
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/duraark_assoc', '--rep-a', reprA, '--rep-b', reprB, '--registration', registrationFile, '--output-file', outputRDF, '--epsilon', epsilon],
       logText = '';
+
+    // Check if file is already created and use it in case:
+    // FIXXME: make this behaviour configurable!
+    var fileAlreadyExist = isThere(outputRDF);
+    if (fileAlreadyExist) {
+      console.log('[Association] Output already exists, skipping processing.');
+      _.forEach(files, function(file) {
+        file.association = outputRDF;
+      });
+      return resolve(files);
+    }
 
     // console.log('[Association] about to run:\n ' + 'docker ' + args.join(' '));
 

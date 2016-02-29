@@ -4,6 +4,7 @@ var spawn = require('child_process').spawn,
   promisify = require('promisify-node'),
   fs = promisify('fs-extra'),
   Promise = require('bluebird'),
+  isThere = require('is-there'),
   _ = require('underscore');
 
 var PotreeConverter = module.exports = function(storagePath) {
@@ -27,6 +28,15 @@ PotreeConverter.prototype.run = function(config) {
     console.log('Converting: [%s] to potree page at: [%s] with page name: [%s]', config.e57File, config.potreeOutdir, config.pageName);
 
     // console.log('[PotreeConverter] about to run:\n ' + 'docker ' + args.join(' '));
+
+    // Check if file is already created and use it in case:
+    // FIXXME: make this behaviour configurable!
+    var fileAlreadyExist = isThere(config.potreeOutdir);
+    if (fileAlreadyExist) {
+      console.log('[PotreeConverter] Output already exists, skipping processing.')
+      config.viewerUrl = path.join(config.potreeOutdir, 'examples', config.pageName) + '.html';
+      return resolve(config);
+    }
 
     var executable = spawn('docker', args);
 

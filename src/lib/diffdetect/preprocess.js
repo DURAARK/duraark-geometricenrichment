@@ -1,6 +1,7 @@
 var spawn = require('child_process').spawn,
   exec = require('child_process').exec,
   path = require('path'),
+  isThere = require('is-there'),
   Promise = require('bluebird');
 
 var Preprocess = module.exports = function(storagePath) {

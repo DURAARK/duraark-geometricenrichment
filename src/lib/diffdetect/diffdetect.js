@@ -2,6 +2,7 @@ var spawn = require('child_process').spawn,
   exec = require('child_process').exec,
   path = require('path'),
   Promise = require('bluebird'),
+  isThere = require('is-there'),
   _ = require('underscore');
 
 var DiffDetect = module.exports = function(storagePath) {
@@ -28,6 +29,17 @@ DiffDetect.prototype.run = function(files) {
       outputFile = path.join(dirname, '../tmp/') + 'diffdetect_' + path.basename(reprA.replace(' ', '_')) + '-' + path.basename(reprB.replace(' ', '_')) + '.e57n',
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/duraark_diffdetect', '--input', reprA, '--assoc', associationFile, '--output', outputFile],
       logText = '';
+
+    // Check if file is already created and use it in case:
+    // FIXXME: make this behaviour configurable!
+    var fileAlreadyExist = isThere(outputFile);
+    if (fileAlreadyExist) {
+      console.log('[DiffDetect] Output already exists, skipping processing.');
+      _.forEach(files, function(file) {
+        file.diffDetectOutputFile = outputFile;
+      });
+      return resolve(files);
+    }
 
     console.log('[DiffDetect] about to run:\n ' + 'docker ' + args.join(' '));
 
