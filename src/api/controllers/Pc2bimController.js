@@ -34,6 +34,8 @@ function startExtraction(derivativeState, config) {
     derivativeState.status = "error";
     derivativeState.errorText = err;
 
+    console.log('[Pc2bimController] derivativeState: ' + JSON.stringify(derivativeState, null, 4));
+
     derivativeState.save().then(function(pc2bimRecord) {
       console.log('[Pc2bimController] Error reconstructing BIM model for: ' + pc2bimRecord.inputFile);
       console.log('[Pc2bimController] Error details:\n' + pc2bimRecord.errorText);
@@ -86,6 +88,9 @@ module.exports = {
       wallsFilePath = inputFile.replace(ext, '_wall.json').replace('master', 'tmp'),
       isAlreadyReconstructed = false;
 
+    // FIXXME: remove after testing!
+    restart = true;
+
     // console.log('duraarkStoragePath: ' + duraarkStoragePath);
     // console.log('inputFile: ' + inputFile);
     console.log('restart: ' + restart);
@@ -97,10 +102,10 @@ module.exports = {
     // Check if reconstructed IFC file is already present:
     isAlreadyReconstructed = isThere(bimFilePath) && isThere(wallsFilePath);
 
-    console.log('bim: ' + bimFilePath);
-    console.log('wall: ' + wallsFilePath);
-    console.log('bim there: ' + isThere(bimFilePath));
-    console.log('wall there: ' + isThere(wallsFilePath));
+    // console.log('bim: ' + bimFilePath);
+    // console.log('wall: ' + wallsFilePath);
+    // console.log('bim there: ' + isThere(bimFilePath));
+    // console.log('wall there: ' + isThere(wallsFilePath));
 
     console.log('[Pc2bim] Found existing reconstruction: ' + isAlreadyReconstructed);
 
@@ -131,6 +136,23 @@ module.exports = {
           status: 'pending',
           bimDownloadUrl: null
         }).then(function(derivativeState) {
+
+          if (restart) {
+            console.log('[Pc2bimController] Reschedule job as requested');
+            startExtraction(derivativeState, {
+              inputFile: derivativeState.inputFile,
+              bimFilePath: bimFilePath,
+              wallsFilePath: wallsFilePath,
+              duraarkStoragePath: duraarkStoragePath
+            });
+
+            derivativeState.status = 'pending';
+            derivativeState.error = 'no error';
+            return derivativeState.save().then(function() {
+              return res.send(derivativeState).status(200);
+            });
+          }
+
           if (isAlreadyReconstructed) {
             console.log('[Pc2bimController] Found existing reconstruction, reusing:');
             console.log('[Pc2bimController]   * BIM model: ' + bimFilePath);
@@ -169,6 +191,22 @@ module.exports = {
         });
 
       } else {
+        if (restart) {
+          console.log('[Pc2bimController] Reschedule job as requested');
+          startExtraction(derivativeState, {
+            inputFile: derivativeState.inputFile,
+            bimFilePath: bimFilePath,
+            wallsFilePath: wallsFilePath,
+            duraarkStoragePath: duraarkStoragePath
+          });
+
+          derivativeState.status = 'pending';
+          derivativeState.error = 'no error';
+          return derivativeState.save().then(function() {
+            return res.send(derivativeState).status(200);
+          });
+        }
+
         if (isAlreadyReconstructed) {
           console.log('[Pc2bimController] Found existing reconstruction, reusing:');
           console.log('[Pc2bimController]   * BIM model: ' + bimFilePath);
@@ -192,6 +230,7 @@ module.exports = {
           // here and not in the resolved promise above only because of the execution flow.
           return res.send(derivativeState).status(200);
         }
+
         if (derivativeState.status === "finished") {
           console.log('[Pc2bimController] Found finished job: ' + JSON.stringify(derivativeState, null, 4));
           return res.send(derivativeState).status(200);
@@ -204,20 +243,7 @@ module.exports = {
 
         if (derivativeState.status === "error") {
           console.log('[Pc2bimController] Found failed job: ' + JSON.stringify(derivativeState, null, 4));
-          if (restart) {
-            console.log('[Pc2bimController] Reschedule job as requested');
-            startExtraction(derivativeState, {
-              inputFile: derivativeState.inputFile,
-              bimFilePath: bimFilePath,
-              wallsFilePath: wallsFilePath,
-              duraarkStoragePath: duraarkStoragePath
-            });
-          }
-          derivativeState.status = 'pending';
-          derivativeState.error = 'no error';
-          derivativeState.save().then(function() {
-            return res.send(derivativeState).status(200);
-          });
+          return res.send(derivativeState).status(200);
         }
       }
     }).catch(function(err) {

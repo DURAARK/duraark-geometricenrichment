@@ -9,10 +9,22 @@
  * http://sailsjs.org/#/documentation/reference/sails.config/sails.config.bootstrap.html
  */
 
+var promisify = require('promisify-node'),
+  fs = promisify('fs-extra'),
+  Promise = require('bluebird');
+
 module.exports.bootstrap = function(cb) {
 
-  // It's very important to trigger this callback method when you are finished
-  // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
-  cb();
-};
+  var promises = [];
 
+  promises.push(fs.mkdirp('/duraark-storage/logs/pc2bim'));
+  promises.push(fs.mkdirp('/duraark-storage/logs/diffdetect'));
+  promises.push(fs.mkdirp('/duraark-storage/logs/compression'));
+
+  Promise.all(promises).then(function() {
+    console.log('[init] Created log folder structure.');
+    cb();
+  }).catch(function(err) {
+    console.log('[init] ERROR: ' + error);
+  });
+};

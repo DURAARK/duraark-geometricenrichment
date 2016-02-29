@@ -11,10 +11,11 @@
     "sailsjs"
   ],
   "dependencies": {
-    "bluebird": "^2.9.34",
+    "bluebird": "^2.10.2",
     "chai": "~1.10.0",
     "easyimage": "^2.1.0",
     "ejs": "~0.8.4",
+    "fs-extra": "^0.26.5",
     "grunt": "0.4.2",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-coffee": "~0.10.1",
@@ -33,6 +34,7 @@
     "lodash": "~3.9.3",
     "mkdirp": "^0.5.0",
     "node-uuid": "~1.4.2",
+    "promisify-node": "^0.3.0",
     "rc": "~0.5.0",
     "sails": "~0.10.2",
     "sails-disk": "~0.10.7",
