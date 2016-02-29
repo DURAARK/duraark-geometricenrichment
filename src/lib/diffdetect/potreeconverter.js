@@ -2,7 +2,7 @@ var spawn = require('child_process').spawn,
   exec = require('child_process').exec,
   path = require('path'),
   promisify = require('promisify-node'),
-  fs = require('fs-extra'),
+  fs = promisify('fs-extra'),
   Promise = require('bluebird'),
   _ = require('underscore');
 

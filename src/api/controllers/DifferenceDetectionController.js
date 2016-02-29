@@ -112,7 +112,7 @@ function startBackgroundTasks(fileIdA, fileIdB, diffDetectRecord, deleteCache) {
       diffDetectRecord.errorText = err;
       diffDetectRecord.viewerUrl = null;
       diffDetectRecord.save();
-      reject(diffDetectRecord);
+      return(diffDetectRecord);
     });
 
   });
