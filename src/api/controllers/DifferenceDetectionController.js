@@ -18,6 +18,7 @@ module.exports = {
     console.log('[duraark-geometricenrichment] Requesting difference detection:');
     console.log('    fileIdA: ' + fileIdA);
     console.log('    fileIdB: ' + fileIdB);
+    console.log('    restart: ' + restart);
 
     var config = {
       inputFileA: fileIdA,
