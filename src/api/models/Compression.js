@@ -9,6 +9,7 @@ module.exports = {
 
   attributes: {
     inputFile: 'string',
+    ration: 'number',
     status: 'string',
     downloadURL: 'string'
   }

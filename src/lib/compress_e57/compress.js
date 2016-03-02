@@ -9,16 +9,16 @@ var Compress = module.exports = function(storagePath) {
   this.storagePath = storagePath;
 };
 
-Compress.prototype.run = function(filePath) {
+Compress.prototype.run = function(config) {
   var that = this;
 
   return new Promise(function(resolve, reject) {
     // docker run --rm -v /home/user/work:/work paulhilbert/compress_e57n duraark_compress --input-cloud /work/pointcloud.e57n --output-json /work/compressed.json --output /work/compressed.e57c
 
-    var dirname = path.dirname(filePath),
-      outputFilePath = path.join(dirname, '../tmp/') + path.basename(filePath.replace(' ', '_')) + '.e57c',
-      outputJSONPath = path.join(dirname, '../tmp/') + 'compression_' + path.basename(filePath.replace(' ', '_')) + '.json',
-      args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', 'paulhilbert/compress_e57n', 'duraark_compress', '--input-cloud', filePath, '--output-json', registrationFile, '--output', outputFilePath],
+    var dirname = path.dirname(config.inputFile),
+      outputFilePath = path.join(dirname, '../tmp/') + path.basename(config.inputFile.replace(' ', '_'), '.e57n') + '.e57c',
+      outputJSONPath = path.join(dirname, '../tmp/') + 'compression_' + path.basename(config.inputFile.replace(' ', '_')) + '.json',
+      args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', '--entrypoint=/bin/duraark_compress', 'paulhilbert/duraark_compress', '--input-cloud', config.inputFile, '--output-json', outputJSONPath, '--output', outputFilePath],
       logText = '';
 
     // Check if file is already created and use it in case:
@@ -27,12 +27,13 @@ Compress.prototype.run = function(filePath) {
     if (filesAlreadyExist) {
       console.log('[Compress] Output already exists, skipping processing.');
       return resolve({
-        outputFilePath: outputFilePath,
-        outputJSONPath: outputJSONPath
+        inputFile: config.inputFile,
+        outputFile: outputFilePath,
+        outputJSON: outputJSONPath
       });
     }
 
-    // console.log('[Compress] about to run:\n ' + 'docker ' + args.join(' '));
+    console.log('[Compress] about to run:\n ' + 'docker ' + args.join(' '));
 
     var executable = spawn('docker', args);
 
@@ -53,8 +54,9 @@ Compress.prototype.run = function(filePath) {
         // console.log('[Compress] successfully finished');
 
         return resolve({
-          outputFilePath: outputFilePath,
-          outputJSONPath: outputJSONPath
+          inputFile: config.inputFile,
+          outputFile: outputFilePath,
+          outputJSON: outputJSONPath
         });
       } else {
         console.log('[Compress] ERROR:\n' + logText);

@@ -7,17 +7,15 @@ var CompressE57 = module.exports = function(storagePath) {
 };
 
 CompressE57.prototype.compress = function(config) {
-  console.log('[CompressE57] fileId: ' + config.fileId);
+  console.log('[CompressE57] inputFile: ' + config.inputFile);
 
-  this._preprocess.run(config.fileId).then(function(preprocessResult) {
+  var that = this;
+
+  return this._preprocess.run(config.inputFile).then(function(preprocessResult) {
     console.log('[CompressE57] finished preprocessing file:\n\n%s\n\n', JSON.stringify(preprocessResult, null, 4));
-    return that._compress(preprocessResult.outputFile).then(function(e57cFile) {
-      var result = {
-        inputFile: config.fileId,
-        downloadURL: 'http://workbench.duraark.eu/file.e57c'
-      }
-
-      return result;
+    return that._compress.run({
+      inputFile: preprocessResult.outputFile,
+      ratio: config.ratio
     });
   });
 }

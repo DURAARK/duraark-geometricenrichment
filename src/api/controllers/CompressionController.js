@@ -10,14 +10,18 @@ var Promise = require('bluebird');
 module.exports = {
   create: function(req, res, next) {
     var inputFile = req.body.inputFile,
+      ratio = req.body.ratio,
       restart = req.body.restart;
 
     console.log('[duraark-geometricenrichment] Requesting E57 compression:');
     console.log('    inputFile: ' + inputFile);
+    console.log('    ratio: ' + ratio);
     console.log('    restart: ' + restart);
 
     var config = {
-      inputFile: inputFile
+      inputFile: inputFile,
+      ratio: ratio,
+      deleteCache: restart
     };
 
     Compression.findOne(config).exec(function(err, compressionRecord) {
@@ -63,7 +67,7 @@ module.exports = {
             }).status(200);
           }
 
-          startBackgroundTasks(inputFile).then(function() {
+          startBackgroundTasks(compressionRecord).then(function() {
             console.log('[duraark-geometricenrichment] Started compression in background');
           });
 
@@ -80,15 +84,15 @@ module.exports = {
   }
 }
 
-function startBackgroundTasks(inputFile, deleteCache) {
+function startBackgroundTasks(compressionRecord) {
   var that = this;
 
-  return this.DuraarkCompressionE57.compress(inputFile).then(function(result) {
-    console.log('[duraark-geometricenrichment] finished compression. Result: ' + JSON.stringify(result, null, 4));
+  return this.DuraarkCompressionE57.compress(compressionRecord).then(function(result) {
+    console.log('[duraark-geometricenrichment] finished compression.');
 
     compressionRecord.status = 'finished';
     compressionRecord.downloadURL = result.outputFile.replace('/duraark-storage', '');
-    compressionRecord.save().then(function() {
+    compressionRecord.save().then(function(compressionRecord) {
       console.log('Finished compression (ID: %s)', compressionRecord.id);
     }).catch(function(err) {
       throw new Error('Failed to save to database:\n' + err);

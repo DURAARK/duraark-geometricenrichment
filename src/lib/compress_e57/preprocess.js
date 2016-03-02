@@ -15,7 +15,7 @@ Preprocess.prototype.run = function(fileId) {
     inputFileId = fileId,
     that = this;
 
-  console.log('[Preprocess::preprocess] Starting preprocessing');
+  console.log('[Preprocess::preprocess] Starting preprocessing for: ' + fileId);
 
   return new Promise(function(resolve, reject) {
     if (fileType === '.e57') {
