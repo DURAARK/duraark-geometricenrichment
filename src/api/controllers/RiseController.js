@@ -227,7 +227,7 @@ function createInputSymbolList(session) {
 module.exports = {
   /**
    * @api {post} /uploadFile Upload geometry file
-   * @apiVersion 0.7.0
+   * @apiVersion 1.0.0
    * @apiName PostUploadFile
    * @apiGroup RISE
    * @apiPermission none
@@ -265,7 +265,7 @@ module.exports = {
 
   /**
    * @api {post} /uploadPanoramas Upload panorama file
-   * @apiVersion 0.7.0
+   * @apiVersion 1.0.0
    * @apiName PostUploadPanorama
    * @apiGroup RISE
    * @apiPermission none
@@ -299,14 +299,14 @@ module.exports = {
 
   /**
    * @api {post} /rise Extract electrical appliances
-   * @apiVersion 0.7.0
+   * @apiVersion 1.0.0
    * @apiName PostRise
    * @apiGroup RISE
    * @apiPermission none
    *
    * @apiDescription Extract BIM model as IFC file with in-wall electrical appliances from given E57 point cloud file.
    *
-   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   * @apiParam (File) {String} e57master Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
    *
    */
   rise: function(req, res, next) {

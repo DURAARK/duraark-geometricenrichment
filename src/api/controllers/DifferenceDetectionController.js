@@ -7,6 +7,31 @@
 
 var Promise = require('bluebird');
 
+/**
+ * @api {post} /differencedetection/ Perform difference detection
+ * @apiVersion 1.0.0
+ * @apiName PostDifferenceDetection
+ * @apiGroup DifferenceDetection
+ * @apiPermission none
+ *
+ * @apiDescription Schedule the difference detection between E57/IFC of E57/E57 files.
+ *
+ * @apiParam (File) {String} fileIdA Location of file A as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+ * @apiParam (File) {String} fileIdB Location of file B as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+ * @apiParam (Restart) {String} restart Perform a new difference detection, even if there is a cached result in the database.
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       "inputFileA": "/duraark-storage/sessions/fixed/CITA_Byg72/master/CITA_Byg72_1st_Scan-0.02.e57n",
+ *       "inputFileB": "/duraark-storage/sessions/fixed/CITA_Byg72/master/CITA_Byg72_2nd_Scan-0.02.e57n",
+ *       "status": "finished",
+ *       "createdAt": "2016-01-03T20:14:13.836Z",
+ *       "updatedAt": "2016-01-03T20:14:14.016Z",
+ *       "id": 1,
+ *       "viewerUrl": "/sessions/fixed/CITA_Byg72/potree/CITA_Byg72_1st_Scan-0.02.e57n-CITA_Byg72_2nd_Scan-0.02.e57n/examples/CITA_Byg72_1st_Scan-0.02.e57n-CITA_Byg72_2nd_Scan-0.02.e57n.html"
+ *      }
+ */
 module.exports = {
   create: function(req, res, next) {
     var fileIdA = req.body.fileIdA,

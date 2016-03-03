@@ -8,6 +8,31 @@
 var Promise = require('bluebird');
 
 module.exports = {
+  /**
+   * @api {post} /compression/ Compress E57 file
+   * @apiVersion 1.0.0
+   * @apiName PostCompress
+   * @apiGroup Compression
+   * @apiPermission none
+   *
+   * @apiDescription Schedule the compression of an E57 point cloud file.
+   *
+   * @apiParam (File) {String} inputFile Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   * @apiParam (Ratio) {Number} ratio Compression Ratio (between 0-1)
+   * @apiParam (Restart) {String} restart Perform a new compression, even if there is a cached result in the database.
+   *
+   * @apiSuccessExample Success-Response:
+   *     HTTP/1.1 200 OK
+   *     {
+   *        "inputFile": "/duraark-storage/sessions/Nygade1001/Nygade_Scan1001.e57",
+   *        "ratio": 0.5,
+   *        "status": "finished",
+   *        "createdAt": "2016-01-03T12:47:23.519Z",
+   *        "updatedAt": "2016-01-03T12:47:23.546Z",
+   *        "id": 1,
+   *        "downloadUrl": "/sessions/Nygade1001/Nygade_Scan1001.e57"
+   *      }
+   */
   create: function(req, res, next) {
     var inputFile = req.body.inputFile,
       ratio = req.body.ratio,

@@ -53,24 +53,29 @@ function startExtraction(derivativeState, config) {
 module.exports = {
   /**
    * @api {post} /pc2bim/ Extract BIM model
-   * @apiVersion 0.8.0
+   * @apiVersion 1.0.0
    * @apiName PostPc2bim
    * @apiGroup PC2BIM
    * @apiPermission none
    *
    * @apiDescription Schedule the extraction of a BIM model as IFC file from a given E57 point cloud file.
    *
-   * @apiParam (File) {String} path Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
-   *
-   * @apiUse ExtractionSuccess
+   * @apiParam (File) {String} inputFile Location of the File as provided by the [DURAARK Sessions API](http://data.duraark.eu/services/api/sessions/).
+   * @apiParam (none) {String} restart Perform a new reconstruction, even if there is a cached result in the database.
    *
    * @apiSuccessExample Success-Response:
    *     HTTP/1.1 200 OK
-   *     {
-   *        "input": "/duraark-storage/files/Nygade_Scan1001.e57",
-   *        "output": "/duraark-storage/files/Nygade_Scan1001_RECONSTRUCTED.ifc",
-   *        "error": null
-   *      }
+   *  {
+   *    "inputFile": "/duraark-storage/sessions/fixed/CITA_NikolajKunsthal/master/CITA_NikolajKunsthal-0_04.e57n",
+   *    "bimFilePath": "/duraark-storage/sessions/fixed/CITA_NikolajKunsthal/derivative_copy/CITA_NikolajKunsthal-0_04_RECONSTRUCTED.ifc",
+   *    "wallsFilePath": "/duraark-storage/sessions/fixed/CITA_NikolajKunsthal/tmp/CITA_NikolajKunsthal-0_04_wall.json",
+   *    "status": "finished",
+   *    "bimDownloadUrl": "/sessions/fixed/CITA_NikolajKunsthal/derivative_copy/CITA_NikolajKunsthal-0_04_RECONSTRUCTED.ifc",
+   *    "createdAt": "2016-03-03T20:25:40.554Z",
+   *    "updatedAt": "2016-03-03T20:25:40.587Z",
+   *    "id": 1,
+   *    "wallsDownloadUrl": "/sessions/fixed/CITA_NikolajKunsthal/tmp/CITA_NikolajKunsthal-0_04_wall.json"
+   * }
    */
   create: function(req, res, next) {
     // return res.send({
