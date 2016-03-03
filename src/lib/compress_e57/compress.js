@@ -16,8 +16,8 @@ Compress.prototype.run = function(config) {
     // docker run --rm -v /home/user/work:/work paulhilbert/compress_e57n duraark_compress --input-cloud /work/pointcloud.e57n --output-json /work/compressed.json --output /work/compressed.e57c
 
     var dirname = path.dirname(config.inputFile),
-      outputFilePath = path.join(dirname, '../tmp/') + path.basename(config.inputFile.replace(' ', '_'), '.e57n') + '.e57c',
-      outputJSONPath = path.join(dirname, '../tmp/') + 'compression_' + path.basename(config.inputFile.replace(' ', '_')) + '.json',
+      outputFilePath = path.join(dirname, '../tmp/') + path.basename(config.inputFile.replace(' ', '_'), '.e57n') + '_' + config.ratio + '.e57c',
+      outputJSONPath = path.join(dirname, '../tmp/') + 'compression_' + path.basename(config.inputFile.replace(' ', '_')) + '_' + config.ratio + '.json',
       args = ['run', '--rm', '-v', that.storagePath + ':/duraark-storage', '--entrypoint=/bin/duraark_compress', 'paulhilbert/duraark_compress', '--input-cloud', config.inputFile, '--output-json', outputJSONPath, '--output', outputFilePath],
       logText = '';
 
@@ -26,11 +26,13 @@ Compress.prototype.run = function(config) {
     var filesAlreadyExist = isThere(outputFilePath) && isThere(outputJSONPath);
     if (filesAlreadyExist) {
       console.log('[Compress] Output already exists, skipping processing.');
-      return resolve({
+      var result = {
         inputFile: config.inputFile,
         outputFile: outputFilePath,
         outputJSON: outputJSONPath
-      });
+      };
+      console.log('alasdf: ' + JSON.stringify(result, null, 4));
+      return resolve(result);
     }
 
     console.log('[Compress] about to run:\n ' + 'docker ' + args.join(' '));

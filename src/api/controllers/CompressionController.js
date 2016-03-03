@@ -20,19 +20,18 @@ module.exports = {
 
     var config = {
       inputFile: inputFile,
-      ratio: ratio,
-      deleteCache: restart
+      ratio: ratio
     };
 
     Compression.findOne(config).exec(function(err, compressionRecord) {
-      // console.log('[debug] compressionRecord: ' + JSON.stringify(compressionRecord, null, 4));
+      console.log('[debug] compressionRecord: ' + JSON.stringify(compressionRecord, null, 4));
       if (compressionRecord) {
         if (restart) {
           console.log('[duraark-geometricenrichment] Deleting cached entry and restarting task');
           return Compression.destroy({
             id: compressionRecord.id
           }).then(function() {
-            startBackgroundTasks(config.inputFile, restart).then(function(compressionRecord) {
+            startBackgroundTasks(config).then(function(compressionRecord) {
               return res.send(compressionRecord).status(200);
             }).catch(function(compressionRecord) {
               throw new Error('Error in compression: ' + JSON.stringify(compressionRecord));
@@ -58,6 +57,7 @@ module.exports = {
 
         Compression.create({
           inputFile: config.inputFile,
+          ratio: config.ratio,
           status: 'pending'
         }).exec(function(err, compressionRecord) {
           if (err) {
@@ -67,9 +67,7 @@ module.exports = {
             }).status(200);
           }
 
-          startBackgroundTasks(compressionRecord).then(function() {
-            console.log('[duraark-geometricenrichment] Started compression in background');
-          });
+          startBackgroundTasks(compressionRecord);
 
           return res.send(compressionRecord).status(200);
         });
@@ -87,13 +85,16 @@ module.exports = {
 function startBackgroundTasks(compressionRecord) {
   var that = this;
 
+  console.log('[duraark-geometricenrichment] Started compression in background');
+
   return this.DuraarkCompressionE57.compress(compressionRecord).then(function(result) {
-    console.log('[duraark-geometricenrichment] finished compression.');
+    console.log('[duraark-geometricenrichment] finished compression: ' + JSON.stringify(result, null, 4));
 
     compressionRecord.status = 'finished';
-    compressionRecord.downloadURL = result.outputFile.replace('/duraark-storage', '');
-    compressionRecord.save().then(function(compressionRecord) {
+    compressionRecord.downloadUrl = result.outputFile.replace('/duraark-storage', '');
+    return compressionRecord.save().then(function(compressionRecord) {
       console.log('Finished compression (ID: %s)', compressionRecord.id);
+      return compressionRecord;
     }).catch(function(err) {
       throw new Error('Failed to save to database:\n' + err);
     });
@@ -101,8 +102,9 @@ function startBackgroundTasks(compressionRecord) {
     console.log('[duraark-geometricenrichment] compression error:\n' + err);
     compressionRecord.status = 'error';
     compressionRecord.errorText = err;
-    compressionRecord.viewerUrl = null;
-    compressionRecord.save();
-    return (compressionRecord);
+    compressionRecord.downloadUrl = null;
+    return compressionRecord.save().then(function(compressionRecord) {
+      return compressionRecord;
+    });
   });
 }

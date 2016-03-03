@@ -6,5 +6,8 @@ var SailsDuraarkDiffDetect = module.exports = function(storagePath) {
 };
 
 SailsDuraarkDiffDetect.prototype.compress = function(filePath) {
-  return this.compressionLib.compress(filePath);
+  return this.compressionLib.compress(filePath).then(function(result) {
+    console.log('juhuu: ' + JSON.stringify(result, null, 4));
+    return result;
+  });
 };
